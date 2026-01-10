@@ -29,12 +29,9 @@ export interface WorkflowOptions {
   days: number;
   scripts: ScriptOptions;
 }
-import {
-  groupUpdatesByType,
-  calculateMaxPackageNameLength,
-} from "../services/versionAnalyzer";
+import { VersionAnalyzer } from "../services/VersionAnalyzer";
 import { processPackageSelection } from "../services/securityValidator";
-import { installPackages } from "../services/packageInstaller";
+import { InstallationService } from "../services/InstallationService";
 import { createUpdateChoices } from "../ui/prompts";
 import { QualityChecksService } from "../services/QualityChecksService";
 import { PROMPT_PAGE_SIZE } from "../constants/config";
@@ -116,8 +113,8 @@ async function runWorkflow(options: WorkflowOptions): Promise<void> {
   // ============================================================================
   logger.step(3, 9, "Organizing updates by type");
 
-  const grouped = groupUpdatesByType(updates as Record<string, string>, allDependencies);
-  const maxNameLength = calculateMaxPackageNameLength(grouped);
+  const grouped = VersionAnalyzer.groupByType(updates as Record<string, string>, allDependencies);
+  const maxNameLength = VersionAnalyzer.getMaxPackageNameLength(grouped);
   const choices = createUpdateChoices(grouped, maxNameLength);
 
   logger.info(
@@ -164,7 +161,8 @@ async function runWorkflow(options: WorkflowOptions): Promise<void> {
   // ============================================================================
   logger.step(6, 9, "Installing packages");
 
-  await installPackages(packagesToInstall);
+  const installer = new InstallationService();
+  await installer.install(packagesToInstall);
 
   // ============================================================================
   // Step 7: Reinstall all dependencies

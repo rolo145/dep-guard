@@ -1,48 +1,17 @@
 /**
  * Security Validator Service
  *
- * Provides security validation pipeline for package installations using NPQ
- * (npm package quality analyzer). Validates packages before installation and
- * manages user confirmation workflow.
- *
- * Security tools used:
- * - npq: Static analysis and security checks for npm packages
+ * Provides security validation pipeline for package installations.
+ * Validates packages using NPQ before installation and manages user
+ * confirmation workflow.
  *
  * @module services/securityValidator
- * @see https://github.com/lirantal/npq
  */
 import { confirm } from "@inquirer/prompts";
 import chalk from "chalk";
 import type { PackageSelection } from "../types/updates";
-import { tryRunCommand } from "../utils/utils";
+import { NPQService } from "./NPQService";
 import { logger } from "../utils/logger";
-
-/**
- * Runs NPQ security check on a package (dry-run mode)
- *
- * NPQ checks for:
- * - Known vulnerabilities
- * - Suspicious package characteristics
- * - Malware signatures
- * - Package quality indicators
- *
- * @param pkgSpec - Package specification (e.g., "chalk@5.0.0")
- * @returns True if NPQ check passed, false if failed
- */
-function runNpqCheck(pkgSpec: string): boolean {
-  logger.info(`Running npq security check for ${chalk.bold(pkgSpec)}`);
-
-  // Run NPQ in dry-run mode (no actual installation)
-  const passed = tryRunCommand("npq", ["install", pkgSpec, "--dry-run"]);
-
-  if (passed) {
-    logger.success("NPQ security check passed");
-  } else {
-    logger.warning(`NPQ security check failed for ${chalk.bold(pkgSpec)}`);
-  }
-
-  return passed;
-}
 
 /**
  * Prompts user to confirm installation of a package after NPQ check
@@ -50,22 +19,22 @@ function runNpqCheck(pkgSpec: string): boolean {
  * Shows NPQ result and asks user whether to proceed with installation.
  * Default is false (don't install) for safety.
  *
- * @param pkgSpec - Package specification (e.g., "chalk@5.0.0")
+ * @param packageSpec - Package specification (e.g., "chalk@5.0.0")
  * @param npqPassed - Whether the NPQ check passed
  * @returns True if user confirms installation, false otherwise
  */
-async function confirmPackageInstall(pkgSpec: string, npqPassed: boolean): Promise<boolean> {
+async function confirmPackageInstall(packageSpec: string, npqPassed: boolean): Promise<boolean> {
   const statusText = npqPassed
     ? chalk.green("(NPQ: passed)")
     : chalk.red("(NPQ: failed)");
 
   const confirmed = await confirm({
-    message: `Install ${chalk.bold(pkgSpec)}? ${statusText}`,
+    message: `Install ${chalk.bold(packageSpec)}? ${statusText}`,
     default: false,
   });
 
   if (!confirmed) {
-    logger.skip(`Skipping ${pkgSpec}`);
+    logger.skip(`Skipping ${packageSpec}`);
   }
 
   return confirmed;
@@ -88,20 +57,17 @@ async function confirmPackageInstall(pkgSpec: string, npqPassed: boolean): Promi
 export async function processPackageSelection(
   selected: PackageSelection[],
 ): Promise<PackageSelection[]> {
+  const npqService = new NPQService();
   const packagesToInstall: PackageSelection[] = [];
 
-  // Process each package sequentially (required for user prompts)
   for (const { name, version } of selected) {
-    const pkgSpec = `${name}@${version}`;
+    const packageSpec = `${name}@${version}`;
 
-    // Display package header
-    logger.header(`Processing ${pkgSpec}`, "🔐");
+    logger.header(`Processing ${packageSpec}`, "🔐");
 
-    // Step 1: Run NPQ security check
-    const npqPassed = runNpqCheck(pkgSpec);
+    const npqPassed = npqService.runSecurityCheck(packageSpec);
 
-    // Step 2: Ask user to confirm installation (showing NPQ result)
-    const confirmed = await confirmPackageInstall(pkgSpec, npqPassed);
+    const confirmed = await confirmPackageInstall(packageSpec, npqPassed);
     if (confirmed) {
       packagesToInstall.push({ name, version });
     }

@@ -13,7 +13,7 @@
  */
 import chalk from "chalk";
 import type { VersionBumpType } from "../types/updates";
-import { cleanVersion, parseSemver } from "../services/versionAnalyzer";
+import { VersionAnalyzer } from "../services/VersionAnalyzer";
 
 /**
  * Formats a version comparison string with color highlighting
@@ -38,10 +38,10 @@ export function formatVersionWithHighlight(
   bumpType: VersionBumpType,
 ): string {
   // Remove version range prefixes (^ and ~) for clean display
-  const cleanCurrent = cleanVersion(currentVersion);
-  const cleanNext = cleanVersion(newVersion);
+  const cleanCurrent = VersionAnalyzer.cleanVersion(currentVersion);
+  const cleanNext = VersionAnalyzer.cleanVersion(newVersion);
 
-  if (!parseSemver(cleanCurrent) || !parseSemver(cleanNext)) {
+  if (!VersionAnalyzer.parseSemver(cleanCurrent) || !VersionAnalyzer.parseSemver(cleanNext)) {
     return `${cleanCurrent} → ${cleanNext}`;
   }
 
