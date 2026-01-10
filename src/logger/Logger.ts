@@ -4,11 +4,12 @@
  * Professional CLI logging with consistent formatting, colors, and visual hierarchy.
  * Provides box headers, status messages, spinners, and summary tables.
  *
- * @module utils/logger
+ * @module logger
  */
 import chalk from "chalk";
 import ora, { type Ora } from "ora";
 import Table from "cli-table3";
+import type { PackageUpdate, SummaryData } from "./types";
 
 // ============================================================================
 // Box Drawing Characters
@@ -170,7 +171,7 @@ class Logger {
    * @param title - Table title
    * @param data - Key-value pairs for the table
    */
-  summaryTable(title: string, data: Record<string, string | number>): void {
+  summaryTable(title: string, data: SummaryData): void {
     const table = new Table({
       head: [{ content: chalk.bold.white(title), colSpan: 2 }] as any,
       style: {
@@ -208,9 +209,7 @@ class Logger {
    * Creates a comparison table for package updates
    * @param updates - Array of package updates
    */
-  updatesTable(
-    updates: Array<{ name: string; current: string; new: string; type: string }>,
-  ): void {
+  updatesTable(updates: PackageUpdate[]): void {
     const table = new Table({
       head: [
         chalk.bold("Package"),

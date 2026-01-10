@@ -3,6 +3,7 @@
  *
  * Professional CLI logging with consistent formatting, colors, and visual hierarchy.
  *
- * @module utils/logger
+ * @module logger
  */
-export { logger } from "./logger";
+export { logger } from "./Logger";
+export type { PackageUpdate, SummaryData } from "./types";
