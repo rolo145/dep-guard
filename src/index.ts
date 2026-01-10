@@ -17,13 +17,8 @@ import { fileURLToPath } from "url";
 import { checkPrerequisites } from "./utils/checkPrerequisites";
 import { executeUpdateWorkflow } from "./workflows/updateWorkflow";
 import { validateScriptNames } from "./utils/utils";
-import { SAFETY_BUFFER_DAYS, DEFAULT_SCRIPTS, type ScriptOptions } from "./constants/config";
-
-/** CLI options parsed from arguments */
-interface CliOptions {
-  days: number;
-  scripts: ScriptOptions;
-}
+import { SAFETY_BUFFER_DAYS, DEFAULT_SCRIPTS } from "./constants/config";
+import { ArgumentParser } from "./cli/ArgumentParser";
 
 /**
  * Handle graceful shutdown on Ctrl+C (SIGINT) and SIGTERM
@@ -80,69 +75,6 @@ Examples:
 }
 
 /**
- * Parse command line arguments
- */
-function parseArgs(args: string[]): CliOptions {
-  const options: CliOptions = {
-    days: SAFETY_BUFFER_DAYS,
-    scripts: { ...DEFAULT_SCRIPTS },
-  };
-
-  for (let i = 0; i < args.length; i++) {
-    const arg = args[i];
-
-    if (arg === "--days" || arg === "-d") {
-      const value = args[i + 1];
-      if (!value || value.startsWith("-")) {
-        console.error("Error: --days requires a number");
-        process.exit(1);
-      }
-      const days = parseInt(value, 10);
-      if (isNaN(days) || days < 0) {
-        console.error("Error: --days must be a positive number");
-        process.exit(1);
-      }
-      options.days = days;
-      i++; // Skip next arg (the value)
-    } else if (arg === "--lint") {
-      const value = args[i + 1];
-      if (!value || value.startsWith("-")) {
-        console.error("Error: --lint requires a script name");
-        process.exit(1);
-      }
-      options.scripts.lint = value;
-      i++;
-    } else if (arg === "--typecheck") {
-      const value = args[i + 1];
-      if (!value || value.startsWith("-")) {
-        console.error("Error: --typecheck requires a script name");
-        process.exit(1);
-      }
-      options.scripts.typecheck = value;
-      i++;
-    } else if (arg === "--test") {
-      const value = args[i + 1];
-      if (!value || value.startsWith("-")) {
-        console.error("Error: --test requires a script name");
-        process.exit(1);
-      }
-      options.scripts.test = value;
-      i++;
-    } else if (arg === "--build") {
-      const value = args[i + 1];
-      if (!value || value.startsWith("-")) {
-        console.error("Error: --build requires a script name");
-        process.exit(1);
-      }
-      options.scripts.build = value;
-      i++;
-    }
-  }
-
-  return options;
-}
-
-/**
  * Main CLI execution
  *
  * 1. Sets up graceful shutdown handlers
@@ -155,22 +87,22 @@ function parseArgs(args: string[]): CliOptions {
   // Setup Ctrl+C handler
   setupGracefulShutdown();
 
-  const args = process.argv.slice(2);
+  const parser = new ArgumentParser(process.argv.slice(2));
 
   // Handle help flag
-  if (args.includes("--help") || args.includes("-h")) {
+  if (parser.hasFlag("--help", "-h")) {
     showHelp();
     process.exit(0);
   }
 
   // Handle version flag
-  if (args.includes("--version") || args.includes("-v")) {
+  if (parser.hasFlag("--version", "-v")) {
     console.log(`dep-guard v${getVersion()}`);
     process.exit(0);
   }
 
   // Parse CLI options
-  const options = parseArgs(args);
+  const options = parser.parse();
 
   // Ensure required security tools (scfw) are installed
   checkPrerequisites();

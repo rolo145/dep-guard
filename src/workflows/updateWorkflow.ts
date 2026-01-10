@@ -36,7 +36,7 @@ import {
 import { processPackageSelection } from "../services/securityValidator";
 import { installPackages } from "../services/packageInstaller";
 import { createUpdateChoices } from "../ui/prompts";
-import { QualityChecksService } from "../services/qualityChecksService";
+import { QualityChecksService } from "../services/QualityChecksService";
 import { PROMPT_PAGE_SIZE } from "../constants/config";
 import { logger } from "../utils/logger";
 
