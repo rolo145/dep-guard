@@ -4,11 +4,11 @@
  * Handles user confirmation prompts and UI for scfw installation.
  * Displays package info and manages user interaction.
  *
- * @module scfw/SCFWConfirmation
+ * @module install/scfw/SCFWConfirmation
  */
 import chalk from "chalk";
 import { confirm } from "@inquirer/prompts";
-import { logger } from "../utils/logger";
+import { logger } from "../../utils/logger";
 
 /**
  * Handles user confirmation workflow for scfw installation.

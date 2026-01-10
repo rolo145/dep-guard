@@ -31,7 +31,7 @@ export interface WorkflowOptions {
 }
 import { VersionAnalyzer } from "../services/VersionAnalyzer";
 import { NPQService } from "../npq";
-import { SCFWService } from "../scfw";
+import { SCFWService } from "../install";
 import { createUpdateChoices } from "../ui/prompts";
 import { QualityChecksService } from "../services/QualityChecksService";
 import { PROMPT_PAGE_SIZE } from "../constants/config";

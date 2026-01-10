@@ -11,6 +11,7 @@ import { logger } from "../utils/logger";
 import { tryRunCommand } from "../utils/utils";
 import { WorkflowContext } from "../context";
 import { BuildService, LintService, TestService } from "../quality";
+import { InstallService } from "../install";
 
 export interface QualityCheckResults {
   lint: boolean | null;
@@ -145,26 +146,7 @@ export class QualityChecksService {
    * Reinstalls all dependencies using npm ci with security flags
    */
   async reinstallDependencies(): Promise<void> {
-    const shouldReinstall = await confirm({
-      message: "Do you want to reinstall dependencies with npm ci?",
-      default: false,
-    });
-
-    if (!shouldReinstall) {
-      logger.skip("Skipping npm ci");
-      return;
-    }
-
-    const spinner = logger.spinner("Reinstalling dependencies via npm ci...");
-    const passed = tryRunCommand("npm", ["ci", "--ignore-scripts"]);
-
-    if (passed) {
-      spinner.succeed("Dependencies reinstalled successfully");
-      return;
-    }
-
-    spinner.fail("Failed to reinstall dependencies");
-    logger.error("Update process aborted");
-    process.exit(1);
+    const installService = new InstallService();
+    await installService.run();
   }
 }

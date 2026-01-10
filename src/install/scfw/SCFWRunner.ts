@@ -9,11 +9,11 @@
  * - --ignore-scripts: Prevents malicious install scripts
  * - --before flag: Only installs if package existed N days ago
  *
- * @module scfw/SCFWRunner
+ * @module install/scfw/SCFWRunner
  * @see https://github.com/DataDog/supply-chain-firewall
  */
-import { tryRunCommand } from "../utils/utils";
-import { WorkflowContext } from "../context";
+import { tryRunCommand } from "../../utils/utils";
+import { WorkflowContext } from "../../context";
 
 export interface SCFWInstallResult {
   packageSpecs: string[];

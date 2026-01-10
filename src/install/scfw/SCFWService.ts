@@ -4,9 +4,9 @@
  * Orchestrates scfw (Supply Chain Firewall) installation workflow
  * including user confirmation, command execution, and result display.
  *
- * @module scfw/SCFWService
+ * @module install/scfw/SCFWService
  */
-import type { PackageSelection } from "../types/updates";
+import type { PackageSelection } from "../../types/updates";
 import { SCFWRunner } from "./SCFWRunner";
 import { SCFWConfirmation } from "./SCFWConfirmation";
 
