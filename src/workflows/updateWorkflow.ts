@@ -30,7 +30,7 @@ export interface WorkflowOptions {
   scripts: ScriptOptions;
 }
 import { VersionAnalyzer } from "../services/VersionAnalyzer";
-import { NPQService } from "../services/NPQService";
+import { NPQService } from "../npq";
 import { InstallationService } from "../services/InstallationService";
 import { createUpdateChoices } from "../ui/prompts";
 import { QualityChecksService } from "../services/QualityChecksService";
