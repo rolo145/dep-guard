@@ -11,13 +11,9 @@
  *
  * @module index
  */
-import { readFileSync } from "fs";
-import { dirname, join } from "path";
-import { fileURLToPath } from "url";
 import { WorkflowOrchestrator } from "./workflows";
 import { ScriptValidator } from "./quality/ScriptValidator";
-import { DEFAULT_SCRIPTS, SAFETY_BUFFER_DAYS } from "./defaults";
-import { ArgumentParser, PrerequisiteValidator } from "./args";
+import { ArgumentParser, CLIHelper, PrerequisiteValidator } from "./args";
 
 /**
  * Handle graceful shutdown on Ctrl+C (SIGINT) and SIGTERM
@@ -31,46 +27,6 @@ function setupGracefulShutdown(): void {
 
   process.on("SIGINT", () => handleShutdown("SIGINT"));
   process.on("SIGTERM", () => handleShutdown("SIGTERM"));
-}
-
-/**
- * Get package version from package.json
- */
-function getVersion(): string {
-  const __dirname = dirname(fileURLToPath(import.meta.url));
-  const packageJsonPath = join(__dirname, "..", "package.json");
-  const packageJson = JSON.parse(readFileSync(packageJsonPath, "utf-8"));
-  return packageJson.version;
-}
-
-/**
- * Display help message
- */
-function showHelp(): void {
-  console.log(`
-dep-guard v${getVersion()}
-
-Safe npm dependency updates with security checks.
-
-Usage:
-  dep-guard [options]
-
-Options:
-  -d, --days <number>       Safety buffer in days (default: ${SAFETY_BUFFER_DAYS})
-  --lint <script>           Lint script name (default: "${DEFAULT_SCRIPTS.lint}")
-  --typecheck <script>      Type check script name (default: "${DEFAULT_SCRIPTS.typecheck}")
-  --test <script>           Test script name (default: "${DEFAULT_SCRIPTS.test}")
-  --build <script>          Build script name (default: "${DEFAULT_SCRIPTS.build}")
-  -v, --version             Show version number
-  -h, --help                Show this help message
-
-Examples:
-  dep-guard                       Run with default settings
-  dep-guard --days 14             Use 14-day safety buffer
-  dep-guard --lint eslint         Use "eslint" as lint script
-  dep-guard --test test:all       Use "test:all" as test script
-  dep-guard --build build:prod    Use "build:prod" as build script
-`);
 }
 
 /**
@@ -90,13 +46,13 @@ Examples:
 
   // Handle help flag
   if (parser.hasFlag("--help", "-h")) {
-    showHelp();
+    CLIHelper.showHelp();
     process.exit(0);
   }
 
   // Handle version flag
   if (parser.hasFlag("--version", "-v")) {
-    console.log(`dep-guard v${getVersion()}`);
+    console.log(`dep-guard v${CLIHelper.getVersion()}`);
     process.exit(0);
   }
 
