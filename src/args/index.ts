@@ -8,5 +8,5 @@
 export { ArgumentParser } from "./ArgumentParser";
 export { ArgumentValidator } from "./ArgumentValidator";
 export { PrerequisiteValidator } from "./PrerequisiteValidator";
-export { ValidationError } from "./ValidationError";
+export { ValidationError, MissingValueError, InvalidFormatError, OutOfRangeError } from "./errors";
 export type { CliOptions } from "./types";

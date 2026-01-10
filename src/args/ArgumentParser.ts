@@ -8,7 +8,7 @@
  */
 import { DEFAULT_SCRIPTS, SAFETY_BUFFER_DAYS } from "../defaults";
 import { ArgumentValidator } from "./ArgumentValidator";
-import { ValidationError } from "./ValidationError";
+import { ValidationError } from "./errors";
 import type { CliOptions } from "./types";
 
 /** Script flags that can be configured via CLI */

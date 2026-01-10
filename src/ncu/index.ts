@@ -21,3 +21,8 @@ export type {
   GroupedUpdates,
   PackageSelection,
 } from "./types";
+export {
+  RegistryError,
+  RegistryFetchError,
+  RegistryParseError,
+} from "./errors";

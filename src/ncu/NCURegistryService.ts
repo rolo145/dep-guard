@@ -7,12 +7,17 @@
  * Safety mechanism: Only considers versions published at least N days ago
  * to allow time for community security review and vulnerability discovery.
  *
+ * Performance: Batches registry requests with concurrency control to optimize
+ * API calls while respecting rate limits.
+ *
  * @module ncu/NCURegistryService
  */
 import type { NpmRegistryResponse } from "./types";
 import { WorkflowContext } from "../context";
 import { VersionAnalyzer } from "./VersionAnalyzer";
 import { logger } from "../logger";
+import { MAX_CONCURRENT_REQUESTS, NPM_REGISTRY_URL, REGISTRY_TIMEOUT_MS } from "../constants/network";
+import { RegistryFetchError, RegistryParseError } from "./errors";
 
 /**
  * Service for filtering updates based on publish date and registry data.
@@ -28,6 +33,8 @@ export class NCURegistryService {
    * @param packageName - Full package name (e.g., "chalk" or "@vue/reactivity")
    * @param suggestedVersion - The latest version suggested by npm-check-updates
    * @returns The latest version that's old enough, null if none found, or suggestedVersion if API call fails
+   * @throws RegistryFetchError if registry request fails (caught and handled gracefully)
+   * @throws RegistryParseError if registry response is malformed (caught and handled gracefully)
    */
   private async findLatestOldEnoughVersion(
     packageName: string,
@@ -35,19 +42,30 @@ export class NCURegistryService {
   ): Promise<string | null> {
     const { cutoff } = WorkflowContext.getInstance();
 
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), REGISTRY_TIMEOUT_MS);
+
     try {
       const encodedName = encodeURIComponent(packageName).replace(/^%40/, "@");
-      // Fetch package metadata from NPM registry
-      const response = await fetch(`https://registry.npmjs.org/${encodedName}`);
+
+      // Fetch package metadata from NPM registry with timeout
+      const response = await fetch(`${NPM_REGISTRY_URL}/${encodedName}`, {
+        signal: controller.signal,
+      });
 
       // Fail open - if registry is unreachable, use suggested version
       if (!response.ok) {
-        return suggestedVersion;
+        throw new RegistryFetchError(packageName, response.status);
       }
 
       const data = (await response.json()) as NpmRegistryResponse;
-      const versions = data.versions ? Object.keys(data.versions) : [];
-      const times = data.time || {};
+      
+      if (!data.versions || !data.time) {
+        throw new RegistryParseError(packageName);
+      }
+      
+      const versions = Object.keys(data.versions);
+      const times = data.time;
 
       // Filter to stable versions published before the cutoff date
       // Excludes prerelease versions (alpha, beta, rc, etc.)
@@ -77,11 +95,34 @@ export class NCURegistryService {
       });
 
       return sorted[0];
-    } catch {
+    } catch (error) {
       // If we can't check (network error, etc.), use suggested version (fail open)
       // This prevents the tool from being unusable due to temporary issues
+      if (error instanceof RegistryFetchError || error instanceof RegistryParseError) {
+        // Log the specific error but continue gracefully
+        logger.progress(`Registry error for ${packageName}, using suggested version`);
+      }
       return suggestedVersion;
+    } finally {
+      clearTimeout(timeoutId);
     }
+  }
+
+  /**
+   * Processes a batch of packages with concurrency control
+   *
+   * @param batch - Array of [packageName, suggestedVersion] tuples
+   * @returns Array of results for each package in the batch
+   */
+  private async processBatch(
+    batch: Array<[string, string]>,
+  ): Promise<Array<{ name: string; suggestedVersion: string; safeVersion: string | null }>> {
+    const promises = batch.map(async ([name, suggestedVersion]) => {
+      const safeVersion = await this.findLatestOldEnoughVersion(name, suggestedVersion);
+      return { name, suggestedVersion, safeVersion };
+    });
+
+    return Promise.all(promises);
   }
 
   /**
@@ -90,6 +131,9 @@ export class NCURegistryService {
    * For packages where the latest version is too new, finds the most recent version
    * that's old enough. Skips packages where no safe version is available.
    * Uses WorkflowContext for cached data (dependencies, days).
+   *
+   * Performance: Processes packages in batches with controlled concurrency
+   * to optimize API calls while respecting registry rate limits.
    *
    * Logs progress to console:
    * - Skipped packages (no safe version or already up to date)
@@ -102,52 +146,61 @@ export class NCURegistryService {
     const { allDependencies, days } = WorkflowContext.getInstance();
 
     const filtered: Record<string, string> = {};
-
-    const spinner = logger.spinner("Filtering versions by safety buffer...");
     const entries = Object.entries(updates);
 
-    // Process each package update sequentially (required for API rate limiting)
-    for (const [name, suggestedVersion] of entries) {
-      spinner.text = `Checking ${name}...`;
+    const spinner = logger.spinner("Filtering versions by safety buffer...");
 
-      const safeVersion = await this.findLatestOldEnoughVersion(name, suggestedVersion);
+    // Process packages in batches with controlled concurrency
+    for (let i = 0; i < entries.length; i += MAX_CONCURRENT_REQUESTS) {
+      const batch = entries.slice(i, i + MAX_CONCURRENT_REQUESTS);
+      const batchNum = Math.floor(i / MAX_CONCURRENT_REQUESTS) + 1;
+      const totalBatches = Math.ceil(entries.length / MAX_CONCURRENT_REQUESTS);
+      
+      spinner.text = `Checking batch ${batchNum}/${totalBatches} (${batch.length} packages)...`;
 
-      if (safeVersion) {
-        // Clean version strings (remove ^ and ~ prefixes)
-        const currentVersion = allDependencies[name]
-          ? VersionAnalyzer.cleanVersion(allDependencies[name])
-          : "";
-        const cleanSafeVersion = VersionAnalyzer.cleanVersion(safeVersion);
+      // Process batch in parallel
+      const results = await this.processBatch(batch);
 
-        // Skip if the safe version is the same as current version (no update needed)
-        if (cleanSafeVersion === currentVersion) {
+      // Process results and update filtered object
+      for (const { name, suggestedVersion, safeVersion } of results) {
+        if (safeVersion) {
+          // Clean version strings (remove ^ and ~ prefixes)
+          const currentVersion = allDependencies[name]
+            ? VersionAnalyzer.cleanVersion(allDependencies[name])
+            : "";
+          const cleanSafeVersion = VersionAnalyzer.cleanVersion(safeVersion);
+
+          // Skip if the safe version is the same as current version (no update needed)
+          if (cleanSafeVersion === currentVersion) {
+            spinner.stopAndPersist({
+              symbol: "⊘",
+              text: `${name} (safe version matches current)`,
+            });
+            spinner.start();
+          } else {
+            filtered[name] = safeVersion;
+
+            // Notify if we're using an older version than suggested
+            if (safeVersion !== suggestedVersion) {
+              spinner.stopAndPersist({
+                symbol: "📅",
+                text: `${name}: ${safeVersion} (newer ${suggestedVersion} not yet ${days} days old)`,
+              });
+            } else {
+              spinner.stopAndPersist({
+                symbol: "✓",
+                text: `${name}: ${safeVersion}`,
+              });
+            }
+            spinner.start();
+          }
+        } else {
           spinner.stopAndPersist({
             symbol: "⊘",
-            text: `${name} (safe version matches current)`,
+            text: `${name} (no version old enough found)`,
           });
-        } else {
-          filtered[name] = safeVersion;
-
-          // Notify if we're using an older version than suggested
-          if (safeVersion !== suggestedVersion) {
-            spinner.stopAndPersist({
-              symbol: "📅",
-              text: `${name}: ${safeVersion} (newer ${suggestedVersion} not yet ${days} days old)`,
-            });
-          } else {
-            spinner.stopAndPersist({
-              symbol: "✓",
-              text: `${name}: ${safeVersion}`,
-            });
-          }
           spinner.start();
         }
-      } else {
-        spinner.stopAndPersist({
-          symbol: "⊘",
-          text: `${name} (no version old enough found)`,
-        });
-        spinner.start();
       }
     }
 

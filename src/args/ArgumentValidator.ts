@@ -2,11 +2,11 @@
  * Argument Validator
  *
  * Validates command-line argument values.
- * Throws ValidationError on invalid input.
+ * Throws specific error types for different validation failures.
  *
  * @module args/ArgumentValidator
  */
-import { ValidationError } from "./ValidationError";
+import { InvalidFormatError, MissingValueError, OutOfRangeError } from "./errors";
 
 /**
  * Handles validation of command-line argument values.
@@ -18,11 +18,11 @@ export class ArgumentValidator {
    * @param flag - The flag name (e.g., "--days")
    * @param value - The value to validate
    * @param expectedType - Description of expected type (e.g., "a number")
-   * @throws ValidationError if value is missing or looks like a flag
+   * @throws MissingValueError if value is missing or looks like a flag
    */
   requireValue(flag: string, value: string | undefined, expectedType: string): void {
     if (!value || value.startsWith("-")) {
-      throw new ValidationError(flag, `${flag} requires ${expectedType}`);
+      throw new MissingValueError(flag, expectedType);
     }
   }
 
@@ -32,14 +32,19 @@ export class ArgumentValidator {
    * @param flag - The flag name
    * @param value - The string value to parse
    * @returns The parsed number
-   * @throws ValidationError if value is not a valid positive number
+   * @throws MissingValueError if value is missing
+   * @throws InvalidFormatError if value is not a valid number
+   * @throws OutOfRangeError if value is negative
    */
   validateNumeric(flag: string, value: string): number {
     this.requireValue(flag, value, "a number");
 
     const num = parseInt(value, 10);
-    if (isNaN(num) || num < 0) {
-      throw new ValidationError(flag, `${flag} must be a positive number`);
+    if (isNaN(num)) {
+      throw new InvalidFormatError(flag, value, "a positive number");
+    }
+    if (num < 0) {
+      throw new OutOfRangeError(flag, num, 0);
     }
 
     return num;
@@ -51,7 +56,7 @@ export class ArgumentValidator {
    * @param flag - The flag name
    * @param value - The string value to validate
    * @returns The validated string
-   * @throws ValidationError if value is missing
+   * @throws MissingValueError if value is missing
    */
   validateString(flag: string, value: string): string {
     this.requireValue(flag, value, "a script name");
