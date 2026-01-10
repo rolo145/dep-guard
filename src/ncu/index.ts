@@ -13,6 +13,7 @@ export { PromptChoiceBuilder } from "./PromptChoiceBuilder";
 export type { PromptChoice } from "./PromptChoiceBuilder";
 export { PROMPT_PAGE_SIZE } from "./constants";
 export { VersionAnalyzer } from "./VersionAnalyzer";
+export { VersionFormatter } from "./VersionFormatter";
 export type {
   NpmRegistryResponse,
   VersionBumpType,

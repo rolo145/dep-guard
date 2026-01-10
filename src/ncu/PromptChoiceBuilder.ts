@@ -9,7 +9,7 @@
 import chalk from "chalk";
 import type { GroupedUpdates, VersionBumpType } from "./types";
 import type { PackageSelection } from "./types";
-import { formatVersionWithHighlight } from "../ui/formatters";
+import { VersionFormatter } from "./VersionFormatter";
 
 /**
  * Choice item structure for inquirer checkbox prompt
@@ -110,7 +110,7 @@ export class PromptChoiceBuilder {
     // Add packages in this group
     packages.forEach(({ name, currentVersion, newVersion }) => {
       const padding = " ".repeat(this.maxNameLength - name.length + 2);
-      const versionDisplay = formatVersionWithHighlight(currentVersion, newVersion, config.type);
+      const versionDisplay = VersionFormatter.formatWithHighlight(currentVersion, newVersion, config.type);
       const npmUrl = `https://www.npmjs.com/package/${name}`;
       const npmLink = chalk.dim(createTerminalHyperlink(npmUrl, `npmjs.com/package/${name}`));
 
