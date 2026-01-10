@@ -7,6 +7,7 @@
  * @module install/InstallService
  */
 import type { PackageSelection } from "../ncu";
+import type { IWorkflowContext } from "../context/IWorkflowContext";
 import { InstallRunner } from "./InstallRunner";
 import { InstallConfirmation } from "./InstallConfirmation";
 
@@ -20,8 +21,13 @@ export class InstallService {
   private runner: InstallRunner;
   private confirmation: InstallConfirmation;
 
-  constructor() {
-    this.runner = new InstallRunner();
+  /**
+   * Creates a new InstallService instance.
+   *
+   * @param context - Workflow context for accessing configuration
+   */
+  constructor(context: IWorkflowContext) {
+    this.runner = new InstallRunner(context);
     this.confirmation = new InstallConfirmation();
   }
 

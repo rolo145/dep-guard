@@ -5,5 +5,7 @@
  *
  * @module context
  */
-export { WorkflowContext } from "./WorkflowContext";
+export { WorkflowContext, type WorkflowContextOptions } from "./WorkflowContext";
+export { WorkflowContextFactory } from "./WorkflowContextFactory";
+export type { IWorkflowContext } from "./IWorkflowContext";
 export { PackageJsonReader, type PackageJson } from "./PackageJsonReader";

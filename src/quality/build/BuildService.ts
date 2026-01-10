@@ -6,7 +6,7 @@
  *
  * @module quality/build/BuildService
  */
-import { WorkflowContext } from "../../context";
+import type { IWorkflowContext } from "../../context/IWorkflowContext";
 import { BuildRunner } from "./BuildRunner";
 import { BuildConfirmation } from "./BuildConfirmation";
 
@@ -16,10 +16,17 @@ import { BuildConfirmation } from "./BuildConfirmation";
  * Combines build command execution with user interaction and logging.
  */
 export class BuildService {
+  private readonly context: IWorkflowContext;
   private runner: BuildRunner;
   private confirmation: BuildConfirmation;
 
-  constructor() {
+  /**
+   * Creates a new BuildService instance.
+   *
+   * @param context - Workflow context for accessing configuration
+   */
+  constructor(context: IWorkflowContext) {
+    this.context = context;
     this.runner = new BuildRunner();
     this.confirmation = new BuildConfirmation();
   }
@@ -30,7 +37,7 @@ export class BuildService {
    * @returns True if build succeeded, false if failed, null if skipped
    */
   async run(): Promise<boolean | null> {
-    const { scriptNames, scripts } = WorkflowContext.getInstance();
+    const { scriptNames, scripts } = this.context;
     const scriptName = scriptNames.build;
 
     if (!scripts[scriptName]) {

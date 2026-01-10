@@ -6,7 +6,7 @@
  *
  * @module quality/lint/LintService
  */
-import { WorkflowContext } from "../../context";
+import type { IWorkflowContext } from "../../context/IWorkflowContext";
 import { LintRunner } from "./LintRunner";
 import { LintConfirmation } from "./LintConfirmation";
 
@@ -16,10 +16,17 @@ import { LintConfirmation } from "./LintConfirmation";
  * Combines lint command execution with user interaction and logging.
  */
 export class LintService {
+  private readonly context: IWorkflowContext;
   private runner: LintRunner;
   private confirmation: LintConfirmation;
 
-  constructor() {
+  /**
+   * Creates a new LintService instance.
+   *
+   * @param context - Workflow context for accessing configuration
+   */
+  constructor(context: IWorkflowContext) {
+    this.context = context;
     this.runner = new LintRunner();
     this.confirmation = new LintConfirmation();
   }
@@ -30,7 +37,7 @@ export class LintService {
    * @returns True if lint succeeded, false if failed, null if skipped
    */
   async run(): Promise<boolean | null> {
-    const { scriptNames, scripts } = WorkflowContext.getInstance();
+    const { scriptNames, scripts } = this.context;
     const scriptName = scriptNames.lint;
 
     if (!scripts[scriptName]) {

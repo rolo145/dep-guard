@@ -8,6 +8,7 @@
  */
 import type { GroupedUpdates, PackageSelection } from "./types";
 import type { PromptChoice } from "./PromptChoiceBuilder";
+import type { IWorkflowContext } from "../context/IWorkflowContext";
 import { VersionAnalyzer } from "./VersionAnalyzer";
 import { PromptChoiceBuilder } from "./PromptChoiceBuilder";
 import { NCUConfirmation } from "./NCUConfirmation";
@@ -23,14 +24,21 @@ export interface NCUGroupingResult {
  * Service for orchestrating npm-check-updates workflow.
  */
 export class NCUService {
+  private readonly context: IWorkflowContext;
   private runner: NCURunner;
   private confirmation: NCUConfirmation;
   private registry: NCURegistryService;
 
-  constructor() {
+  /**
+   * Creates a new NCUService instance.
+   *
+   * @param context - Workflow context for accessing configuration and dependencies
+   */
+  constructor(context: IWorkflowContext) {
+    this.context = context;
     this.runner = new NCURunner();
     this.confirmation = new NCUConfirmation();
-    this.registry = new NCURegistryService();
+    this.registry = new NCURegistryService(context);
   }
 
   /**

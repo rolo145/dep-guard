@@ -7,6 +7,7 @@
  * @module install/scfw/SCFWService
  */
 import type { PackageSelection } from "../../ncu";
+import type { IWorkflowContext } from "../../context/IWorkflowContext";
 import { SCFWRunner } from "./SCFWRunner";
 import { SCFWConfirmation } from "./SCFWConfirmation";
 
@@ -19,8 +20,13 @@ export class SCFWService {
   private runner: SCFWRunner;
   private confirmation: SCFWConfirmation;
 
-  constructor() {
-    this.runner = new SCFWRunner();
+  /**
+   * Creates a new SCFWService instance.
+   *
+   * @param context - Workflow context for accessing configuration
+   */
+  constructor(context: IWorkflowContext) {
+    this.runner = new SCFWRunner(context);
     this.confirmation = new SCFWConfirmation();
   }
 

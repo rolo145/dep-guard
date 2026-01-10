@@ -19,7 +19,7 @@
  * @module workflows/updateWorkflow
  */
 import type { ScriptOptions } from "../args/types";
-import { WorkflowContext } from "../context";
+import { WorkflowContextFactory } from "../context/WorkflowContextFactory";
 
 /** Workflow options */
 export interface WorkflowOptions {
@@ -64,15 +64,16 @@ async function runWorkflow(options: WorkflowOptions): Promise<void> {
   const { days, scripts } = options;
   const startTime = Date.now();
 
-  // Initialize workflow context (caches package.json and cutoff date)
-  const { allDependencies} = WorkflowContext.create(days, scripts);
+  // Create workflow context using factory (enables DI and testing)
+  const context = WorkflowContextFactory.create({ days, scripts });
+  const { allDependencies } = context;
 
   // ============================================================================
   // Step 1: Check for available updates
   // ============================================================================
   logger.step(1, 9, "Checking for available updates");
 
-  const ncuService = new NCUService();
+  const ncuService = new NCUService(context);
   const rawUpdates = await ncuService.loadUpdates();
 
   // Exit if no updates available
@@ -145,7 +146,7 @@ async function runWorkflow(options: WorkflowOptions): Promise<void> {
   logger.step(6, 9, "Installing packages");
 
   // Orchestrates SCFW package installation
-  const installService = new InstallService();
+  const installService = new InstallService(context);
   await installService.installPackages(packagesToInstall);
 
   // ============================================================================
@@ -156,7 +157,7 @@ async function runWorkflow(options: WorkflowOptions): Promise<void> {
   // Ensures package-lock.json is consistent and all transitive deps are correct
   await installService.reinstall();
 
-  const qualityChecks = new QualityService();
+  const qualityChecks = new QualityService(context);
 
   // ============================================================================
   // Step 8: Quality checks

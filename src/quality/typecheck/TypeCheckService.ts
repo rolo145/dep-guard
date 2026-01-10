@@ -6,7 +6,7 @@
  *
  * @module quality/typecheck/TypeCheckService
  */
-import { WorkflowContext } from "../../context";
+import type { IWorkflowContext } from "../../context/IWorkflowContext";
 import { TypeCheckRunner } from "./TypeCheckRunner";
 import { TypeCheckConfirmation } from "./TypeCheckConfirmation";
 
@@ -16,10 +16,17 @@ import { TypeCheckConfirmation } from "./TypeCheckConfirmation";
  * Combines type check command execution with user interaction and logging.
  */
 export class TypeCheckService {
+  private readonly context: IWorkflowContext;
   private runner: TypeCheckRunner;
   private confirmation: TypeCheckConfirmation;
 
-  constructor() {
+  /**
+   * Creates a new TypeCheckService instance.
+   *
+   * @param context - Workflow context for accessing configuration
+   */
+  constructor(context: IWorkflowContext) {
+    this.context = context;
     this.runner = new TypeCheckRunner();
     this.confirmation = new TypeCheckConfirmation();
   }
@@ -30,7 +37,7 @@ export class TypeCheckService {
    * @returns True if type check succeeded, false if failed, null if skipped
    */
   async run(): Promise<boolean | null> {
-    const { scriptNames, scripts } = WorkflowContext.getInstance();
+    const { scriptNames, scripts } = this.context;
     const scriptName = scriptNames.typecheck;
 
     if (!scripts[scriptName]) {

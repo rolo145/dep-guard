@@ -1,8 +1,9 @@
 /**
  * Workflow Context
  *
- * Singleton class that caches frequently accessed data to avoid repeated
- * calculations during the workflow execution.
+ * Provides cached access to frequently needed data during workflow execution.
+ * Designed for dependency injection - create via WorkflowContextFactory and
+ * pass to services that need it.
  *
  * Cached data:
  * - package.json contents (via PackageJsonReader)
@@ -11,17 +12,35 @@
  * @module context/WorkflowContext
  */
 import type { ScriptOptions } from "../args/types";
-import { PackageJsonReader } from "./PackageJsonReader";
+import type { IWorkflowContext } from "./IWorkflowContext";
+import { PackageJsonReader, type PackageJson } from "./PackageJsonReader";
 
 /**
- * Workflow context containing cached data for the update workflow
+ * Options for creating a WorkflowContext
+ */
+export interface WorkflowContextOptions {
+  days: number;
+  scripts: ScriptOptions;
+  packageJsonPath?: string;
+}
+
+/**
+ * Workflow context containing cached data for the update workflow.
  *
  * This class provides efficient access to package.json data and
  * calculates the cutoff date once at initialization.
+ *
+ * @example
+ * ```typescript
+ * // Create via factory
+ * const context = WorkflowContextFactory.create({ days: 7, scripts });
+ *
+ * // Inject into services
+ * const ncuService = new NCUService(context);
+ * const lintService = new LintService(context);
+ * ```
  */
-export class WorkflowContext {
-  private static instance: WorkflowContext | null = null;
-
+export class WorkflowContext implements IWorkflowContext {
   private readonly packageReader: PackageJsonReader;
   private readonly cutoffDate: Date;
   private readonly cutoffIsoString: string;
@@ -29,60 +48,23 @@ export class WorkflowContext {
   private readonly scriptOptions: ScriptOptions;
 
   /**
-   * Private constructor - use WorkflowContext.create() or WorkflowContext.getInstance()
+   * Creates a new WorkflowContext instance.
+   *
+   * Prefer using WorkflowContextFactory.create() for standard usage.
+   *
+   * @param options - Context configuration options
    */
-  private constructor(days: number, scripts: ScriptOptions) {
-    this.safetyBufferDays = days;
-    this.scriptOptions = scripts;
+  constructor(options: WorkflowContextOptions) {
+    this.safetyBufferDays = options.days;
+    this.scriptOptions = options.scripts;
 
     // Read package.json once
-    this.packageReader = new PackageJsonReader();
+    this.packageReader = new PackageJsonReader(options.packageJsonPath);
 
     // Calculate cutoff date once
     const ONE_DAY_MS = 24 * 60 * 60 * 1000;
-    this.cutoffDate = new Date(Date.now() - (days * ONE_DAY_MS));
+    this.cutoffDate = new Date(Date.now() - options.days * ONE_DAY_MS);
     this.cutoffIsoString = this.cutoffDate.toISOString();
-  }
-
-  /**
-   * Creates and initializes the singleton context
-   * Should be called once at the start of the workflow
-   *
-   * @param days - Number of days for safety buffer
-   * @param scripts - Script name configuration
-   * @returns The initialized context instance
-   */
-  static create(days: number, scripts: ScriptOptions): WorkflowContext {
-    WorkflowContext.instance = new WorkflowContext(days, scripts);
-    return WorkflowContext.instance;
-  }
-
-  /**
-   * Gets the existing context instance
-   * Throws if context hasn't been created yet
-   *
-   * @returns The context instance
-   * @throws Error if context hasn't been initialized
-   */
-  static getInstance(): WorkflowContext {
-    if (!WorkflowContext.instance) {
-      throw new Error("WorkflowContext not initialized. Call WorkflowContext.create() first.");
-    }
-    return WorkflowContext.instance;
-  }
-
-  /**
-   * Checks if context has been initialized
-   */
-  static isInitialized(): boolean {
-    return WorkflowContext.instance !== null;
-  }
-
-  /**
-   * Resets the singleton instance (useful for testing)
-   */
-  static reset(): void {
-    WorkflowContext.instance = null;
   }
 
   // ============================================================================
@@ -120,7 +102,7 @@ export class WorkflowContext {
   /**
    * Gets the raw package.json object
    */
-  get raw() {
+  get raw(): PackageJson {
     return this.packageReader.raw;
   }
 

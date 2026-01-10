@@ -12,8 +12,8 @@
  * @module install/scfw/SCFWRunner
  * @see https://github.com/DataDog/supply-chain-firewall
  */
+import type { IWorkflowContext } from "../../context/IWorkflowContext";
 import { tryRunCommand } from "../../utils/command";
-import { WorkflowContext } from "../../context";
 
 export interface SCFWInstallResult {
   packageSpecs: string[];
@@ -27,6 +27,17 @@ export interface SCFWInstallResult {
  * structured results.
  */
 export class SCFWRunner {
+  private readonly context: IWorkflowContext;
+
+  /**
+   * Creates a new SCFWRunner instance.
+   *
+   * @param context - Workflow context for accessing configuration
+   */
+  constructor(context: IWorkflowContext) {
+    this.context = context;
+  }
+
   /**
    * Builds scfw install command arguments with security flags
    *
@@ -34,7 +45,6 @@ export class SCFWRunner {
    * @returns Array of command arguments for scfw
    */
   private buildInstallArgs(packageSpecs: string[]): string[] {
-    const ctx = WorkflowContext.getInstance();
     return [
       "run",
       "npm",
@@ -43,7 +53,7 @@ export class SCFWRunner {
       "--save-exact",
       "--ignore-scripts",
       "--before",
-      ctx.cutoffIso,
+      this.context.cutoffIso,
     ];
   }
 

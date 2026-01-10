@@ -13,7 +13,7 @@
  * @module ncu/NCURegistryService
  */
 import type { NpmRegistryResponse } from "./types";
-import { WorkflowContext } from "../context";
+import type { IWorkflowContext } from "../context/IWorkflowContext";
 import { VersionAnalyzer } from "./VersionAnalyzer";
 import { logger } from "../logger";
 import { MAX_CONCURRENT_REQUESTS, NPM_REGISTRY_URL, REGISTRY_TIMEOUT_MS } from "../constants/network";
@@ -23,12 +23,22 @@ import { RegistryFetchError, RegistryParseError } from "./errors";
  * Service for filtering updates based on publish date and registry data.
  */
 export class NCURegistryService {
+  private readonly context: IWorkflowContext;
+
+  /**
+   * Creates a new NCURegistryService instance.
+   *
+   * @param context - Workflow context for accessing configuration and dependencies
+   */
+  constructor(context: IWorkflowContext) {
+    this.context = context;
+  }
+
   /**
    * Finds the latest version of a package that was published at least N days ago
    *
    * This function queries the NPM registry to get all versions and their publish dates,
    * then filters to find the most recent version that meets the safety buffer requirement.
-   * Uses cutoff date from WorkflowContext (cached).
    *
    * @param packageName - Full package name (e.g., "chalk" or "@vue/reactivity")
    * @param suggestedVersion - The latest version suggested by npm-check-updates
@@ -40,7 +50,7 @@ export class NCURegistryService {
     packageName: string,
     suggestedVersion: string,
   ): Promise<string | null> {
-    const { cutoff } = WorkflowContext.getInstance();
+    const { cutoff } = this.context;
 
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), REGISTRY_TIMEOUT_MS);
@@ -59,11 +69,11 @@ export class NCURegistryService {
       }
 
       const data = (await response.json()) as NpmRegistryResponse;
-      
+
       if (!data.versions || !data.time) {
         throw new RegistryParseError(packageName);
       }
-      
+
       const versions = Object.keys(data.versions);
       const times = data.time;
 
@@ -130,7 +140,6 @@ export class NCURegistryService {
    *
    * For packages where the latest version is too new, finds the most recent version
    * that's old enough. Skips packages where no safe version is available.
-   * Uses WorkflowContext for cached data (dependencies, days).
    *
    * Performance: Processes packages in batches with controlled concurrency
    * to optimize API calls while respecting registry rate limits.
@@ -143,7 +152,7 @@ export class NCURegistryService {
    * @returns Filtered updates object with only safe versions
    */
   async filterUpdatesByAge(updates: Record<string, string>): Promise<Record<string, string>> {
-    const { allDependencies, days } = WorkflowContext.getInstance();
+    const { allDependencies, days } = this.context;
 
     const filtered: Record<string, string> = {};
     const entries = Object.entries(updates);
@@ -155,7 +164,7 @@ export class NCURegistryService {
       const batch = entries.slice(i, i + MAX_CONCURRENT_REQUESTS);
       const batchNum = Math.floor(i / MAX_CONCURRENT_REQUESTS) + 1;
       const totalBatches = Math.ceil(entries.length / MAX_CONCURRENT_REQUESTS);
-      
+
       spinner.text = `Checking batch ${batchNum}/${totalBatches} (${batch.length} packages)...`;
 
       // Process batch in parallel

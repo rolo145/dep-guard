@@ -7,6 +7,7 @@
  * @module install/InstallRunner
  */
 import type { PackageSelection } from "../ncu";
+import type { IWorkflowContext } from "../context/IWorkflowContext";
 import { CIInstallService } from "./ci/CIInstallService";
 import { SCFWService } from "./scfw/SCFWService";
 
@@ -22,9 +23,14 @@ export class InstallRunner {
   private ciInstallService: CIInstallService;
   private scfwService: SCFWService;
 
-  constructor() {
+  /**
+   * Creates a new InstallRunner instance.
+   *
+   * @param context - Workflow context for accessing configuration
+   */
+  constructor(context: IWorkflowContext) {
     this.ciInstallService = new CIInstallService();
-    this.scfwService = new SCFWService();
+    this.scfwService = new SCFWService(context);
   }
 
   /**
