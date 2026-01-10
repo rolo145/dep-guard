@@ -2,38 +2,27 @@
  * Workflow Context
  *
  * Singleton class that caches frequently accessed data to avoid repeated
- * file reads and calculations during the workflow execution.
+ * calculations during the workflow execution.
  *
  * Cached data:
- * - package.json contents (scripts, dependencies)
+ * - package.json contents (via PackageJsonReader)
  * - Cutoff date for safety buffer calculations
  *
  * @module context/WorkflowContext
  */
-
-import fs from "fs";
 import type { ScriptOptions } from "../constants/config";
-
-/** Parsed package.json structure */
-interface PackageJson {
-  name?: string;
-  version?: string;
-  scripts?: Record<string, string>;
-  dependencies?: Record<string, string>;
-  devDependencies?: Record<string, string>;
-  [key: string]: unknown;
-}
+import { PackageJsonReader } from "./PackageJsonReader";
 
 /**
  * Workflow context containing cached data for the update workflow
  *
- * This class reads package.json once and calculates the cutoff date once,
- * providing efficient access throughout the workflow execution.
+ * This class provides efficient access to package.json data and
+ * calculates the cutoff date once at initialization.
  */
 export class WorkflowContext {
   private static instance: WorkflowContext | null = null;
 
-  private readonly packageJson: PackageJson;
+  private readonly packageReader: PackageJsonReader;
   private readonly cutoffDate: Date;
   private readonly cutoffIsoString: string;
   private readonly safetyBufferDays: number;
@@ -47,7 +36,7 @@ export class WorkflowContext {
     this.scriptOptions = scripts;
 
     // Read package.json once
-    this.packageJson = this.readPackageJsonFile();
+    this.packageReader = new PackageJsonReader();
 
     // Calculate cutoff date once
     const ONE_DAY_MS = 24 * 60 * 60 * 1000;
@@ -96,48 +85,48 @@ export class WorkflowContext {
     WorkflowContext.instance = null;
   }
 
-  /**
-   * Reads and parses package.json from current directory
-   */
-  private readPackageJsonFile(): PackageJson {
-    const content = fs.readFileSync("package.json", "utf8");
-    return JSON.parse(content);
-  }
-
   // ============================================================================
-  // Accessors
+  // Package.json Accessors (delegated to PackageJsonReader)
   // ============================================================================
 
   /**
    * Gets the npm scripts from package.json
    */
   get scripts(): Record<string, string> {
-    return this.packageJson.scripts ?? {};
+    return this.packageReader.scripts;
   }
 
   /**
    * Gets all dependencies (both dependencies and devDependencies)
    */
   get allDependencies(): Record<string, string> {
-    return {
-      ...this.packageJson.dependencies,
-      ...this.packageJson.devDependencies,
-    };
+    return this.packageReader.allDependencies;
   }
 
   /**
    * Gets only production dependencies
    */
   get dependencies(): Record<string, string> {
-    return this.packageJson.dependencies ?? {};
+    return this.packageReader.dependencies;
   }
 
   /**
    * Gets only dev dependencies
    */
   get devDependencies(): Record<string, string> {
-    return this.packageJson.devDependencies ?? {};
+    return this.packageReader.devDependencies;
   }
+
+  /**
+   * Gets the raw package.json object
+   */
+  get raw() {
+    return this.packageReader.raw;
+  }
+
+  // ============================================================================
+  // Workflow Configuration Accessors
+  // ============================================================================
 
   /**
    * Gets the cutoff date for version filtering
@@ -167,35 +156,28 @@ export class WorkflowContext {
     return this.scriptOptions;
   }
 
-  /**
-   * Gets the raw package.json object
-   */
-  get raw(): PackageJson {
-    return this.packageJson;
-  }
-
   // ============================================================================
-  // Helper Methods
+  // Helper Methods (delegated to PackageJsonReader)
   // ============================================================================
 
   /**
    * Checks if a script exists in package.json
    */
   hasScript(name: string): boolean {
-    return !!this.scripts[name];
+    return this.packageReader.hasScript(name);
   }
 
   /**
    * Checks if a package is in dependencies or devDependencies
    */
   hasPackage(name: string): boolean {
-    return !!(this.packageJson.dependencies?.[name] || this.packageJson.devDependencies?.[name]);
+    return this.packageReader.hasPackage(name);
   }
 
   /**
    * Gets the current version of a package
    */
   getPackageVersion(name: string): string | undefined {
-    return this.packageJson.dependencies?.[name] ?? this.packageJson.devDependencies?.[name];
+    return this.packageReader.getPackageVersion(name);
   }
 }

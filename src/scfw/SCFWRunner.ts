@@ -13,7 +13,7 @@
  * @see https://github.com/DataDog/supply-chain-firewall
  */
 import { tryRunCommand } from "../utils/utils";
-import { WorkflowContext } from "../context/WorkflowContext";
+import { WorkflowContext } from "../context";
 
 export interface SCFWInstallResult {
   packageSpecs: string[];

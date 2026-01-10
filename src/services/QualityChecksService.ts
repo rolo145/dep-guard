@@ -9,7 +9,7 @@
 import { confirm } from "@inquirer/prompts";
 import { logger } from "../utils/logger";
 import { tryRunCommand } from "../utils/utils";
-import { WorkflowContext } from "../context/WorkflowContext";
+import { WorkflowContext } from "../context";
 
 export interface QualityCheckResults {
   lint: boolean | null;

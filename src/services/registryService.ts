@@ -10,7 +10,7 @@
  * @module services/registryService
  */
 import type { NpmRegistryResponse } from "../types/registry";
-import { WorkflowContext } from "../context/WorkflowContext";
+import { WorkflowContext } from "../context";
 import { VersionAnalyzer } from "./VersionAnalyzer";
 import { logger } from "../utils/logger";
 

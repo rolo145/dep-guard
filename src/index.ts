@@ -18,7 +18,7 @@ import { checkPrerequisites } from "./utils/checkPrerequisites";
 import { executeUpdateWorkflow } from "./workflows/updateWorkflow";
 import { validateScriptNames } from "./utils/utils";
 import { SAFETY_BUFFER_DAYS, DEFAULT_SCRIPTS } from "./constants/config";
-import { ArgumentParser } from "./cli/ArgumentParser";
+import { ArgumentParser } from "./args";
 
 /**
  * Handle graceful shutdown on Ctrl+C (SIGINT) and SIGTERM
@@ -102,7 +102,7 @@ Examples:
   }
 
   // Parse CLI options
-  const options = parser.parse();
+  const options = parser.parseOrExit();
 
   // Ensure required security tools (scfw) are installed
   checkPrerequisites();

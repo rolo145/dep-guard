@@ -22,7 +22,7 @@ import { run as ncuRun } from "npm-check-updates";
 import { checkbox } from "@inquirer/prompts";
 import { filterUpdatesByAge } from "../services/registryService";
 import type { ScriptOptions } from "../constants/config";
-import { WorkflowContext } from "../context/WorkflowContext";
+import { WorkflowContext } from "../context";
 
 /** Workflow options */
 export interface WorkflowOptions {
