@@ -27,7 +27,7 @@ export interface WorkflowOptions {
   scripts: ScriptOptions;
 }
 import { NPQService } from "../npq";
-import { SCFWService, InstallService } from "../install";
+import { InstallService } from "../install";
 import { QualityService } from "../quality";
 import { logger } from "../logger";
 import { NCUService } from "../ncu";
@@ -144,8 +144,9 @@ async function runWorkflow(options: WorkflowOptions): Promise<void> {
   // ============================================================================
   logger.step(6, 9, "Installing packages");
 
-  const scfwService = new SCFWService();
-  await scfwService.install(packagesToInstall);
+  // Orchestrates SCFW package installation
+  const installService = new InstallService();
+  await installService.installPackages(packagesToInstall);
 
   // ============================================================================
   // Step 7: Reinstall all dependencies
@@ -153,13 +154,12 @@ async function runWorkflow(options: WorkflowOptions): Promise<void> {
   logger.step(7, 9, "Reinstalling all dependencies");
 
   // Ensures package-lock.json is consistent and all transitive deps are correct
-  const installService = new InstallService();
-  await installService.run();
+  await installService.reinstall();
 
   const qualityChecks = new QualityService();
 
   // ============================================================================
-  // Step 8: Run quality checks
+  // Step 8: Quality checks
   // ============================================================================
   logger.step(8, 9, "Quality checks");
 

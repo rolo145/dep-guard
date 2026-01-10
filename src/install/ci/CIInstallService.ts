@@ -1,24 +1,24 @@
 /**
- * Install Service
+ * CI Install Service
  *
  * Orchestrates dependency reinstall workflow including user confirmation,
  * command execution, and result display.
  *
- * @module install/ci/InstallService
+ * @module install/ci/CIInstallService
  */
-import { InstallRunner } from "./InstallRunner";
-import { InstallConfirmation } from "./InstallConfirmation";
+import { CIInstallRunner } from "./CIInstallRunner";
+import { CIInstallConfirmation } from "./CIInstallConfirmation";
 
 /**
  * Service for orchestrating dependency reinstall workflow.
  */
-export class InstallService {
-  private runner: InstallRunner;
-  private confirmation: InstallConfirmation;
+export class CIInstallService {
+  private runner: CIInstallRunner;
+  private confirmation: CIInstallConfirmation;
 
   constructor() {
-    this.runner = new InstallRunner();
-    this.confirmation = new InstallConfirmation();
+    this.runner = new CIInstallRunner();
+    this.confirmation = new CIInstallConfirmation();
   }
 
   /**

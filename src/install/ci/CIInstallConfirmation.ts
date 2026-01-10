@@ -1,9 +1,9 @@
 /**
- * Install Confirmation
+ * CI Install Confirmation
  *
  * Handles user confirmation prompts and UI for dependency reinstall operations.
  *
- * @module install/ci/InstallConfirmation
+ * @module install/ci/CIInstallConfirmation
  */
 import { confirm } from "@inquirer/prompts";
 import { logger } from "../../logger";
@@ -11,7 +11,7 @@ import { logger } from "../../logger";
 /**
  * Handles user confirmation workflow for dependency reinstall.
  */
-export class InstallConfirmation {
+export class CIInstallConfirmation {
   /**
    * Shows reinstall header
    */

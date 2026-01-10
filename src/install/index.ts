@@ -1,16 +1,22 @@
 /**
  * Install Module
  *
- * Provides dependency reinstall workflow support.
+ * Provides dependency installation and reinstall workflow support.
+ * Includes root orchestrator and child services for CI and SCFW installations.
  *
  * @module install
  */
-// NPM CI
-export { InstallService } from "./ci/InstallService";
-export { InstallRunner, type InstallResult } from "./ci/InstallRunner";
-export { InstallConfirmation } from "./ci/InstallConfirmation";
+// Root Install Orchestrator
+export { InstallService } from "./InstallService";
+export { InstallRunner, type InstallRunnerResult } from "./InstallRunner";
+export { InstallConfirmation } from "./InstallConfirmation";
 
-// SCFW Install
+// CI Install (npm ci)
+export { CIInstallService } from "./ci/CIInstallService";
+export { CIInstallRunner, type CIInstallResult } from "./ci/CIInstallRunner";
+export { CIInstallConfirmation } from "./ci/CIInstallConfirmation";
+
+// SCFW Install (Supply Chain Firewall)
 export { SCFWService } from "./scfw/SCFWService";
 export { SCFWRunner, type SCFWInstallResult } from "./scfw/SCFWRunner";
 export { SCFWConfirmation } from "./scfw/SCFWConfirmation";
