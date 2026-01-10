@@ -110,5 +110,8 @@ Examples:
   ScriptValidator.validate(options.scripts);
 
   // Run the complete update workflow
-  await executeUpdateWorkflow({ days: options.days, scripts: options.scripts });
+  const result = await executeUpdateWorkflow({ days: options.days, scripts: options.scripts });
+
+  // Exit with the workflow's exit code
+  process.exit(result.exitCode);
 })();

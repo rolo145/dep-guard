@@ -7,6 +7,7 @@
  * @module npq/NPQService
  */
 import type { PackageSelection } from "../ncu";
+import type { IWorkflowContext } from "../context/IWorkflowContext";
 import { NPQRunner } from "./NPQRunner";
 import { NPQConfirmation } from "./NPQConfirmation";
 
@@ -16,10 +17,17 @@ import { NPQConfirmation } from "./NPQConfirmation";
  * Combines NPQ command execution with user interaction and logging.
  */
 export class NPQService {
+  private readonly context: IWorkflowContext;
   private runner: NPQRunner;
   private confirmation: NPQConfirmation;
 
-  constructor() {
+  /**
+   * Creates a new NPQService instance.
+   *
+   * @param context - Workflow context for accessing configuration and dependencies
+   */
+  constructor(context: IWorkflowContext) {
+    this.context = context;
     this.runner = new NPQRunner();
     this.confirmation = new NPQConfirmation();
   }
