@@ -5,8 +5,12 @@
  *
  * @module quality
  */
-export { LintRunner } from "./LintRunner";
+export { LintService } from "./lint/LintService";
+export { LintRunner } from "./lint/LintRunner";
+export { LintConfirmation } from "./lint/LintConfirmation";
 export { BuildService } from "./build/BuildService";
 export { BuildRunner } from "./build/BuildRunner";
 export { BuildConfirmation } from "./build/BuildConfirmation";
-export { TestRunner } from "./TestRunner";
+export { TestService } from "./test/TestService";
+export { TestRunner } from "./test/TestRunner";
+export { TestConfirmation } from "./test/TestConfirmation";

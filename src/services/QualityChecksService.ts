@@ -10,6 +10,7 @@ import { confirm } from "@inquirer/prompts";
 import { logger } from "../utils/logger";
 import { tryRunCommand } from "../utils/utils";
 import { WorkflowContext } from "../context";
+import { BuildService, LintService, TestService } from "../quality";
 
 export interface QualityCheckResults {
   lint: boolean | null;
@@ -18,7 +19,7 @@ export interface QualityCheckResults {
 }
 
 interface CheckConfig {
-  scriptKey: "lint" | "typecheck" | "test" | "build";
+  scriptKey: "typecheck";
   displayName: string;
   runningMessage: string;
   successMessage: string;
@@ -33,15 +34,7 @@ interface CheckConfig {
  * or all checks at once. Each check prompts for user confirmation before running.
  */
 export class QualityChecksService {
-  private static readonly CHECK_CONFIGS: Record<string, CheckConfig> = {
-    lint: {
-      scriptKey: "lint",
-      displayName: "linter",
-      runningMessage: "Running linter...",
-      successMessage: "Lint passed",
-      failureMessage: "Lint failed",
-      warningMessage: "Linting errors detected. Please review and fix them.",
-    },
+  private static readonly CHECK_CONFIGS: Record<"typecheck", CheckConfig> = {
     typecheck: {
       scriptKey: "typecheck",
       displayName: "type checks",
@@ -49,22 +42,6 @@ export class QualityChecksService {
       successMessage: "Type checks passed",
       failureMessage: "Type checks failed",
       warningMessage: "Type errors detected. Please review and fix them.",
-    },
-    test: {
-      scriptKey: "test",
-      displayName: "tests",
-      runningMessage: "Running tests...",
-      successMessage: "Tests passed",
-      failureMessage: "Tests failed",
-      warningMessage: "Some tests failed. Please review and fix them.",
-    },
-    build: {
-      scriptKey: "build",
-      displayName: "build",
-      runningMessage: "Building...",
-      successMessage: "Build complete!",
-      failureMessage: "Build failed",
-      warningMessage: "Build errors detected. Please review and fix them.",
     },
   };
 
@@ -108,7 +85,8 @@ export class QualityChecksService {
    * @returns true if passed, false if failed, null if skipped
    */
   async runLint(): Promise<boolean | null> {
-    return this.runCheck(QualityChecksService.CHECK_CONFIGS.lint);
+    const lintService = new LintService();
+    return lintService.run();
   }
 
   /**
@@ -124,7 +102,8 @@ export class QualityChecksService {
    * @returns true if passed, false if failed, null if skipped
    */
   async runTests(): Promise<boolean | null> {
-    return this.runCheck(QualityChecksService.CHECK_CONFIGS.test);
+    const testService = new TestService();
+    return testService.run();
   }
 
   /**
@@ -132,7 +111,8 @@ export class QualityChecksService {
    * @returns true if passed, false if failed, null if skipped
    */
   async runBuild(): Promise<boolean | null> {
-    return this.runCheck(QualityChecksService.CHECK_CONFIGS.build);
+    const buildService = new BuildService();
+    return buildService.run();
   }
 
   /**
