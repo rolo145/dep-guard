@@ -31,7 +31,7 @@ export interface WorkflowOptions {
 }
 import { VersionAnalyzer } from "../services/VersionAnalyzer";
 import { NPQService } from "../npq";
-import { InstallationService } from "../services/InstallationService";
+import { SCFWService } from "../scfw";
 import { createUpdateChoices } from "../ui/prompts";
 import { QualityChecksService } from "../services/QualityChecksService";
 import { PROMPT_PAGE_SIZE } from "../constants/config";
@@ -162,8 +162,8 @@ async function runWorkflow(options: WorkflowOptions): Promise<void> {
   // ============================================================================
   logger.step(6, 9, "Installing packages");
 
-  const installer = new InstallationService();
-  await installer.install(packagesToInstall);
+  const scfwService = new SCFWService();
+  await scfwService.install(packagesToInstall);
 
   // ============================================================================
   // Step 7: Reinstall all dependencies

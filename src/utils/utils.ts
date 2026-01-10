@@ -5,7 +5,6 @@ import {
 import fs from "fs";
 import { SPAWN_OPTIONS } from "../constants/setup";
 import { logger } from "./logger";
-import { WorkflowContext } from "../context/WorkflowContext";
 
 /**
  * Runs a command synchronously and returns success/failure (doesn't exit on failure)
@@ -112,25 +111,4 @@ export function validateScriptNames(scriptNames: {
 export function isPackageInstalled(pkgName: string): boolean {
   const pkgJson = readPackageJson();
   return !!(pkgJson.dependencies?.[pkgName] || pkgJson.devDependencies?.[pkgName]);
-}
-
-/**
- * Builds scfw install command arguments with security flags for multiple packages
- * Uses cutoff date from WorkflowContext (cached).
- *
- * @param pkgSpecs - array of package specs to install (e.g., ["chalk@5.0.0", "axios@1.0.0"])
- * @returns array of command arguments for scfw
- */
-export function buildScfwBatchInstallArgs(pkgSpecs: string[]): string[] {
-  const ctx = WorkflowContext.getInstance();
-  return [
-    "run",
-    "npm",
-    "install",
-    ...pkgSpecs,
-    "--save-exact",
-    "--ignore-scripts",
-    "--before",
-    ctx.cutoffIso,
-  ];
 }
