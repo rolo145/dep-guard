@@ -6,7 +6,7 @@
  *
  * @module quality/test/TestService
  */
-import type { IWorkflowContext } from "../../context/IWorkflowContext";
+import type { IExecutionContext } from "../../context/IExecutionContext";
 import { TestRunner } from "./TestRunner";
 import { TestConfirmation } from "./TestConfirmation";
 
@@ -16,7 +16,7 @@ import { TestConfirmation } from "./TestConfirmation";
  * Combines test command execution with user interaction and logging.
  */
 export class TestService {
-  private readonly context: IWorkflowContext;
+  private readonly context: IExecutionContext;
   private runner: TestRunner;
   private confirmation: TestConfirmation;
 
@@ -25,7 +25,7 @@ export class TestService {
    *
    * @param context - Workflow context for accessing configuration
    */
-  constructor(context: IWorkflowContext) {
+  constructor(context: IExecutionContext) {
     this.context = context;
     this.runner = new TestRunner();
     this.confirmation = new TestConfirmation();

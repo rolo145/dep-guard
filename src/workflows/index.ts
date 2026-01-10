@@ -26,6 +26,8 @@ export type {
   StepContext,
   StepResult,
   WorkflowServices,
+  StepData,
+  StepDataFor,
 } from "./steps";
 export {
   CheckUpdatesStep,
@@ -38,5 +40,6 @@ export {
   QualityChecksStep,
   BuildVerificationStep,
   continueWith,
+  continueWithStep,
   exitWith,
 } from "./steps";

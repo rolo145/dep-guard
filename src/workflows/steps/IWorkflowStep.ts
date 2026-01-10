@@ -6,12 +6,33 @@
  *
  * @module workflows/steps/IWorkflowStep
  */
-import type { IWorkflowContext } from "../../context/IWorkflowContext";
+import type { IExecutionContext } from "../../context/IExecutionContext";
 import type { WorkflowExitReason, WorkflowStepDef, WorkflowStats } from "../types";
 import type { NCUService } from "../../ncu";
 import type { NPQService } from "../../npq";
 import type { InstallService } from "../../install";
 import type { QualityService } from "../../quality";
+import type { PackageSelection, GroupedUpdates } from "../../ncu/types";
+import type { PromptChoice } from "../../ncu/PromptChoiceBuilder";
+
+/**
+ * Discriminated union of all possible step data types.
+ * Provides type safety for data flowing between workflow steps.
+ */
+export type StepData =
+  | { step: "init"; data: undefined }
+  | { step: "check_updates"; data: Record<string, string> }
+  | { step: "safety_buffer"; data: Record<string, string> }
+  | { step: "organize"; data: { grouped: GroupedUpdates; choices: PromptChoice[] } }
+  | { step: "select"; data: PackageSelection[] }
+  | { step: "security"; data: PackageSelection[] }
+  | { step: "install"; data: PackageSelection[] }
+  | { step: "reinstall"; data: PackageSelection[] }
+  | { step: "quality"; data: PackageSelection[] }
+  | { step: "build"; data: PackageSelection[] };
+
+/** Type helper to extract data type for a specific step */
+export type StepDataFor<S extends StepData["step"]> = Extract<StepData, { step: S }>["data"];
 
 /** Container for all workflow services */
 export interface WorkflowServices {
@@ -24,7 +45,7 @@ export interface WorkflowServices {
 /** Context passed to each step during execution */
 export interface StepContext {
   /** Workflow configuration and package data */
-  workflow: IWorkflowContext;
+  workflow: IExecutionContext;
   /** All available services */
   services: WorkflowServices;
   /** Accumulated statistics */
@@ -39,8 +60,10 @@ export interface StepResult<T = unknown> {
   continue: boolean;
   /** Reason for early exit (required if continue=false) */
   exitReason?: WorkflowExitReason;
-  /** Output data to pass to next step */
+  /** Output data to pass to next step (wrapped with step discriminant) */
   data?: T;
+  /** Step data wrapper for type-safe pipeline */
+  stepData?: StepData;
 }
 
 /**
@@ -75,6 +98,13 @@ export interface IWorkflowStep<TInput = unknown, TOutput = unknown> {
  */
 export function continueWith<T>(data: T): StepResult<T> {
   return { continue: true, data };
+}
+
+/**
+ * Helper to create a continue result with typed step data.
+ */
+export function continueWithStep<D extends StepData>(stepData: D): StepResult<D["data"]> {
+  return { continue: true, data: stepData.data, stepData };
 }
 
 /**

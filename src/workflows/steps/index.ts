@@ -12,8 +12,10 @@ export type {
   StepContext,
   StepResult,
   WorkflowServices,
+  StepData,
+  StepDataFor,
 } from "./IWorkflowStep";
-export { continueWith, exitWith } from "./IWorkflowStep";
+export { continueWith, continueWithStep, exitWith } from "./IWorkflowStep";
 
 // Step classes
 export { CheckUpdatesStep } from "./CheckUpdatesStep";

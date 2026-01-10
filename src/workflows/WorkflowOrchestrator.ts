@@ -6,11 +6,11 @@
  *
  * @module workflows/WorkflowOrchestrator
  */
-import type { IWorkflowContext } from "../context/IWorkflowContext";
+import type { IExecutionContext } from "../context/IExecutionContext";
 import type { WorkflowOptions, WorkflowResult, WorkflowStats, WorkflowStepDef } from "./types";
-import type { IWorkflowStep, StepContext, StepResult, WorkflowServices } from "./steps";
+import type { IWorkflowStep, StepContext, StepResult, WorkflowServices, StepData } from "./steps";
 import type { PackageSelection } from "../ncu/types";
-import { WorkflowContextFactory } from "../context/WorkflowContextFactory";
+import { ExecutionContextFactory } from "../context/ExecutionContextFactory";
 import { NCUService } from "../ncu";
 import { NPQService } from "../npq";
 import { InstallService } from "../install";
@@ -39,7 +39,7 @@ import {
  */
 export class WorkflowOrchestrator {
   private readonly options: WorkflowOptions;
-  private readonly context: IWorkflowContext;
+  private readonly context: IExecutionContext;
   private readonly services: WorkflowServices;
   private readonly stats: WorkflowStats;
   private readonly startTime: number;
@@ -54,7 +54,7 @@ export class WorkflowOrchestrator {
     this.startTime = Date.now();
 
     // Create workflow context using factory (enables DI and testing)
-    this.context = WorkflowContextFactory.create({
+    this.context = ExecutionContextFactory.create({
       days: options.days,
       scripts: options.scripts,
     });
@@ -100,23 +100,24 @@ export class WorkflowOrchestrator {
       new BuildVerificationStep(),
     ];
 
-    // Execute steps in sequence
-    let currentData: unknown = undefined;
+    // Execute steps in sequence with typed step data
+    let currentStepData: StepData = { step: "init", data: undefined };
 
     for (const step of steps) {
       this.logStep(step.stepDef);
 
-      const result: StepResult = await step.execute(currentData, stepContext);
+      const result: StepResult = await step.execute(currentStepData.data, stepContext);
 
       if (!result.continue) {
         return this.createEarlyExitResult(result.exitReason!);
       }
 
-      currentData = result.data;
+      // Use stepData if provided, otherwise wrap raw data
+      currentStepData = result.stepData ?? { step: "init", data: result.data as undefined };
     }
 
     // All steps completed successfully
-    return this.createSuccessResult(currentData as PackageSelection[]);
+    return this.createSuccessResult(currentStepData.data as PackageSelection[]);
   }
 
   /**

@@ -6,7 +6,7 @@
  *
  * @module quality/lint/LintService
  */
-import type { IWorkflowContext } from "../../context/IWorkflowContext";
+import type { IExecutionContext } from "../../context/IExecutionContext";
 import { LintRunner } from "./LintRunner";
 import { LintConfirmation } from "./LintConfirmation";
 
@@ -16,7 +16,7 @@ import { LintConfirmation } from "./LintConfirmation";
  * Combines lint command execution with user interaction and logging.
  */
 export class LintService {
-  private readonly context: IWorkflowContext;
+  private readonly context: IExecutionContext;
   private runner: LintRunner;
   private confirmation: LintConfirmation;
 
@@ -25,7 +25,7 @@ export class LintService {
    *
    * @param context - Workflow context for accessing configuration
    */
-  constructor(context: IWorkflowContext) {
+  constructor(context: IExecutionContext) {
     this.context = context;
     this.runner = new LintRunner();
     this.confirmation = new LintConfirmation();

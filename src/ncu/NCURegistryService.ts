@@ -13,7 +13,7 @@
  * @module ncu/NCURegistryService
  */
 import type { NpmRegistryResponse } from "./types";
-import type { IWorkflowContext } from "../context/IWorkflowContext";
+import type { IExecutionContext } from "../context/IExecutionContext";
 import { VersionAnalyzer } from "./VersionAnalyzer";
 import { logger } from "../logger";
 import { MAX_CONCURRENT_REQUESTS, NPM_REGISTRY_URL, REGISTRY_TIMEOUT_MS } from "../constants/network";
@@ -23,14 +23,14 @@ import { RegistryFetchError, RegistryParseError } from "./errors";
  * Service for filtering updates based on publish date and registry data.
  */
 export class NCURegistryService {
-  private readonly context: IWorkflowContext;
+  private readonly context: IExecutionContext;
 
   /**
    * Creates a new NCURegistryService instance.
    *
    * @param context - Workflow context for accessing configuration and dependencies
    */
-  constructor(context: IWorkflowContext) {
+  constructor(context: IExecutionContext) {
     this.context = context;
   }
 

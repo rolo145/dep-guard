@@ -6,7 +6,7 @@
  *
  * @module quality/typecheck/TypeCheckService
  */
-import type { IWorkflowContext } from "../../context/IWorkflowContext";
+import type { IExecutionContext } from "../../context/IExecutionContext";
 import { TypeCheckRunner } from "./TypeCheckRunner";
 import { TypeCheckConfirmation } from "./TypeCheckConfirmation";
 
@@ -16,7 +16,7 @@ import { TypeCheckConfirmation } from "./TypeCheckConfirmation";
  * Combines type check command execution with user interaction and logging.
  */
 export class TypeCheckService {
-  private readonly context: IWorkflowContext;
+  private readonly context: IExecutionContext;
   private runner: TypeCheckRunner;
   private confirmation: TypeCheckConfirmation;
 
@@ -25,7 +25,7 @@ export class TypeCheckService {
    *
    * @param context - Workflow context for accessing configuration
    */
-  constructor(context: IWorkflowContext) {
+  constructor(context: IExecutionContext) {
     this.context = context;
     this.runner = new TypeCheckRunner();
     this.confirmation = new TypeCheckConfirmation();

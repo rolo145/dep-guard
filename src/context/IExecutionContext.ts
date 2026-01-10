@@ -1,21 +1,21 @@
 /**
- * Workflow Context Interface
+ * Execution Context Interface
  *
- * Defines the contract for workflow context implementations.
+ * Defines the contract for execution context implementations.
  * Enables dependency injection and easier testing through mock implementations.
  *
- * @module context/IWorkflowContext
+ * @module context/IExecutionContext
  */
 import type { ScriptOptions } from "../args/types";
 import type { PackageJson } from "./PackageJsonReader";
 
 /**
- * Interface for workflow context.
+ * Interface for execution context.
  *
  * Provides access to cached workflow data including package.json contents,
  * cutoff dates for safety buffer, and script configuration.
  */
-export interface IWorkflowContext {
+export interface IExecutionContext {
   // Package.json accessors
   readonly scripts: Record<string, string>;
   readonly allDependencies: Record<string, string>;

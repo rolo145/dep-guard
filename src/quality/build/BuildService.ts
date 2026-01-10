@@ -6,7 +6,7 @@
  *
  * @module quality/build/BuildService
  */
-import type { IWorkflowContext } from "../../context/IWorkflowContext";
+import type { IExecutionContext } from "../../context/IExecutionContext";
 import { BuildRunner } from "./BuildRunner";
 import { BuildConfirmation } from "./BuildConfirmation";
 
@@ -16,7 +16,7 @@ import { BuildConfirmation } from "./BuildConfirmation";
  * Combines build command execution with user interaction and logging.
  */
 export class BuildService {
-  private readonly context: IWorkflowContext;
+  private readonly context: IExecutionContext;
   private runner: BuildRunner;
   private confirmation: BuildConfirmation;
 
@@ -25,7 +25,7 @@ export class BuildService {
    *
    * @param context - Workflow context for accessing configuration
    */
-  constructor(context: IWorkflowContext) {
+  constructor(context: IExecutionContext) {
     this.context = context;
     this.runner = new BuildRunner();
     this.confirmation = new BuildConfirmation();

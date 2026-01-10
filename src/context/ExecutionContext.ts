@@ -1,31 +1,31 @@
 /**
- * Workflow Context
+ * Execution Context
  *
  * Provides cached access to frequently needed data during workflow execution.
- * Designed for dependency injection - create via WorkflowContextFactory and
+ * Designed for dependency injection - create via ExecutionContextFactory and
  * pass to services that need it.
  *
  * Cached data:
  * - package.json contents (via PackageJsonReader)
  * - Cutoff date for safety buffer calculations
  *
- * @module context/WorkflowContext
+ * @module context/ExecutionContext
  */
 import type { ScriptOptions } from "../args/types";
-import type { IWorkflowContext } from "./IWorkflowContext";
+import type { IExecutionContext } from "./IExecutionContext";
 import { PackageJsonReader, type PackageJson } from "./PackageJsonReader";
 
 /**
- * Options for creating a WorkflowContext
+ * Options for creating an ExecutionContext
  */
-export interface WorkflowContextOptions {
+export interface ExecutionContextOptions {
   days: number;
   scripts: ScriptOptions;
   packageJsonPath?: string;
 }
 
 /**
- * Workflow context containing cached data for the update workflow.
+ * Execution context containing cached data for the update workflow.
  *
  * This class provides efficient access to package.json data and
  * calculates the cutoff date once at initialization.
@@ -33,14 +33,14 @@ export interface WorkflowContextOptions {
  * @example
  * ```typescript
  * // Create via factory
- * const context = WorkflowContextFactory.create({ days: 7, scripts });
+ * const context = ExecutionContextFactory.create({ days: 7, scripts });
  *
  * // Inject into services
  * const ncuService = new NCUService(context);
  * const lintService = new LintService(context);
  * ```
  */
-export class WorkflowContext implements IWorkflowContext {
+export class ExecutionContext implements IExecutionContext {
   private readonly packageReader: PackageJsonReader;
   private readonly cutoffDate: Date;
   private readonly cutoffIsoString: string;
@@ -48,13 +48,13 @@ export class WorkflowContext implements IWorkflowContext {
   private readonly scriptOptions: ScriptOptions;
 
   /**
-   * Creates a new WorkflowContext instance.
+   * Creates a new ExecutionContext instance.
    *
-   * Prefer using WorkflowContextFactory.create() for standard usage.
+   * Prefer using ExecutionContextFactory.create() for standard usage.
    *
    * @param options - Context configuration options
    */
-  constructor(options: WorkflowContextOptions) {
+  constructor(options: ExecutionContextOptions) {
     this.safetyBufferDays = options.days;
     this.scriptOptions = options.scripts;
 

@@ -6,7 +6,7 @@
  *
  * @module quality/QualityRunner
  */
-import type { IWorkflowContext } from "../context/IWorkflowContext";
+import type { IExecutionContext } from "../context/IExecutionContext";
 import { LintService } from "./lint/LintService";
 import { TypeCheckService } from "./typecheck/TypeCheckService";
 import { TestService } from "./test/TestService";
@@ -35,7 +35,7 @@ export class QualityRunner {
    *
    * @param context - Workflow context for accessing configuration
    */
-  constructor(context: IWorkflowContext) {
+  constructor(context: IExecutionContext) {
     this.lintService = new LintService(context);
     this.typeCheckService = new TypeCheckService(context);
     this.testService = new TestService(context);

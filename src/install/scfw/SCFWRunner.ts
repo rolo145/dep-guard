@@ -12,7 +12,7 @@
  * @module install/scfw/SCFWRunner
  * @see https://github.com/DataDog/supply-chain-firewall
  */
-import type { IWorkflowContext } from "../../context/IWorkflowContext";
+import type { IExecutionContext } from "../../context/IExecutionContext";
 import { tryRunCommand } from "../../utils/command";
 
 export interface SCFWInstallResult {
@@ -27,14 +27,14 @@ export interface SCFWInstallResult {
  * structured results.
  */
 export class SCFWRunner {
-  private readonly context: IWorkflowContext;
+  private readonly context: IExecutionContext;
 
   /**
    * Creates a new SCFWRunner instance.
    *
    * @param context - Workflow context for accessing configuration
    */
-  constructor(context: IWorkflowContext) {
+  constructor(context: IExecutionContext) {
     this.context = context;
   }
 

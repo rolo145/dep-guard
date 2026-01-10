@@ -6,7 +6,7 @@
  *
  * @module quality/QualityService
  */
-import type { IWorkflowContext } from "../context/IWorkflowContext";
+import type { IExecutionContext } from "../context/IExecutionContext";
 import { QualityRunner, QualityCheckResults } from "./QualityRunner";
 import { QualityConfirmation } from "./QualityConfirmation";
 
@@ -25,7 +25,7 @@ export class QualityService {
    *
    * @param context - Workflow context for accessing configuration
    */
-  constructor(context: IWorkflowContext) {
+  constructor(context: IExecutionContext) {
     this.runner = new QualityRunner(context);
     this.confirmation = new QualityConfirmation();
   }
