@@ -36,11 +36,7 @@ import {
 import { processPackageSelection } from "../services/securityValidator";
 import { installPackages } from "../services/packageInstaller";
 import { createUpdateChoices } from "../ui/prompts";
-import {
-  reinstallWithNpmCi,
-  runQualityChecks,
-  runBuild,
-} from "../utils/utils";
+import { QualityChecksService } from "../services/qualityChecksService";
 import { PROMPT_PAGE_SIZE } from "../constants/config";
 import { logger } from "../utils/logger";
 
@@ -175,8 +171,10 @@ async function runWorkflow(options: WorkflowOptions): Promise<void> {
   // ============================================================================
   logger.step(7, 9, "Reinstalling all dependencies");
 
+  const qualityChecks = new QualityChecksService();
+
   // Ensures package-lock.json is consistent and all transitive deps are correct
-  await reinstallWithNpmCi();
+  await qualityChecks.reinstallDependencies();
 
   // ============================================================================
   // Step 8: Run quality checks
@@ -184,7 +182,7 @@ async function runWorkflow(options: WorkflowOptions): Promise<void> {
   logger.step(8, 9, "Quality checks");
 
   // Optional: lint, type checking, tests
-  await runQualityChecks();
+  await qualityChecks.runAll();
 
   // ============================================================================
   // Step 9: Build verification
@@ -192,7 +190,7 @@ async function runWorkflow(options: WorkflowOptions): Promise<void> {
   logger.step(9, 9, "Build verification");
 
   // Optional: ensure project still builds successfully
-  await runBuild();
+  await qualityChecks.runBuild();
 
   // ============================================================================
   // Success!
