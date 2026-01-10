@@ -1,6 +1,6 @@
 import { spawnSync } from "child_process";
 import chalk from "chalk";
-import { logger } from "./logger";
+import { logger } from "../logger";
 
 /**
  * Checks if a command is available in the system PATH

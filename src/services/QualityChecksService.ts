@@ -7,7 +7,7 @@
  * @module services/qualityChecksService
  */
 import { confirm } from "@inquirer/prompts";
-import { logger } from "../utils/logger";
+import { logger } from "../logger";
 import { tryRunCommand } from "../utils/utils";
 import { WorkflowContext } from "../context";
 import { BuildService, LintService, TestService } from "../quality";

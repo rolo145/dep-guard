@@ -29,7 +29,7 @@ export interface WorkflowOptions {
 import { NPQService } from "../npq";
 import { SCFWService } from "../install";
 import { QualityChecksService } from "../services/QualityChecksService";
-import { logger } from "../utils/logger";
+import { logger } from "../logger";
 import { NCUService } from "../ncu";
 
 /**

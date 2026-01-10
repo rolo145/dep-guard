@@ -8,7 +8,7 @@
  */
 import chalk from "chalk";
 import { confirm } from "@inquirer/prompts";
-import { logger } from "../../utils/logger";
+import { logger } from "../../logger";
 
 /**
  * Handles user confirmation workflow for build operations.

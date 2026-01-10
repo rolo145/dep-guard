@@ -4,7 +4,7 @@ import {
 } from "child_process";
 import fs from "fs";
 import { SPAWN_OPTIONS } from "../constants/setup";
-import { logger } from "./logger";
+import { logger } from "../logger";
 
 /**
  * Runs a command synchronously and returns success/failure (doesn't exit on failure)

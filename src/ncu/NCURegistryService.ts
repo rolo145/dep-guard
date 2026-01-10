@@ -12,7 +12,7 @@
 import type { NpmRegistryResponse } from "./types";
 import { WorkflowContext } from "../context";
 import { VersionAnalyzer } from "./VersionAnalyzer";
-import { logger } from "../utils/logger";
+import { logger } from "../logger";
 
 /**
  * Service for filtering updates based on publish date and registry data.

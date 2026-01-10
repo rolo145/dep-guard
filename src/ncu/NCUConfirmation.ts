@@ -6,7 +6,7 @@
  * @module ncu/NCUConfirmation
  */
 import { checkbox } from "@inquirer/prompts";
-import { logger } from "../utils/logger";
+import { logger } from "../logger";
 import { PROMPT_PAGE_SIZE } from "./constants";
 import type { GroupedUpdates, PackageSelection } from "./types";
 import type { PromptChoice } from "./PromptChoiceBuilder";

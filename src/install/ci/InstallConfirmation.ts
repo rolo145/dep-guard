@@ -6,7 +6,7 @@
  * @module install/ci/InstallConfirmation
  */
 import { confirm } from "@inquirer/prompts";
-import { logger } from "../../utils/logger";
+import { logger } from "../../logger";
 
 /**
  * Handles user confirmation workflow for dependency reinstall.
