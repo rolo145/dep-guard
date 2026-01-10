@@ -18,9 +18,6 @@
  *
  * @module workflows/updateWorkflow
  */
-import { run as ncuRun } from "npm-check-updates";
-import { checkbox } from "@inquirer/prompts";
-import { filterUpdatesByAge } from "../services/registryService";
 import type { ScriptOptions } from "../constants/config";
 import { WorkflowContext } from "../context";
 
@@ -29,13 +26,11 @@ export interface WorkflowOptions {
   days: number;
   scripts: ScriptOptions;
 }
-import { VersionAnalyzer } from "../services/VersionAnalyzer";
 import { NPQService } from "../npq";
 import { SCFWService } from "../install";
-import { createUpdateChoices } from "../ui/prompts";
 import { QualityChecksService } from "../services/QualityChecksService";
-import { PROMPT_PAGE_SIZE } from "../constants/config";
 import { logger } from "../utils/logger";
+import { NCUService } from "../ncu";
 
 /**
  * Handles user cancellation (Ctrl+C) during prompts
@@ -77,62 +72,49 @@ async function runWorkflow(options: WorkflowOptions): Promise<void> {
   // ============================================================================
   logger.step(1, 9, "Checking for available updates");
 
-  const spinner = logger.spinner("Querying npm-check-updates...");
-  const rawUpdates = await ncuRun({
-    packageFile: "package.json",
-    upgrade: false, // Don't write to package.json yet
-    jsonUpgraded: true, // Return object with version info
-  });
-  spinner.stop();
+  const ncuService = new NCUService();
+  const rawUpdates = await ncuService.loadUpdates();
 
   // Exit if no updates available
   if (!rawUpdates || Object.keys(rawUpdates).length === 0) {
-    logger.success("All dependencies are up to date!");
+    ncuService.showNoUpdates();
     process.exit(0);
   }
 
-  logger.success(`Found ${Object.keys(rawUpdates).length} potential updates`);
+  ncuService.showPotentialUpdates(Object.keys(rawUpdates).length);
 
   // ============================================================================
   // Step 2: Apply safety buffer (7-day filter by default)
   // ============================================================================
   logger.step(2, 9, `Applying ${days}-day safety buffer`);
 
-  const updates = await filterUpdatesByAge(rawUpdates as Record<string, string>);
+  const updates = await ncuService.filterByAge(rawUpdates as Record<string, string>);
 
   // Exit if all updates filtered out
   if (Object.keys(updates).length === 0) {
-    logger.warning(`No updates available (all recent versions are less than ${days} days old)`);
+    ncuService.showNoSafeUpdates(days);
     process.exit(0);
   }
 
-  logger.success(`${Object.keys(updates).length} safe updates available`);
+  ncuService.showSafeUpdates(Object.keys(updates).length);
 
   // ============================================================================
   // Step 3: Group updates by type and prepare display
   // ============================================================================
   logger.step(3, 9, "Organizing updates by type");
 
-  const grouped = VersionAnalyzer.groupByType(updates as Record<string, string>, allDependencies);
-  const maxNameLength = VersionAnalyzer.getMaxPackageNameLength(grouped);
-  const choices = createUpdateChoices(grouped, maxNameLength);
-
-  logger.info(
-    `Major: ${grouped.major.length}, Minor: ${grouped.minor.length}, Patch: ${grouped.patch.length}`,
+  const { grouped, choices } = ncuService.buildChoices(
+    updates as Record<string, string>,
+    allDependencies,
   );
-  logger.newLine();
+  ncuService.showGroupSummary(grouped);
 
   // ============================================================================
   // Step 4: Interactive package selection
   // ============================================================================
   logger.step(4, 9, "Select packages to update");
 
-  const selected = await checkbox({
-    message: "Select packages to update (Space to select, Enter to confirm):",
-    choices,
-    loop: false,
-    pageSize: PROMPT_PAGE_SIZE,
-  });
+  const selected = await ncuService.promptSelection(choices);
 
   // Exit if no packages selected
   if (selected.length === 0) {
