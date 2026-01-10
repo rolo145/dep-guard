@@ -14,7 +14,7 @@
 import { readFileSync } from "fs";
 import { dirname, join } from "path";
 import { fileURLToPath } from "url";
-import { executeUpdateWorkflow } from "./workflows/updateWorkflow";
+import { WorkflowOrchestrator } from "./workflows";
 import { ScriptValidator } from "./quality/ScriptValidator";
 import { DEFAULT_SCRIPTS, SAFETY_BUFFER_DAYS } from "./defaults";
 import { ArgumentParser, PrerequisiteValidator } from "./args";
@@ -110,7 +110,8 @@ Examples:
   ScriptValidator.validate(options.scripts);
 
   // Run the complete update workflow
-  const result = await executeUpdateWorkflow({ days: options.days, scripts: options.scripts });
+  const orchestrator = new WorkflowOrchestrator({ days: options.days, scripts: options.scripts });
+  const result = await orchestrator.execute();
 
   // Exit with the workflow's exit code
   process.exit(result.exitCode);
