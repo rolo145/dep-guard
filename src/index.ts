@@ -17,7 +17,7 @@ import { fileURLToPath } from "url";
 import { checkPrerequisites } from "./utils/checkPrerequisites";
 import { executeUpdateWorkflow } from "./workflows/updateWorkflow";
 import { validateScriptNames } from "./utils/utils";
-import { SAFETY_BUFFER_DAYS, DEFAULT_SCRIPTS } from "./constants/config";
+import { DEFAULT_SCRIPTS, SAFETY_BUFFER_DAYS } from "./defaults";
 import { ArgumentParser } from "./args";
 
 /**

@@ -6,7 +6,7 @@
  *
  * @module args/ArgumentParser
  */
-import { SAFETY_BUFFER_DAYS, DEFAULT_SCRIPTS } from "../constants/config";
+import { DEFAULT_SCRIPTS, SAFETY_BUFFER_DAYS } from "../defaults";
 import { ArgumentValidator } from "./ArgumentValidator";
 import { ValidationError } from "./ValidationError";
 import type { CliOptions } from "./types";

@@ -18,7 +18,7 @@
  *
  * @module workflows/updateWorkflow
  */
-import type { ScriptOptions } from "../constants/config";
+import type { ScriptOptions } from "../args/types";
 import { WorkflowContext } from "../context";
 
 /** Workflow options */

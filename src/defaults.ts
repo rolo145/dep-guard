@@ -1,10 +1,9 @@
 /**
- * Configuration Constants
+ * Default Constants
  *
- * Application-wide configuration values and constants.
- * Modify these values to adjust application behavior.
+ * Default values used across the application.
  *
- * @module constants/config
+ * @module defaults
  */
 
 /**
@@ -20,25 +19,6 @@
 export const SAFETY_BUFFER_DAYS = 7;
 
 /**
- * Visual separator for console output sections
- * Used to visually separate different workflow steps
- *
- * @example
- * console.log(SEPARATOR);
- * console.log("Processing package...");
- * console.log(SEPARATOR);
- */
-export const SEPARATOR = "=".repeat(60);
-
-/**
- * Number of items to display per page in the interactive package selection prompt
- * Set high to minimize scrolling (most projects have fewer than 50 outdated packages)
- *
- * @default 40
- */
-export const PROMPT_PAGE_SIZE = 40;
-
-/**
  * Default script names for quality checks and build
  * These can be overridden via CLI options
  */
@@ -52,13 +32,3 @@ export const DEFAULT_SCRIPTS = {
   /** Script name for building (e.g., "build", "build:all") */
   build: "build",
 } as const;
-
-/**
- * Type for script configuration options
- */
-export interface ScriptOptions {
-  lint: string;
-  typecheck: string;
-  test: string;
-  build: string;
-}

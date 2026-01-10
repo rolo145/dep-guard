@@ -5,7 +5,15 @@
  *
  * @module args/types
  */
-import type { ScriptOptions } from "../constants/config";
+/**
+ * Type for script configuration options
+ */
+export interface ScriptOptions {
+  lint: string;
+  typecheck: string;
+  test: string;
+  build: string;
+}
 
 /**
  * CLI options parsed from command-line arguments

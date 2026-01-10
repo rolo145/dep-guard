@@ -10,7 +10,7 @@
  *
  * @module context/WorkflowContext
  */
-import type { ScriptOptions } from "../constants/config";
+import type { ScriptOptions } from "../args/types";
 import { PackageJsonReader } from "./PackageJsonReader";
 
 /**

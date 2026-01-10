@@ -7,7 +7,7 @@
  */
 import { checkbox } from "@inquirer/prompts";
 import { logger } from "../utils/logger";
-import { PROMPT_PAGE_SIZE } from "../constants/config";
+import { PROMPT_PAGE_SIZE } from "./constants";
 import type { GroupedUpdates, PackageSelection } from "./types";
 import type { PromptChoice } from "./PromptChoiceBuilder";
 
