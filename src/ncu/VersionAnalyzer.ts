@@ -5,9 +5,9 @@
  * Determines the type of version bump (major, minor, patch) and groups updates
  * accordingly for organized display and risk assessment.
  *
- * @module services/VersionAnalyzer
+ * @module ncu/VersionAnalyzer
  */
-import type { VersionBumpType, GroupedUpdates, PackageUpdate } from "../ncu";
+import type { VersionBumpType, GroupedUpdates, PackageUpdate } from "./types";
 
 interface SemverParts {
   major: number;

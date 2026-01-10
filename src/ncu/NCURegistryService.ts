@@ -11,7 +11,7 @@
  */
 import type { NpmRegistryResponse } from "./types";
 import { WorkflowContext } from "../context";
-import { VersionAnalyzer } from "../services/VersionAnalyzer";
+import { VersionAnalyzer } from "./VersionAnalyzer";
 import { logger } from "../utils/logger";
 
 /**

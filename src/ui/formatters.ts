@@ -13,7 +13,7 @@
  */
 import chalk from "chalk";
 import type { VersionBumpType } from "../ncu";
-import { VersionAnalyzer } from "../services/VersionAnalyzer";
+import { VersionAnalyzer } from "../ncu";
 
 /**
  * Formats a version comparison string with color highlighting

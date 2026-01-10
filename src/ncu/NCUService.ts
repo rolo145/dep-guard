@@ -8,7 +8,7 @@
  */
 import type { GroupedUpdates, PackageSelection } from "./types";
 import type { PromptChoice } from "./PromptChoiceBuilder";
-import { VersionAnalyzer } from "../services/VersionAnalyzer";
+import { VersionAnalyzer } from "./VersionAnalyzer";
 import { PromptChoiceBuilder } from "./PromptChoiceBuilder";
 import { NCUConfirmation } from "./NCUConfirmation";
 import { NCURegistryService } from "./NCURegistryService";
