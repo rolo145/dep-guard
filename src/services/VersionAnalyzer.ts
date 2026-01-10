@@ -43,6 +43,22 @@ export class VersionAnalyzer {
   }
 
   /**
+   * Checks if a version string is a stable release (major.minor.patch only)
+   *
+   * Excludes prerelease versions like:
+   * - 1.0.0-alpha.1
+   * - 2.0.0-beta.3
+   * - 3.0.0-rc.1
+   * - 1.0.0-next.5
+   *
+   * @param version - Version string to check
+   * @returns True if version is stable (e.g., "1.2.3"), false if prerelease
+   */
+  static isStable(version: string): boolean {
+    return /^\d+\.\d+\.\d+$/.test(version);
+  }
+
+  /**
    * Parses a semantic version string into its component parts
    *
    * Extracts major, minor, and patch numbers from a version string.

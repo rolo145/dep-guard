@@ -30,7 +30,7 @@ export interface WorkflowOptions {
   scripts: ScriptOptions;
 }
 import { VersionAnalyzer } from "../services/VersionAnalyzer";
-import { processPackageSelection } from "../services/securityValidator";
+import { NPQService } from "../services/NPQService";
 import { InstallationService } from "../services/InstallationService";
 import { createUpdateChoices } from "../ui/prompts";
 import { QualityChecksService } from "../services/QualityChecksService";
@@ -148,7 +148,8 @@ async function runWorkflow(options: WorkflowOptions): Promise<void> {
   logger.step(5, 9, "Security validation");
 
   // Validates each package with NPQ and gets user confirmation
-  const packagesToInstall = await processPackageSelection(selected);
+  const npqService = new NPQService();
+  const packagesToInstall = await npqService.processSelection(selected);
 
   // Exit if no packages passed validation and confirmation
   if (packagesToInstall.length === 0) {

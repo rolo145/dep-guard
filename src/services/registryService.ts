@@ -11,23 +11,8 @@
  */
 import type { NpmRegistryResponse } from "../types/registry";
 import { WorkflowContext } from "../context/WorkflowContext";
+import { VersionAnalyzer } from "./VersionAnalyzer";
 import { logger } from "../utils/logger";
-
-/**
- * Checks if a version string is a stable release (major.minor.patch only)
- *
- * Excludes prerelease versions like:
- * - 1.0.0-alpha.1
- * - 2.0.0-beta.3
- * - 3.0.0-rc.1
- * - 1.0.0-next.5
- *
- * @param version - Version string to check
- * @returns True if version is stable (e.g., "1.2.3"), false if prerelease
- */
-function isStableVersion(version: string): boolean {
-  return /^\d+\.\d+\.\d+$/.test(version);
-}
 
 /**
  * Finds the latest version of a package that was published at least N days ago
@@ -64,7 +49,7 @@ async function findLatestOldEnoughVersion(
     // Excludes prerelease versions (alpha, beta, rc, etc.)
     const eligibleVersions = versions.filter((version) => {
       // Skip prerelease versions (e.g., 1.0.0-beta.1, 2.0.0-alpha.3)
-      if (!isStableVersion(version)) {
+      if (!VersionAnalyzer.isStable(version)) {
         return false;
       }
 
@@ -127,8 +112,8 @@ export async function filterUpdatesByAge(
 
     if (safeVersion) {
       // Clean version strings (remove ^ and ~ prefixes)
-      const currentVersion = allDependencies[name]?.replace(/^[\^~]/, "") || "";
-      const cleanSafeVersion = safeVersion.replace(/^[\^~]/, "");
+      const currentVersion = allDependencies[name] ? VersionAnalyzer.cleanVersion(allDependencies[name]) : "";
+      const cleanSafeVersion = VersionAnalyzer.cleanVersion(safeVersion);
 
       // Skip if the safe version is the same as current version (no update needed)
       if (cleanSafeVersion === currentVersion) {
