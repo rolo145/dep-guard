@@ -14,11 +14,10 @@
 import { readFileSync } from "fs";
 import { dirname, join } from "path";
 import { fileURLToPath } from "url";
-import { checkPrerequisites } from "./utils/checkPrerequisites";
 import { executeUpdateWorkflow } from "./workflows/updateWorkflow";
 import { validateScriptNames } from "./utils/utils";
 import { DEFAULT_SCRIPTS, SAFETY_BUFFER_DAYS } from "./defaults";
-import { ArgumentParser } from "./args";
+import { ArgumentParser, PrerequisiteValidator } from "./args";
 
 /**
  * Handle graceful shutdown on Ctrl+C (SIGINT) and SIGTERM
@@ -105,7 +104,7 @@ Examples:
   const options = parser.parseOrExit();
 
   // Ensure required security tools (scfw) are installed
-  checkPrerequisites();
+  PrerequisiteValidator.checkPrerequisites();
 
   // Validate configured script names and warn about missing ones
   validateScriptNames(options.scripts);
