@@ -4,12 +4,12 @@
  * Builds structured choice lists for interactive prompts.
  * Uses the builder pattern to construct grouped package update choices.
  *
- * @module ui/PromptChoiceBuilder
+ * @module ncu/PromptChoiceBuilder
  */
 import chalk from "chalk";
-import type { GroupedUpdates, VersionBumpType } from "../ncu";
-import type { PackageSelection } from "../types/updates";
-import { formatVersionWithHighlight } from "./formatters";
+import type { GroupedUpdates, VersionBumpType } from "./types";
+import type { PackageSelection } from "./types";
+import { formatVersionWithHighlight } from "../ui/formatters";
 
 /**
  * Choice item structure for inquirer checkbox prompt

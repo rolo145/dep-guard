@@ -9,4 +9,12 @@ export { NCUService } from "./NCUService";
 export { NCURegistryService } from "./NCURegistryService";
 export { NCURunner } from "./NCURunner";
 export { NCUConfirmation } from "./NCUConfirmation";
-export type { NpmRegistryResponse, VersionBumpType, PackageUpdate, GroupedUpdates } from "./types";
+export { PromptChoiceBuilder } from "./PromptChoiceBuilder";
+export type { PromptChoice } from "./PromptChoiceBuilder";
+export type {
+  NpmRegistryResponse,
+  VersionBumpType,
+  PackageUpdate,
+  GroupedUpdates,
+  PackageSelection,
+} from "./types";

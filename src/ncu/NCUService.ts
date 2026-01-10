@@ -6,11 +6,10 @@
  *
  * @module ncu/NCUService
  */
-import type { GroupedUpdates } from "./types";
-import type { PackageSelection } from "../types/updates";
-import type { PromptChoice } from "../ui/PromptChoiceBuilder";
+import type { GroupedUpdates, PackageSelection } from "./types";
+import type { PromptChoice } from "./PromptChoiceBuilder";
 import { VersionAnalyzer } from "../services/VersionAnalyzer";
-import { createUpdateChoices } from "../ui/prompts";
+import { PromptChoiceBuilder } from "./PromptChoiceBuilder";
 import { NCUConfirmation } from "./NCUConfirmation";
 import { NCURegistryService } from "./NCURegistryService";
 import { NCURunner } from "./NCURunner";
@@ -88,7 +87,11 @@ export class NCUService {
   ): NCUGroupingResult {
     const grouped = VersionAnalyzer.groupByType(updates, allDependencies);
     const maxNameLength = VersionAnalyzer.getMaxPackageNameLength(grouped);
-    const choices = createUpdateChoices(grouped, maxNameLength);
+    const choices = new PromptChoiceBuilder(grouped, maxNameLength)
+      .addPatchGroup()
+      .addMinorGroup()
+      .addMajorGroup()
+      .build();
     return { grouped, choices };
   }
 

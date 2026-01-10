@@ -6,7 +6,7 @@
  *
  * @module npq/NPQService
  */
-import type { PackageSelection } from "../types/updates";
+import type { PackageSelection } from "../ncu";
 import { NPQRunner } from "./NPQRunner";
 import { NPQConfirmation } from "./NPQConfirmation";
 

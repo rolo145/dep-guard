@@ -67,3 +67,14 @@ export interface GroupedUpdates {
   /** Patch version updates (lowest risk) */
   patch: PackageUpdate[];
 }
+
+/**
+ * Represents a user's selection of a package to install
+ * Returned from interactive prompts
+ */
+export interface PackageSelection {
+  /** Package name */
+  name: string;
+  /** Selected version to install */
+  version: string;
+}

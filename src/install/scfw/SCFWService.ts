@@ -6,7 +6,7 @@
  *
  * @module install/scfw/SCFWService
  */
-import type { PackageSelection } from "../../types/updates";
+import type { PackageSelection } from "../../ncu";
 import { SCFWRunner } from "./SCFWRunner";
 import { SCFWConfirmation } from "./SCFWConfirmation";
 
