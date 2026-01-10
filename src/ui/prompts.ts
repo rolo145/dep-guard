@@ -7,7 +7,7 @@
  *
  * @module ui/prompts
  */
-import type { GroupedUpdates } from "../types/updates";
+import type { GroupedUpdates } from "../ncu";
 import { PromptChoiceBuilder, type PromptChoice } from "./PromptChoiceBuilder";
 
 /**

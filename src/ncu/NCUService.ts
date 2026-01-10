@@ -6,7 +6,8 @@
  *
  * @module ncu/NCUService
  */
-import type { GroupedUpdates, PackageSelection } from "../types/updates";
+import type { GroupedUpdates } from "./types";
+import type { PackageSelection } from "../types/updates";
 import type { PromptChoice } from "../ui/PromptChoiceBuilder";
 import { VersionAnalyzer } from "../services/VersionAnalyzer";
 import { createUpdateChoices } from "../ui/prompts";

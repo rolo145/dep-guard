@@ -9,7 +9,7 @@
  *
  * @module ncu/NCURegistryService
  */
-import type { NpmRegistryResponse } from "../types/registry";
+import type { NpmRegistryResponse } from "./types";
 import { WorkflowContext } from "../context";
 import { VersionAnalyzer } from "../services/VersionAnalyzer";
 import { logger } from "../utils/logger";

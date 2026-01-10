@@ -7,7 +7,7 @@
  *
  * @module services/VersionAnalyzer
  */
-import type { VersionBumpType, GroupedUpdates, PackageUpdate } from "../types/updates";
+import type { VersionBumpType, GroupedUpdates, PackageUpdate } from "../ncu";
 
 interface SemverParts {
   major: number;

@@ -7,7 +7,8 @@
  * @module ui/PromptChoiceBuilder
  */
 import chalk from "chalk";
-import type { GroupedUpdates, VersionBumpType, PackageSelection } from "../types/updates";
+import type { GroupedUpdates, VersionBumpType } from "../ncu";
+import type { PackageSelection } from "../types/updates";
 import { formatVersionWithHighlight } from "./formatters";
 
 /**

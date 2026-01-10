@@ -8,7 +8,8 @@
 import { checkbox } from "@inquirer/prompts";
 import { logger } from "../utils/logger";
 import { PROMPT_PAGE_SIZE } from "../constants/config";
-import type { GroupedUpdates, PackageSelection } from "../types/updates";
+import type { GroupedUpdates } from "./types";
+import type { PackageSelection } from "../types/updates";
 import type { PromptChoice } from "../ui/PromptChoiceBuilder";
 
 /**

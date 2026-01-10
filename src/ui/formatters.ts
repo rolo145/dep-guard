@@ -12,7 +12,7 @@
  * @module ui/formatters
  */
 import chalk from "chalk";
-import type { VersionBumpType } from "../types/updates";
+import type { VersionBumpType } from "../ncu";
 import { VersionAnalyzer } from "../services/VersionAnalyzer";
 
 /**
