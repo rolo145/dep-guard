@@ -6,7 +6,7 @@
  *
  * @module quality/test/TestRunner
  */
-import { tryRunCommand } from "../../utils/utils";
+import { tryRunCommand } from "../../utils/command";
 
 export interface TestResult {
   scriptName: string;

@@ -6,7 +6,7 @@
  *
  * @module quality/typecheck/TypeCheckRunner
  */
-import { tryRunCommand } from "../../utils/utils";
+import { tryRunCommand } from "../../utils/command";
 
 export interface TypeCheckResult {
   scriptName: string;

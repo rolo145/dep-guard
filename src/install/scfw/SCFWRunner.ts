@@ -12,7 +12,7 @@
  * @module install/scfw/SCFWRunner
  * @see https://github.com/DataDog/supply-chain-firewall
  */
-import { tryRunCommand } from "../../utils/utils";
+import { tryRunCommand } from "../../utils/command";
 import { WorkflowContext } from "../../context";
 
 export interface SCFWInstallResult {

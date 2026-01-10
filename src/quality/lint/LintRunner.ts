@@ -6,7 +6,7 @@
  *
  * @module quality/lint/LintRunner
  */
-import { tryRunCommand } from "../../utils/utils";
+import { tryRunCommand } from "../../utils/command";
 
 export interface LintResult {
   scriptName: string;

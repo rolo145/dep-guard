@@ -20,3 +20,4 @@ export { TypeCheckConfirmation } from "./typecheck/TypeCheckConfirmation";
 export { QualityService } from "./QualityService";
 export { QualityRunner, QualityCheckResults } from "./QualityRunner";
 export { QualityConfirmation } from "./QualityConfirmation";
+export { ScriptValidator, type ScriptNames, type ScriptValidationResult } from "./ScriptValidator";

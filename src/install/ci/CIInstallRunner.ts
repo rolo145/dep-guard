@@ -5,7 +5,7 @@
  *
  * @module install/ci/CIInstallRunner
  */
-import { tryRunCommand } from "../../utils/utils";
+import { tryRunCommand } from "../../utils/command";
 
 export interface CIInstallResult {
   success: boolean;

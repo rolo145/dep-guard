@@ -15,7 +15,7 @@ import { readFileSync } from "fs";
 import { dirname, join } from "path";
 import { fileURLToPath } from "url";
 import { executeUpdateWorkflow } from "./workflows/updateWorkflow";
-import { validateScriptNames } from "./utils/utils";
+import { ScriptValidator } from "./quality/ScriptValidator";
 import { DEFAULT_SCRIPTS, SAFETY_BUFFER_DAYS } from "./defaults";
 import { ArgumentParser, PrerequisiteValidator } from "./args";
 
@@ -107,7 +107,7 @@ Examples:
   PrerequisiteValidator.checkPrerequisites();
 
   // Validate configured script names and warn about missing ones
-  validateScriptNames(options.scripts);
+  ScriptValidator.validate(options.scripts);
 
   // Run the complete update workflow
   await executeUpdateWorkflow({ days: options.days, scripts: options.scripts });

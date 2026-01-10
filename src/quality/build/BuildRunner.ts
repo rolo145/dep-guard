@@ -6,7 +6,7 @@
  *
  * @module quality/build/BuildRunner
  */
-import { tryRunCommand } from "../../utils/utils";
+import { tryRunCommand } from "../../utils/command";
 
 export interface BuildResult {
   scriptName: string;

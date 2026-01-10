@@ -8,7 +8,7 @@
  * @module npq/NPQRunner
  * @see https://github.com/lirantal/npq
  */
-import { tryRunCommand } from "../utils/utils";
+import { tryRunCommand } from "../utils/command";
 
 export interface NPQCheckResult {
   packageSpec: string;
