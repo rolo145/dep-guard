@@ -14,6 +14,7 @@
 import { WorkflowOrchestrator } from "./workflows";
 import { ScriptValidator } from "./quality/ScriptValidator";
 import { ArgumentParser, CLIHelper, PrerequisiteValidator } from "./args";
+import { EXIT_CODE_CANCELLED, handleFatalError } from "./errors";
 
 /**
  * Handle graceful shutdown on Ctrl+C (SIGINT) and SIGTERM
@@ -22,7 +23,7 @@ function setupGracefulShutdown(): void {
   const handleShutdown = (signal: string): void => {
     console.log(`\n\nReceived ${signal}. Shutting down gracefully...`);
     console.log("No changes were made to your dependencies.");
-    process.exit(0);
+    process.exit(EXIT_CODE_CANCELLED);
   };
 
   process.on("SIGINT", () => handleShutdown("SIGINT"));
@@ -71,4 +72,4 @@ function setupGracefulShutdown(): void {
 
   // Exit with the workflow's exit code
   process.exit(result.exitCode);
-})();
+})().catch(handleFatalError);

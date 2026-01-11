@@ -9,6 +9,7 @@
 import chalk from "chalk";
 import { confirm } from "@inquirer/prompts";
 import { logger } from "../../logger";
+import { withCancellationHandling } from "../../errors";
 
 /**
  * Handles user confirmation workflow for test operations.
@@ -46,10 +47,12 @@ export class TestConfirmation {
    * @returns True if user confirms, false otherwise
    */
   async confirmRun(scriptName: string): Promise<boolean> {
-    const confirmed = await confirm({
-      message: `Do you want to run tests (npm run ${scriptName})?`,
-      default: false,
-    });
+    const confirmed = await withCancellationHandling(() =>
+      confirm({
+        message: `Do you want to run tests (npm run ${scriptName})?`,
+        default: false,
+      }),
+    );
 
     if (!confirmed) {
       logger.skip("Skipping tests");

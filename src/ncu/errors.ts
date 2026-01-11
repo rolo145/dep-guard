@@ -2,14 +2,16 @@
  * NCU Error Classes
  *
  * Custom error classes for NCU-related failures.
+ * Extends CLIError for centralized error handling.
  *
  * @module ncu/errors
  */
+import { CLIError } from "../errors";
 
 /**
  * Base error class for NCU registry operations
  */
-export class RegistryError extends Error {
+export class RegistryError extends CLIError {
   readonly packageName: string;
 
   constructor(packageName: string, message: string, options?: ErrorOptions) {

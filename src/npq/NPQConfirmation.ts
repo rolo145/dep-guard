@@ -9,6 +9,7 @@
 import chalk from "chalk";
 import { confirm } from "@inquirer/prompts";
 import { logger } from "../logger";
+import { withCancellationHandling } from "../errors";
 
 /**
  * Handles user confirmation workflow for NPQ checks.
@@ -46,10 +47,12 @@ export class NPQConfirmation {
       ? chalk.green("(NPQ: passed)")
       : chalk.red("(NPQ: failed)");
 
-    const confirmed = await confirm({
-      message: `Install ${chalk.bold(packageSpec)}? ${statusText}`,
-      default: false,
-    });
+    const confirmed = await withCancellationHandling(() =>
+      confirm({
+        message: `Install ${chalk.bold(packageSpec)}? ${statusText}`,
+        default: false,
+      }),
+    );
 
     if (!confirmed) {
       logger.skip(`Skipping ${packageSpec}`);

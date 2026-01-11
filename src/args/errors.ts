@@ -2,14 +2,16 @@
  * Argument Error Classes
  *
  * Custom error classes for command-line argument validation failures.
+ * Extends CLIError for centralized error handling.
  *
  * @module args/errors
  */
+import { CLIError } from "../errors";
 
 /**
  * Base error thrown when argument validation fails.
  */
-export class ValidationError extends Error {
+export class ValidationError extends CLIError {
   readonly flag: string;
 
   constructor(flag: string, message: string) {

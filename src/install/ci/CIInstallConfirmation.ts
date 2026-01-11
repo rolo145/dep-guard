@@ -7,6 +7,7 @@
  */
 import { confirm } from "@inquirer/prompts";
 import { logger } from "../../logger";
+import { withCancellationHandling } from "../../errors";
 
 /**
  * Handles user confirmation workflow for dependency reinstall.
@@ -25,10 +26,12 @@ export class CIInstallConfirmation {
    * @returns True if user confirms, false otherwise
    */
   async confirmRun(): Promise<boolean> {
-    const confirmed = await confirm({
-      message: "Do you want to reinstall dependencies with npm ci?",
-      default: false,
-    });
+    const confirmed = await withCancellationHandling(() =>
+      confirm({
+        message: "Do you want to reinstall dependencies with npm ci?",
+        default: false,
+      }),
+    );
 
     if (!confirmed) {
       logger.skip("Skipping npm ci");

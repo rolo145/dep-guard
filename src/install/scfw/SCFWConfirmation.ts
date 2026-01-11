@@ -9,6 +9,7 @@
 import chalk from "chalk";
 import { confirm } from "@inquirer/prompts";
 import { logger } from "../../logger";
+import { withCancellationHandling } from "../../errors";
 
 /**
  * Handles user confirmation workflow for scfw installation.
@@ -36,10 +37,12 @@ export class SCFWConfirmation {
    * @returns True if user confirms, false otherwise
    */
   async confirmInstall(): Promise<boolean> {
-    const confirmed = await confirm({
-      message: "Do you want to install these packages via scfw?",
-      default: false,
-    });
+    const confirmed = await withCancellationHandling(() =>
+      confirm({
+        message: "Do you want to install these packages via scfw?",
+        default: false,
+      }),
+    );
 
     if (!confirmed) {
       logger.skip("Skipping scfw installation");

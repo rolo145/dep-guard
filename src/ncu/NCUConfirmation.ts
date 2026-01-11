@@ -7,6 +7,7 @@
  */
 import { checkbox } from "@inquirer/prompts";
 import { logger } from "../logger";
+import { withCancellationHandling } from "../errors";
 import { PROMPT_PAGE_SIZE } from "./constants";
 import type { GroupedUpdates, PackageSelection } from "./types";
 import type { PromptChoice } from "./PromptChoiceBuilder";
@@ -67,11 +68,13 @@ export class NCUConfirmation {
    * @returns Array of selected packages
    */
   async promptSelection(choices: PromptChoice[]): Promise<PackageSelection[]> {
-    return checkbox({
-      message: "Select packages to update (Space to select, Enter to confirm):",
-      choices,
-      loop: false,
-      pageSize: PROMPT_PAGE_SIZE,
-    });
+    return withCancellationHandling(() =>
+      checkbox({
+        message: "Select packages to update (Space to select, Enter to confirm):",
+        choices,
+        loop: false,
+        pageSize: PROMPT_PAGE_SIZE,
+      }),
+    );
   }
 }

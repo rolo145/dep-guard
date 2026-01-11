@@ -16,6 +16,7 @@ import { NPQService } from "../npq";
 import { InstallService } from "../install";
 import { QualityService } from "../quality";
 import { logger } from "../logger";
+import { isUserCancellation, logCancellation, EXIT_CODE_CANCELLED } from "../errors";
 import {
   CheckUpdatesStep,
   SafetyBufferStep,
@@ -127,15 +128,9 @@ export class WorkflowOrchestrator {
    * @returns WorkflowResult if user cancelled, otherwise re-throws
    */
   private handleUserCancellation(error: unknown): WorkflowResult {
-    const isUserCancellation =
-      error instanceof Error &&
-      (error.name === "ExitPromptError" || error.message.includes("User force closed"));
-
-    if (isUserCancellation) {
-      console.log("\n");
-      logger.info("Operation cancelled by user");
-      logger.info("No changes were made to your dependencies.");
-      return this.createEarlyExitResult("user_cancelled");
+    if (isUserCancellation(error)) {
+      logCancellation();
+      return this.createCancellationResult();
     }
 
     // Re-throw unexpected errors
@@ -197,6 +192,20 @@ export class WorkflowOrchestrator {
       success: true,
       exitCode: 0,
       reason,
+      stats: this.stats,
+    };
+  }
+
+  /**
+   * Creates a cancellation result with standard SIGINT exit code.
+   */
+  private createCancellationResult(): WorkflowResult {
+    this.stats.durationMs = Date.now() - this.startTime;
+
+    return {
+      success: false,
+      exitCode: EXIT_CODE_CANCELLED,
+      reason: "user_cancelled",
       stats: this.stats,
     };
   }

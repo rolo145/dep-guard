@@ -36,7 +36,8 @@ export interface WorkflowStats {
 /** Result returned by workflow instead of process.exit() */
 export interface WorkflowResult {
   success: boolean;
-  exitCode: 0 | 1;
+  /** Exit code: 0 = success, 1 = error, 130 = user cancelled (SIGINT) */
+  exitCode: 0 | 1 | 130;
   reason: WorkflowExitReason;
   stats?: WorkflowStats;
 }
