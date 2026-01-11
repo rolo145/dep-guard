@@ -82,14 +82,14 @@ describe("PackageJsonReader", () => {
     it("returns true when script exists", () => {
       const reader = new PackageJsonReader(FIXTURE_PATH);
 
-      expect(reader.hasScript("build")).toBe(true);
-      expect(reader.hasScript("test")).toBe(true);
+      expect(reader.hasScript("build")).toBeTruthy();
+      expect(reader.hasScript("test")).toBeTruthy();
     });
 
     it("returns false when script does not exist", () => {
       const reader = new PackageJsonReader(FIXTURE_PATH);
 
-      expect(reader.hasScript("nonexistent")).toBe(false);
+      expect(reader.hasScript("nonexistent")).toBeFalsy();
     });
   });
 
@@ -97,19 +97,19 @@ describe("PackageJsonReader", () => {
     it("returns true for production dependency", () => {
       const reader = new PackageJsonReader(FIXTURE_PATH);
 
-      expect(reader.hasPackage("lodash")).toBe(true);
+      expect(reader.hasPackage("lodash")).toBeTruthy();
     });
 
     it("returns true for dev dependency", () => {
       const reader = new PackageJsonReader(FIXTURE_PATH);
 
-      expect(reader.hasPackage("typescript")).toBe(true);
+      expect(reader.hasPackage("typescript")).toBeTruthy();
     });
 
     it("returns false for non-existent package", () => {
       const reader = new PackageJsonReader(FIXTURE_PATH);
 
-      expect(reader.hasPackage("nonexistent")).toBe(false);
+      expect(reader.hasPackage("nonexistent")).toBeFalsy();
     });
   });
 

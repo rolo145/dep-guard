@@ -54,22 +54,22 @@ describe("errors module", () => {
 
   describe("isCLIError()", () => {
     it("returns true for CLIError", () => {
-      expect(isCLIError(new CLIError("test"))).toBe(true);
+      expect(isCLIError(new CLIError("test"))).toBeTruthy();
     });
 
     it("returns true for CLIError subclass", () => {
-      expect(isCLIError(new UserCancellationError())).toBe(true);
+      expect(isCLIError(new UserCancellationError())).toBeTruthy();
     });
 
     it("returns false for regular Error", () => {
-      expect(isCLIError(new Error("test"))).toBe(false);
+      expect(isCLIError(new Error("test"))).toBeFalsy();
     });
 
     it("returns false for non-error values", () => {
-      expect(isCLIError(null)).toBe(false);
-      expect(isCLIError(undefined)).toBe(false);
-      expect(isCLIError("string")).toBe(false);
-      expect(isCLIError({})).toBe(false);
+      expect(isCLIError(null)).toBeFalsy();
+      expect(isCLIError(undefined)).toBeFalsy();
+      expect(isCLIError("string")).toBeFalsy();
+      expect(isCLIError({})).toBeFalsy();
     });
   });
 
@@ -100,22 +100,22 @@ describe("errors module", () => {
       const error = new Error("test");
       error.name = "ExitPromptError";
 
-      expect(isPromptCancellation(error)).toBe(true);
+      expect(isPromptCancellation(error)).toBeTruthy();
     });
 
     it("returns true for force closed message", () => {
       const error = new Error("User force closed the prompt");
 
-      expect(isPromptCancellation(error)).toBe(true);
+      expect(isPromptCancellation(error)).toBeTruthy();
     });
 
     it("returns false for regular errors", () => {
-      expect(isPromptCancellation(new Error("test"))).toBe(false);
+      expect(isPromptCancellation(new Error("test"))).toBeFalsy();
     });
 
     it("returns false for non-error values", () => {
-      expect(isPromptCancellation(null)).toBe(false);
-      expect(isPromptCancellation("string")).toBe(false);
+      expect(isPromptCancellation(null)).toBeFalsy();
+      expect(isPromptCancellation("string")).toBeFalsy();
     });
   });
 
@@ -184,20 +184,20 @@ describe("errors module", () => {
 
   describe("isUserCancellation()", () => {
     it("returns true for UserCancellationError", () => {
-      expect(isUserCancellation(new UserCancellationError())).toBe(true);
+      expect(isUserCancellation(new UserCancellationError())).toBeTruthy();
     });
 
     it("returns false for CLIError", () => {
-      expect(isUserCancellation(new CLIError("test"))).toBe(false);
+      expect(isUserCancellation(new CLIError("test"))).toBeFalsy();
     });
 
     it("returns false for regular Error", () => {
-      expect(isUserCancellation(new Error("test"))).toBe(false);
+      expect(isUserCancellation(new Error("test"))).toBeFalsy();
     });
 
     it("returns false for non-error values", () => {
-      expect(isUserCancellation(null)).toBe(false);
-      expect(isUserCancellation(undefined)).toBe(false);
+      expect(isUserCancellation(null)).toBeFalsy();
+      expect(isUserCancellation(undefined)).toBeFalsy();
     });
   });
 

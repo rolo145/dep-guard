@@ -100,25 +100,25 @@ describe("ArgumentParser", () => {
     it("returns true when flag exists", () => {
       const parser = new ArgumentParser(["--help"]);
 
-      expect(parser.hasFlag("--help")).toBe(true);
+      expect(parser.hasFlag("--help")).toBeTruthy();
     });
 
     it("returns false when flag does not exist", () => {
       const parser = new ArgumentParser(["--days", "7"]);
 
-      expect(parser.hasFlag("--help")).toBe(false);
+      expect(parser.hasFlag("--help")).toBeFalsy();
     });
 
     it("returns true if any of multiple flags exist", () => {
       const parser = new ArgumentParser(["-h"]);
 
-      expect(parser.hasFlag("--help", "-h")).toBe(true);
+      expect(parser.hasFlag("--help", "-h")).toBeTruthy();
     });
 
     it("returns false when none of multiple flags exist", () => {
       const parser = new ArgumentParser(["--days", "7"]);
 
-      expect(parser.hasFlag("--help", "-h")).toBe(false);
+      expect(parser.hasFlag("--help", "-h")).toBeFalsy();
     });
   });
 });

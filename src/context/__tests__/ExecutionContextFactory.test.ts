@@ -77,8 +77,8 @@ describe("ExecutionContextFactory", () => {
       expect(mock.dependencies).toEqual({});
       expect(mock.devDependencies).toEqual({});
       expect(mock.days).toBe(7);
-      expect(mock.hasScript("any")).toBe(false);
-      expect(mock.hasPackage("any")).toBe(false);
+      expect(mock.hasScript("any")).toBeFalsy();
+      expect(mock.hasPackage("any")).toBeFalsy();
       expect(mock.getPackageVersion("any")).toBeUndefined();
     });
 
@@ -98,10 +98,10 @@ describe("ExecutionContextFactory", () => {
         hasPackage: (name: string) => name === "lodash",
       });
 
-      expect(mock.hasScript("test")).toBe(true);
-      expect(mock.hasScript("build")).toBe(false);
-      expect(mock.hasPackage("lodash")).toBe(true);
-      expect(mock.hasPackage("express")).toBe(false);
+      expect(mock.hasScript("test")).toBeTruthy();
+      expect(mock.hasScript("build")).toBeFalsy();
+      expect(mock.hasPackage("lodash")).toBeTruthy();
+      expect(mock.hasPackage("express")).toBeFalsy();
     });
 
     it("includes cutoff date", () => {

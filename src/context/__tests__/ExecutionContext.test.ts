@@ -167,7 +167,7 @@ describe("ExecutionContext", () => {
         packageJsonPath: FIXTURE_PATH,
       });
 
-      expect(context.hasScript("build")).toBe(true);
+      expect(context.hasScript("build")).toBeTruthy();
     });
 
     it("hasScript returns false for non-existing script", () => {
@@ -177,7 +177,7 @@ describe("ExecutionContext", () => {
         packageJsonPath: FIXTURE_PATH,
       });
 
-      expect(context.hasScript("nonexistent")).toBe(false);
+      expect(context.hasScript("nonexistent")).toBeFalsy();
     });
 
     it("hasPackage returns true for existing package", () => {
@@ -187,8 +187,8 @@ describe("ExecutionContext", () => {
         packageJsonPath: FIXTURE_PATH,
       });
 
-      expect(context.hasPackage("lodash")).toBe(true);
-      expect(context.hasPackage("typescript")).toBe(true);
+      expect(context.hasPackage("lodash")).toBeTruthy();
+      expect(context.hasPackage("typescript")).toBeTruthy();
     });
 
     it("hasPackage returns false for non-existing package", () => {
@@ -198,7 +198,7 @@ describe("ExecutionContext", () => {
         packageJsonPath: FIXTURE_PATH,
       });
 
-      expect(context.hasPackage("nonexistent")).toBe(false);
+      expect(context.hasPackage("nonexistent")).toBeFalsy();
     });
 
     it("getPackageVersion returns version for existing package", () => {
