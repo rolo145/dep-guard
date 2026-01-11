@@ -37,10 +37,9 @@ export class LintService {
    * @returns True if lint succeeded, false if failed, null if skipped
    */
   async run(): Promise<boolean | null> {
-    const { scriptNames, scripts } = this.context;
-    const scriptName = scriptNames.lint;
+    const scriptName = this.context.scriptNames.lint;
 
-    if (!scripts[scriptName]) {
+    if (!this.context.hasScript(scriptName)) {
       this.confirmation.showScriptNotFound(scriptName);
       return null;
     }

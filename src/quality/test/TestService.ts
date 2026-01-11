@@ -37,10 +37,9 @@ export class TestService {
    * @returns True if tests succeeded, false if failed, null if skipped
    */
   async run(): Promise<boolean | null> {
-    const { scriptNames, scripts } = this.context;
-    const scriptName = scriptNames.test;
+    const scriptName = this.context.scriptNames.test;
 
-    if (!scripts[scriptName]) {
+    if (!this.context.hasScript(scriptName)) {
       this.confirmation.showScriptNotFound(scriptName);
       return null;
     }

@@ -37,10 +37,9 @@ export class BuildService {
    * @returns True if build succeeded, false if failed, null if skipped
    */
   async run(): Promise<boolean | null> {
-    const { scriptNames, scripts } = this.context;
-    const scriptName = scriptNames.build;
+    const scriptName = this.context.scriptNames.build;
 
-    if (!scripts[scriptName]) {
+    if (!this.context.hasScript(scriptName)) {
       this.confirmation.showScriptNotFound(scriptName);
       return null;
     }

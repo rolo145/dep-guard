@@ -37,10 +37,9 @@ export class TypeCheckService {
    * @returns True if type check succeeded, false if failed, null if skipped
    */
   async run(): Promise<boolean | null> {
-    const { scriptNames, scripts } = this.context;
-    const scriptName = scriptNames.typecheck;
+    const scriptName = this.context.scriptNames.typecheck;
 
-    if (!scripts[scriptName]) {
+    if (!this.context.hasScript(scriptName)) {
       this.confirmation.showScriptNotFound(scriptName);
       return null;
     }
