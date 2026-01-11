@@ -1,6 +1,6 @@
 {
   "name": "@roland.botka/dep-guard",
-  "version": "0.1.0-preview.1",
+  "version": "0.1.0-preview.2",
   "author": "Roland Botka",
   "description": "Guardrail for safe npm dependency updates",
   "type": "module",
@@ -38,5 +38,13 @@
   "license": "MIT",
   "engines": {
     "node": ">=24.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/rolo145/dep-guard"
+  },
+  "homepage": "https://github.com/rolo145/dep-guard",
+  "bugs": {
+    "url": "https://github.com/rolo145/dep-guard/issues"
   }
 }
