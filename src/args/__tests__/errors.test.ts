@@ -4,7 +4,7 @@ import {
   MissingValueError,
   InvalidFormatError,
   OutOfRangeError,
-} from "../../src/args/errors";
+} from "../errors";
 
 describe("Argument Errors", () => {
   describe("ValidationError", () => {

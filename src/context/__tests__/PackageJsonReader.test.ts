@@ -1,6 +1,6 @@
 import { describe, it, expect } from "vitest";
 import { join } from "path";
-import { PackageJsonReader } from "../../src/context/PackageJsonReader";
+import { PackageJsonReader } from "../PackageJsonReader";
 
 const FIXTURE_PATH = join(__dirname, "fixtures/package.json");
 

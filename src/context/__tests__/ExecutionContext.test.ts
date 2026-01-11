@@ -1,7 +1,7 @@
 import { describe, it, expect, vi } from "vitest";
 import { join } from "path";
-import { ExecutionContext } from "../../src/context/ExecutionContext";
-import type { ScriptOptions } from "../../src/args/types";
+import { ExecutionContext } from "../ExecutionContext";
+import type { ScriptOptions } from "../../args/types";
 
 const FIXTURE_PATH = join(__dirname, "fixtures/package.json");
 

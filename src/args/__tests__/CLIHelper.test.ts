@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { readFileSync } from "fs";
-import { CLIHelper } from "../../src/args/CLIHelper";
+import { CLIHelper } from "../CLIHelper";
 
 // Mock fs module
 vi.mock("fs", () => ({

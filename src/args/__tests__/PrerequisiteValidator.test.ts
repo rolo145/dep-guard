@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { spawnSync } from "child_process";
-import { PrerequisiteValidator } from "../../src/args/PrerequisiteValidator";
+import { PrerequisiteValidator } from "../PrerequisiteValidator";
 
 // Mock child_process
 vi.mock("child_process", () => ({
@@ -8,7 +8,7 @@ vi.mock("child_process", () => ({
 }));
 
 // Mock logger to avoid console output during tests
-vi.mock("../../src/logger", () => ({
+vi.mock("../../logger", () => ({
   logger: {
     header: vi.fn(),
     warning: vi.fn(),

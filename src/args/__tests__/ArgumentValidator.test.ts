@@ -1,6 +1,6 @@
 import { describe, it, expect } from "vitest";
-import { ArgumentValidator } from "../../src/args/ArgumentValidator";
-import { InvalidFormatError, MissingValueError, OutOfRangeError } from "../../src/args/errors";
+import { ArgumentValidator } from "../ArgumentValidator";
+import { InvalidFormatError, MissingValueError, OutOfRangeError } from "../errors";
 
 describe("ArgumentValidator", () => {
   const validator = new ArgumentValidator();

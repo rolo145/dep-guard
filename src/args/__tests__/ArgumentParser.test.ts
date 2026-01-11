@@ -1,7 +1,7 @@
 import { describe, it, expect } from "vitest";
-import { ArgumentParser } from "../../src/args/ArgumentParser";
-import { InvalidFormatError, MissingValueError } from "../../src/args/errors";
-import { DEFAULT_SCRIPTS, SAFETY_BUFFER_DAYS } from "../../src/defaults";
+import { ArgumentParser } from "../ArgumentParser";
+import { InvalidFormatError, MissingValueError } from "../errors";
+import { DEFAULT_SCRIPTS, SAFETY_BUFFER_DAYS } from "../../defaults";
 
 describe("ArgumentParser", () => {
   describe("parse()", () => {

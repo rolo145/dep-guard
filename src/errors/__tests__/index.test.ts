@@ -10,10 +10,10 @@ import {
   isUserCancellation,
   logCancellation,
   handleFatalError,
-} from "../../src/errors";
+} from "../index";
 
 // Mock logger
-vi.mock("../../src/logger", () => ({
+vi.mock("../../logger", () => ({
   logger: {
     info: vi.fn(),
   },
@@ -208,7 +208,7 @@ describe("errors module", () => {
 
     it("logs cancellation messages", async () => {
       const consoleSpy = vi.spyOn(console, "log").mockImplementation(() => {});
-      const { logger } = await import("../../src/logger");
+      const { logger } = await import("../../logger");
 
       logCancellation();
 
