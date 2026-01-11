@@ -62,10 +62,10 @@ dep-guard --lint eslint --test test:all --build build:prod
 
 ```
 # install globally
-npm install -g dep-guard
+npm install -g @roland.botka/dep-guard
 
 # or run once without installing
-npx dep-guard --help
+npx @roland.botka/dep-guard
 ```
 
 ## Install / run locally
