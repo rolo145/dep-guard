@@ -1,16 +1,17 @@
 {
   "name": "dep-guard",
-  "version": "0.1.0",
+  "version": "0.1.0-preview.1",
+  "author": "Roland Botka",
   "description": "Guardrail for safe npm dependency updates",
   "type": "module",
   "bin": {
-    "dep-guard": "./dist/index.js"
+    "dep-guard": "dist/index.js"
   },
   "files": [
     "dist"
   ],
   "scripts": {
-    "build": "tsup",
+    "build": "tsup && chmod +x dist/index.js",
     "dev": "tsup --watch",
     "start": "node ./dist/index.js",
     "typecheck": "tsc --noEmit",
