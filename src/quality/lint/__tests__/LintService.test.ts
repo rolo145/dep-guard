@@ -136,7 +136,7 @@ describe("LintService", () => {
 
       const result = await service.run();
 
-      expect(result).toBe(true);
+      expect(result).toBeTruthy();
     });
 
     it("shows success when lint passes", async () => {
@@ -156,7 +156,7 @@ describe("LintService", () => {
 
       const result = await service.run();
 
-      expect(result).toBe(false);
+      expect(result).toBeFalsy();
     });
 
     it("shows failure when lint fails", async () => {

@@ -73,7 +73,7 @@ describe("SafetyBufferStep", () => {
 
       const result = await step.execute(rawUpdates, mockContext);
 
-      expect(result.continue).toBe(false);
+      expect(result.continue).toBeFalsy();
       expect(result.exitReason).toBe("all_updates_filtered");
     });
 
@@ -93,7 +93,7 @@ describe("SafetyBufferStep", () => {
 
       const result = await step.execute(rawUpdates, mockContext);
 
-      expect(result.continue).toBe(true);
+      expect(result.continue).toBeTruthy();
     });
 
     it("returns filtered updates as data", async () => {

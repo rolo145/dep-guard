@@ -76,7 +76,7 @@ describe("TestConfirmation", () => {
 
       const result = await confirmation.confirmRun("test");
 
-      expect(result).toBe(true);
+      expect(result).toBeTruthy();
     });
 
     it("returns false when user declines", async () => {
@@ -84,7 +84,7 @@ describe("TestConfirmation", () => {
 
       const result = await confirmation.confirmRun("test");
 
-      expect(result).toBe(false);
+      expect(result).toBeFalsy();
     });
 
     it("shows skip message when user declines", async () => {

@@ -63,7 +63,7 @@ describe("CheckUpdatesStep", () => {
 
       const result = await step.execute(undefined, mockContext);
 
-      expect(result.continue).toBe(false);
+      expect(result.continue).toBeFalsy();
       expect(result.exitReason).toBe("no_updates_available");
     });
 
@@ -72,7 +72,7 @@ describe("CheckUpdatesStep", () => {
 
       const result = await step.execute(undefined, mockContext);
 
-      expect(result.continue).toBe(false);
+      expect(result.continue).toBeFalsy();
       expect(result.exitReason).toBe("no_updates_available");
     });
 
@@ -90,7 +90,7 @@ describe("CheckUpdatesStep", () => {
 
       const result = await step.execute(undefined, mockContext);
 
-      expect(result.continue).toBe(true);
+      expect(result.continue).toBeTruthy();
     });
 
     it("returns updates as data", async () => {

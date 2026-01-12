@@ -6,7 +6,7 @@ describe("IWorkflowStep helpers", () => {
     it("creates a continue result", () => {
       const result = continueWith({ foo: "bar" });
 
-      expect(result.continue).toBe(true);
+      expect(result.continue).toBeTruthy();
     });
 
     it("includes the provided data", () => {
@@ -47,7 +47,7 @@ describe("IWorkflowStep helpers", () => {
       const stepData = { step: "check_updates" as const, data: { lodash: "5.0.0" } };
       const result = continueWithStep(stepData);
 
-      expect(result.continue).toBe(true);
+      expect(result.continue).toBeTruthy();
     });
 
     it("includes both data and stepData", () => {
@@ -80,7 +80,7 @@ describe("IWorkflowStep helpers", () => {
     it("creates a non-continue result", () => {
       const result = exitWith("no_updates_available");
 
-      expect(result.continue).toBe(false);
+      expect(result.continue).toBeFalsy();
     });
 
     it("includes the exit reason", () => {

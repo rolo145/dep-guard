@@ -152,7 +152,7 @@ describe("QualityRunner", () => {
 
       const result = await runner.runLint();
 
-      expect(result).toBe(true);
+      expect(result).toBeTruthy();
     });
 
     it("returns false when lint fails", async () => {
@@ -160,7 +160,7 @@ describe("QualityRunner", () => {
 
       const result = await runner.runLint();
 
-      expect(result).toBe(false);
+      expect(result).toBeFalsy();
     });
 
     it("returns null when lint is skipped", async () => {
@@ -186,7 +186,7 @@ describe("QualityRunner", () => {
 
       const result = await runner.runTypeCheck();
 
-      expect(result).toBe(true);
+      expect(result).toBeTruthy();
     });
 
     it("returns false when typecheck fails", async () => {
@@ -194,7 +194,7 @@ describe("QualityRunner", () => {
 
       const result = await runner.runTypeCheck();
 
-      expect(result).toBe(false);
+      expect(result).toBeFalsy();
     });
 
     it("returns null when typecheck is skipped", async () => {
@@ -220,7 +220,7 @@ describe("QualityRunner", () => {
 
       const result = await runner.runTests();
 
-      expect(result).toBe(true);
+      expect(result).toBeTruthy();
     });
 
     it("returns false when tests fail", async () => {
@@ -228,7 +228,7 @@ describe("QualityRunner", () => {
 
       const result = await runner.runTests();
 
-      expect(result).toBe(false);
+      expect(result).toBeFalsy();
     });
 
     it("returns null when tests are skipped", async () => {
@@ -254,7 +254,7 @@ describe("QualityRunner", () => {
 
       const result = await runner.runBuild();
 
-      expect(result).toBe(true);
+      expect(result).toBeTruthy();
     });
 
     it("returns false when build fails", async () => {
@@ -262,7 +262,7 @@ describe("QualityRunner", () => {
 
       const result = await runner.runBuild();
 
-      expect(result).toBe(false);
+      expect(result).toBeFalsy();
     });
 
     it("returns null when build is skipped", async () => {

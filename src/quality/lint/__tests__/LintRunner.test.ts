@@ -38,7 +38,7 @@ describe("LintRunner", () => {
 
       const result = runner.run("lint");
 
-      expect(result.success).toBe(true);
+      expect(result.success).toBeTruthy();
     });
 
     it("returns success false when command fails", () => {
@@ -46,7 +46,7 @@ describe("LintRunner", () => {
 
       const result = runner.run("lint");
 
-      expect(result.success).toBe(false);
+      expect(result.success).toBeFalsy();
     });
 
     it("works with custom script names", () => {

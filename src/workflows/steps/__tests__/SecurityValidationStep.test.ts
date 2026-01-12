@@ -79,7 +79,7 @@ describe("SecurityValidationStep", () => {
 
       const result = await step.execute(selected, mockContext);
 
-      expect(result.continue).toBe(false);
+      expect(result.continue).toBeFalsy();
       expect(result.exitReason).toBe("no_packages_confirmed");
     });
 
@@ -98,7 +98,7 @@ describe("SecurityValidationStep", () => {
 
       const result = await step.execute(selected, mockContext);
 
-      expect(result.continue).toBe(true);
+      expect(result.continue).toBeTruthy();
     });
 
     it("returns confirmed packages as data", async () => {

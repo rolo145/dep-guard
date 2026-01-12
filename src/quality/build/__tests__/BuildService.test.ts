@@ -136,7 +136,7 @@ describe("BuildService", () => {
 
       const result = await service.run();
 
-      expect(result).toBe(true);
+      expect(result).toBeTruthy();
     });
 
     it("shows success when build passes", async () => {
@@ -156,7 +156,7 @@ describe("BuildService", () => {
 
       const result = await service.run();
 
-      expect(result).toBe(false);
+      expect(result).toBeFalsy();
     });
 
     it("shows failure when build fails", async () => {

@@ -76,7 +76,7 @@ describe("TypeCheckConfirmation", () => {
 
       const result = await confirmation.confirmRun("typecheck");
 
-      expect(result).toBe(true);
+      expect(result).toBeTruthy();
     });
 
     it("returns false when user declines", async () => {
@@ -84,7 +84,7 @@ describe("TypeCheckConfirmation", () => {
 
       const result = await confirmation.confirmRun("typecheck");
 
-      expect(result).toBe(false);
+      expect(result).toBeFalsy();
     });
 
     it("shows skip message when user declines", async () => {

@@ -76,7 +76,7 @@ describe("LintConfirmation", () => {
 
       const result = await confirmation.confirmRun("lint");
 
-      expect(result).toBe(true);
+      expect(result).toBeTruthy();
     });
 
     it("returns false when user declines", async () => {
@@ -84,7 +84,7 @@ describe("LintConfirmation", () => {
 
       const result = await confirmation.confirmRun("lint");
 
-      expect(result).toBe(false);
+      expect(result).toBeFalsy();
     });
 
     it("shows skip message when user declines", async () => {

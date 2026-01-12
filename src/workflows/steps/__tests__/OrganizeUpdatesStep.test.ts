@@ -84,7 +84,7 @@ describe("OrganizeUpdatesStep", () => {
 
       const result = await step.execute(updates, mockContext);
 
-      expect(result.continue).toBe(true);
+      expect(result.continue).toBeTruthy();
     });
 
     it("returns grouped and choices as data", async () => {

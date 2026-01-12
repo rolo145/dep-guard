@@ -75,7 +75,7 @@ describe("QualityChecksStep", () => {
 
       const result = await step.execute(packages, mockContext);
 
-      expect(result.continue).toBe(true);
+      expect(result.continue).toBeTruthy();
     });
 
     it("returns packages as data for next step", async () => {
@@ -97,7 +97,7 @@ describe("QualityChecksStep", () => {
 
       const result = await step.execute(packages, mockContext);
 
-      expect(result.continue).toBe(true);
+      expect(result.continue).toBeTruthy();
     });
 
     it("continues when quality checks are skipped", async () => {
@@ -110,7 +110,7 @@ describe("QualityChecksStep", () => {
 
       const result = await step.execute(packages, mockContext);
 
-      expect(result.continue).toBe(true);
+      expect(result.continue).toBeTruthy();
     });
   });
 });

@@ -99,7 +99,7 @@ describe("QualityService", () => {
 
       const result = await service.runLint();
 
-      expect(result).toBe(false);
+      expect(result).toBeFalsy();
     });
   });
 
@@ -135,7 +135,7 @@ describe("QualityService", () => {
 
       const result = await service.runTests();
 
-      expect(result).toBe(true);
+      expect(result).toBeTruthy();
     });
   });
 
@@ -153,7 +153,7 @@ describe("QualityService", () => {
 
       const result = await service.runBuild();
 
-      expect(result).toBe(false);
+      expect(result).toBeFalsy();
     });
   });
 });

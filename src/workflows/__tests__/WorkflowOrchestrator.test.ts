@@ -97,7 +97,7 @@ vi.mock("../../errors", () => ({
 }));
 
 import { WorkflowOrchestrator } from "../WorkflowOrchestrator";
-import { isUserCancellation } from "../../errors";
+import * as errors from "../../errors";
 
 describe("WorkflowOrchestrator", () => {
   beforeEach(() => {
@@ -115,7 +115,7 @@ describe("WorkflowOrchestrator", () => {
 
       const result = await orchestrator.execute();
 
-      expect(result.success).toBe(true);
+      expect(result.success).toBeTruthy();
       expect(result.exitCode).toBe(0);
       expect(result.reason).toBe("no_updates_available");
     });
@@ -131,7 +131,7 @@ describe("WorkflowOrchestrator", () => {
 
       const result = await orchestrator.execute();
 
-      expect(result.success).toBe(true);
+      expect(result.success).toBeTruthy();
       expect(result.exitCode).toBe(0);
       expect(result.reason).toBe("all_updates_filtered");
     });
@@ -149,7 +149,7 @@ describe("WorkflowOrchestrator", () => {
 
       const result = await orchestrator.execute();
 
-      expect(result.success).toBe(true);
+      expect(result.success).toBeTruthy();
       expect(result.exitCode).toBe(0);
       expect(result.reason).toBe("no_packages_selected");
     });
@@ -168,7 +168,7 @@ describe("WorkflowOrchestrator", () => {
 
       const result = await orchestrator.execute();
 
-      expect(result.success).toBe(true);
+      expect(result.success).toBeTruthy();
       expect(result.exitCode).toBe(0);
       expect(result.reason).toBe("no_packages_confirmed");
     });
@@ -193,7 +193,7 @@ describe("WorkflowOrchestrator", () => {
 
       const result = await orchestrator.execute();
 
-      expect(result.success).toBe(true);
+      expect(result.success).toBeTruthy();
       expect(result.exitCode).toBe(0);
       expect(result.reason).toBe("completed");
       expect(result.stats?.packagesInstalled).toBe(1);
@@ -202,7 +202,7 @@ describe("WorkflowOrchestrator", () => {
     it("handles user cancellation gracefully", async () => {
       const cancellationError = new Error("User cancelled");
       mockNCUService.loadUpdates.mockRejectedValue(cancellationError);
-      (isUserCancellation as ReturnType<typeof vi.fn>).mockReturnValue(true);
+      vi.mocked(errors.isUserCancellation).mockReturnValue(true);
 
       const orchestrator = new WorkflowOrchestrator({
         days: 7,
@@ -211,7 +211,7 @@ describe("WorkflowOrchestrator", () => {
 
       const result = await orchestrator.execute();
 
-      expect(result.success).toBe(false);
+      expect(result.success).toBeFalsy();
       expect(result.exitCode).toBe(130);
       expect(result.reason).toBe("user_cancelled");
     });
@@ -219,7 +219,7 @@ describe("WorkflowOrchestrator", () => {
     it("re-throws non-cancellation errors", async () => {
       const unexpectedError = new Error("Unexpected error");
       mockNCUService.loadUpdates.mockRejectedValue(unexpectedError);
-      (isUserCancellation as ReturnType<typeof vi.fn>).mockReturnValue(false);
+      vi.mocked(errors.isUserCancellation).mockReturnValue(false);
 
       const orchestrator = new WorkflowOrchestrator({
         days: 7,

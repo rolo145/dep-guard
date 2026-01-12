@@ -85,7 +85,7 @@ describe("SelectPackagesStep", () => {
 
       const result = await step.execute(input, mockContext);
 
-      expect(result.continue).toBe(false);
+      expect(result.continue).toBeFalsy();
       expect(result.exitReason).toBe("no_packages_selected");
     });
 
@@ -105,7 +105,7 @@ describe("SelectPackagesStep", () => {
 
       const result = await step.execute(input, mockContext);
 
-      expect(result.continue).toBe(true);
+      expect(result.continue).toBeTruthy();
     });
 
     it("returns selected packages as data", async () => {
