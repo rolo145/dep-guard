@@ -105,12 +105,18 @@ export class ArgumentParser {
     const options: CliOptions = {
       days: SAFETY_BUFFER_DAYS,
       scripts: { ...DEFAULT_SCRIPTS },
+      allowNpmInstall: false,
     };
 
     // Parse --days/-d
     const days = this.parseNumericOption("--days", "-d");
     if (days !== null) {
       options.days = days;
+    }
+
+    // Parse --allow-npm-install flag
+    if (this.hasFlag("--allow-npm-install")) {
+      options.allowNpmInstall = true;
     }
 
     // Parse all script options

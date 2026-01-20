@@ -18,9 +18,10 @@ Guardrail CLI for safer npm dependency updates. dep-guard combines a time-based 
 
 - Node.js >= 24
 - npm
-- `scfw` installed (Supply Chain Firewall)
+- `scfw` installed (Supply Chain Firewall) - recommended but optional
   - `pipx install scfw` (recommended)
   - or `pip install scfw`
+  - If scfw is not installed, use `--allow-npm-install` to fall back to npm install
 
 More info: https://github.com/DataDog/supply-chain-firewall
 
@@ -35,6 +36,7 @@ dep-guard [options]
 Options:
 
 - `-d, --days <number>`: Safety buffer in days (default: 7)
+- `--allow-npm-install`: Use npm install fallback when scfw is not available
 - `--lint <script>`: Lint script name (default: `lint`)
 - `--typecheck <script>`: Type check script name (default: `typecheck`)
 - `--test <script>`: Test script name (default: `test`)
@@ -52,6 +54,10 @@ dep-guard
 # Use a 14-day safety buffer
 
 dep-guard --days 14
+
+# Use npm install fallback when scfw is not installed
+
+dep-guard --allow-npm-install
 
 # Customize script names
 

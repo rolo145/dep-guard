@@ -1,0 +1,81 @@
+/**
+ * NPM Install Confirmation
+ *
+ * Handles user confirmation prompts and UI for npm installation fallback.
+ * Displays package info and manages user interaction.
+ *
+ * @module install/npm/NpmInstallConfirmation
+ */
+import chalk from "chalk";
+import { confirm } from "@inquirer/prompts";
+import { logger } from "../../logger";
+import { withCancellationHandling } from "../../errors";
+
+/**
+ * Handles user confirmation workflow for npm install fallback.
+ */
+export class NpmInstallConfirmation {
+  /**
+   * Shows installation header
+   */
+  showHeader(): void {
+    logger.header("Installing packages via npm (fallback mode)", "📦");
+  }
+
+  /**
+   * Shows list of packages to be installed
+   *
+   * @param packageSpecs - Array of package specs
+   */
+  showPackageList(packageSpecs: string[]): void {
+    logger.info(`Packages to install: ${packageSpecs.map((p) => chalk.bold(p)).join(", ")}`);
+  }
+
+  /**
+   * Prompts user to confirm installation
+   *
+   * @returns True if user confirms, false otherwise
+   */
+  async confirmInstall(): Promise<boolean> {
+    const confirmed = await withCancellationHandling(() =>
+      confirm({
+        message: "Do you want to install these packages via npm?",
+        default: false,
+      }),
+    );
+
+    if (!confirmed) {
+      logger.skip("Skipping npm installation");
+    }
+
+    return confirmed;
+  }
+
+  /**
+   * Creates a spinner for installation progress
+   *
+   * @returns Spinner instance
+   */
+  showInstallProgress(): ReturnType<typeof logger.spinner> {
+    return logger.spinner("Installing packages...");
+  }
+
+  /**
+   * Shows installation success message
+   *
+   * @param spinner - Spinner to update
+   */
+  showSuccess(spinner: ReturnType<typeof logger.spinner>): void {
+    spinner.succeed("All packages installed successfully");
+  }
+
+  /**
+   * Shows installation failure message
+   *
+   * @param spinner - Spinner to update
+   */
+  showFailure(spinner: ReturnType<typeof logger.spinner>): void {
+    spinner.fail("Failed to install packages");
+    logger.error("Update process aborted");
+  }
+}

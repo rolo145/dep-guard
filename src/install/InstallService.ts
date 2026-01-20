@@ -9,26 +9,24 @@
 import type { PackageSelection } from "../ncu";
 import type { IExecutionContext } from "../context/IExecutionContext";
 import { InstallRunner } from "./InstallRunner";
-import { InstallConfirmation } from "./InstallConfirmation";
 
 /**
  * Service for orchestrating the complete install workflow.
  *
  * Provides public API for running install operations with CI reinstall
- * and SCFW package installation, coordinating user interaction and execution.
+ * and SCFW/npm package installation, coordinating user interaction and execution.
  */
 export class InstallService {
   private runner: InstallRunner;
-  private confirmation: InstallConfirmation;
 
   /**
    * Creates a new InstallService instance.
    *
    * @param context - Workflow context for accessing configuration
+   * @param useNpmFallback - If true, use npm install instead of scfw
    */
-  constructor(context: IExecutionContext) {
-    this.runner = new InstallRunner(context);
-    this.confirmation = new InstallConfirmation();
+  constructor(context: IExecutionContext, useNpmFallback: boolean = false) {
+    this.runner = new InstallRunner(context, useNpmFallback);
   }
 
   /**

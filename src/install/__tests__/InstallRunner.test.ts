@@ -4,6 +4,7 @@ import { ExecutionContextFactory } from "../../context/ExecutionContextFactory";
 
 const mockCIRun = vi.fn();
 const mockSCFWInstall = vi.fn();
+const mockNpmInstall = vi.fn();
 
 // Mock the child services
 vi.mock("../ci/CIInstallService", () => ({
@@ -15,6 +16,12 @@ vi.mock("../ci/CIInstallService", () => ({
 vi.mock("../scfw/SCFWService", () => ({
   SCFWService: class {
     install = mockSCFWInstall;
+  },
+}));
+
+vi.mock("../npm/NpmInstallService", () => ({
+  NpmInstallService: class {
+    install = mockNpmInstall;
   },
 }));
 
@@ -117,6 +124,62 @@ describe("InstallRunner", () => {
       const result = await runner.runCI();
 
       expect(result).toBeFalsy();
+    });
+  });
+
+  describe("with useNpmFallback=true", () => {
+    let npmRunner: InstallRunner;
+
+    beforeEach(() => {
+      vi.clearAllMocks();
+      npmRunner = new InstallRunner(mockContext, true);
+    });
+
+    describe("run()", () => {
+      it("uses npm install instead of scfw when packages provided", async () => {
+        mockNpmInstall.mockResolvedValue(true);
+        mockCIRun.mockResolvedValue(true);
+
+        const packages = [{ name: "chalk", version: "5.0.0" }];
+        const result = await npmRunner.run(packages);
+
+        expect(mockNpmInstall).toHaveBeenCalledWith(packages);
+        expect(mockSCFWInstall).not.toHaveBeenCalled();
+        expect(mockCIRun).toHaveBeenCalled();
+        expect(result.scfwSuccess).toBeTruthy();
+        expect(result.ciSuccess).toBeTruthy();
+      });
+
+      it("still runs CI install with npm fallback", async () => {
+        mockCIRun.mockResolvedValue(true);
+
+        const result = await npmRunner.run();
+
+        expect(mockCIRun).toHaveBeenCalled();
+        expect(result.ciSuccess).toBeTruthy();
+      });
+    });
+
+    describe("runSCFW()", () => {
+      it("uses npm install instead of scfw", async () => {
+        mockNpmInstall.mockResolvedValue(true);
+
+        const packages = [{ name: "chalk", version: "5.0.0" }];
+        const result = await npmRunner.runSCFW(packages);
+
+        expect(mockNpmInstall).toHaveBeenCalledWith(packages);
+        expect(mockSCFWInstall).not.toHaveBeenCalled();
+        expect(result).toBeTruthy();
+      });
+
+      it("returns false when npm install fails", async () => {
+        mockNpmInstall.mockResolvedValue(false);
+
+        const packages = [{ name: "chalk", version: "5.0.0" }];
+        const result = await npmRunner.runSCFW(packages);
+
+        expect(result).toBeFalsy();
+      });
     });
   });
 });

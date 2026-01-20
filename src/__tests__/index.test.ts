@@ -30,6 +30,7 @@ vi.mock("../args", () => ({
       return {
         days: 7,
         scripts: { lint: "lint", typecheck: "typecheck", test: "test", build: "build" },
+        allowNpmInstall: false,
       };
     }
   },
@@ -38,7 +39,7 @@ vi.mock("../args", () => ({
     getVersion: vi.fn().mockReturnValue("1.0.0"),
   },
   PrerequisiteValidator: {
-    checkPrerequisites: vi.fn(),
+    checkPrerequisites: vi.fn().mockReturnValue({ scfwAvailable: true, useNpmFallback: false }),
   },
 }));
 

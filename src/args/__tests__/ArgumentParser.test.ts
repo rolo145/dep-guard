@@ -11,6 +11,7 @@ describe("ArgumentParser", () => {
 
       expect(options.days).toBe(SAFETY_BUFFER_DAYS);
       expect(options.scripts).toEqual(DEFAULT_SCRIPTS);
+      expect(options.allowNpmInstall).toBe(false);
     });
 
     it("parses --days with valid number", () => {
@@ -68,6 +69,21 @@ describe("ArgumentParser", () => {
       expect(options.scripts.test).toBe("jest");
       expect(options.scripts.typecheck).toBe(DEFAULT_SCRIPTS.typecheck);
       expect(options.scripts.build).toBe(DEFAULT_SCRIPTS.build);
+    });
+
+    it("parses --allow-npm-install flag", () => {
+      const parser = new ArgumentParser(["--allow-npm-install"]);
+      const options = parser.parse();
+
+      expect(options.allowNpmInstall).toBe(true);
+    });
+
+    it("parses --allow-npm-install with other options", () => {
+      const parser = new ArgumentParser(["--allow-npm-install", "--days", "14"]);
+      const options = parser.parse();
+
+      expect(options.allowNpmInstall).toBe(true);
+      expect(options.days).toBe(14);
     });
 
     it("throws InvalidFormatError for non-numeric days", () => {

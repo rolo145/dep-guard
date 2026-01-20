@@ -144,7 +144,7 @@ export class WorkflowOrchestrator {
     return {
       ncu: new NCUService(this.context),
       npq: new NPQService(this.context),
-      install: new InstallService(this.context),
+      install: new InstallService(this.context, this.options.useNpmFallback ?? false),
       quality: new QualityService(this.context),
     };
   }

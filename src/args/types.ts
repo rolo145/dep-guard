@@ -23,4 +23,6 @@ export interface CliOptions {
   days: number;
   /** Script names for quality checks */
   scripts: ScriptOptions;
+  /** Allow npm install fallback when scfw is not available */
+  allowNpmInstall: boolean;
 }

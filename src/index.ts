@@ -60,14 +60,18 @@ function setupGracefulShutdown(): void {
   // Parse CLI options
   const options = parser.parseOrExit();
 
-  // Ensure required security tools (scfw) are installed
-  PrerequisiteValidator.checkPrerequisites();
+  // Ensure required security tools (scfw) are installed or fallback is allowed
+  const { useNpmFallback } = PrerequisiteValidator.checkPrerequisites(options.allowNpmInstall);
 
   // Validate configured script names and warn about missing ones
   ScriptValidator.validate(options.scripts);
 
   // Run the complete update workflow
-  const orchestrator = new WorkflowOrchestrator({ days: options.days, scripts: options.scripts });
+  const orchestrator = new WorkflowOrchestrator({
+    days: options.days,
+    scripts: options.scripts,
+    useNpmFallback,
+  });
   const result = await orchestrator.execute();
 
   // Exit with the workflow's exit code

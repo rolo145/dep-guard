@@ -12,6 +12,8 @@ import type { ScriptOptions } from "../args/types";
 export interface WorkflowOptions {
   days: number;
   scripts: ScriptOptions;
+  /** Whether to use npm install fallback instead of scfw */
+  useNpmFallback?: boolean;
 }
 
 /** Reasons workflow may exit early */

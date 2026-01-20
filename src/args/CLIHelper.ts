@@ -36,6 +36,7 @@ Usage:
 
 Options:
   -d, --days <number>       Safety buffer in days (default: ${SAFETY_BUFFER_DAYS})
+  --allow-npm-install       Use npm install fallback when scfw is not available
   --lint <script>           Lint script name (default: "${DEFAULT_SCRIPTS.lint}")
   --typecheck <script>      Type check script name (default: "${DEFAULT_SCRIPTS.typecheck}")
   --test <script>           Test script name (default: "${DEFAULT_SCRIPTS.test}")
@@ -46,6 +47,7 @@ Options:
 Examples:
   dep-guard                       Run with default settings
   dep-guard --days 14             Use 14-day safety buffer
+  dep-guard --allow-npm-install   Use npm install when scfw is not installed
   dep-guard --lint eslint         Use "eslint" as lint script
   dep-guard --test test:all       Use "test:all" as test script
   dep-guard --build build:prod    Use "build:prod" as build script

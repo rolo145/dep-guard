@@ -34,10 +34,12 @@ describe("PrerequisiteValidator", () => {
   });
 
   describe("checkPrerequisites()", () => {
-    it("does not exit when scfw is available", () => {
+    it("returns scfwAvailable: true when scfw is available", () => {
       vi.mocked(spawnSync).mockReturnValue({ status: 0 } as ReturnType<typeof spawnSync>);
 
-      expect(() => PrerequisiteValidator.checkPrerequisites()).not.toThrow();
+      const result = PrerequisiteValidator.checkPrerequisites();
+
+      expect(result).toEqual({ scfwAvailable: true, useNpmFallback: false });
       expect(mockExit).not.toHaveBeenCalled();
     });
 
@@ -52,7 +54,7 @@ describe("PrerequisiteValidator", () => {
       });
     });
 
-    it("exits with code 1 when scfw is not available", () => {
+    it("exits with code 1 when scfw is not available and allowNpmInstall is false", () => {
       vi.mocked(spawnSync).mockReturnValue({ status: 1 } as ReturnType<typeof spawnSync>);
 
       expect(() => PrerequisiteValidator.checkPrerequisites()).toThrow();
@@ -64,6 +66,33 @@ describe("PrerequisiteValidator", () => {
 
       expect(() => PrerequisiteValidator.checkPrerequisites()).toThrow();
       expect(mockExit).toHaveBeenCalledWith(1);
+    });
+  });
+
+  describe("checkPrerequisites() with allowNpmInstall", () => {
+    it("returns useNpmFallback: true when scfw is not available and allowNpmInstall is true", () => {
+      vi.mocked(spawnSync).mockReturnValue({ status: 1 } as ReturnType<typeof spawnSync>);
+
+      const result = PrerequisiteValidator.checkPrerequisites(true);
+
+      expect(result).toEqual({ scfwAvailable: false, useNpmFallback: true });
+      expect(mockExit).not.toHaveBeenCalled();
+    });
+
+    it("exits with code 1 when scfw IS available and allowNpmInstall is true", () => {
+      vi.mocked(spawnSync).mockReturnValue({ status: 0 } as ReturnType<typeof spawnSync>);
+
+      expect(() => PrerequisiteValidator.checkPrerequisites(true)).toThrow();
+      expect(mockExit).toHaveBeenCalledWith(1);
+    });
+
+    it("returns scfwAvailable: true when scfw is available and allowNpmInstall is false", () => {
+      vi.mocked(spawnSync).mockReturnValue({ status: 0 } as ReturnType<typeof spawnSync>);
+
+      const result = PrerequisiteValidator.checkPrerequisites(false);
+
+      expect(result).toEqual({ scfwAvailable: true, useNpmFallback: false });
+      expect(mockExit).not.toHaveBeenCalled();
     });
   });
 });
