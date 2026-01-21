@@ -13,6 +13,15 @@ vi.mock("../workflows", () => ({
   },
 }));
 
+vi.mock("../workflows/BootstrapWorkflowOrchestrator", () => ({
+  BootstrapWorkflowOrchestrator: class MockBootstrapOrchestrator {
+    constructor() {}
+    async execute() {
+      return { exitCode: 0 };
+    }
+  },
+}));
+
 vi.mock("../quality/ScriptValidator", () => ({
   ScriptValidator: {
     validate: vi.fn(),
@@ -33,6 +42,12 @@ vi.mock("../args", () => ({
         allowNpmInstall: false,
       };
     }
+  },
+  SubcommandParser: {
+    parse: vi.fn().mockReturnValue({
+      subcommand: "update",
+      args: process.argv.slice(2),
+    }),
   },
   CLIHelper: {
     showHelp: vi.fn(),

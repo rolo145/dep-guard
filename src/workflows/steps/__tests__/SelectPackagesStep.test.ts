@@ -67,8 +67,8 @@ describe("SelectPackagesStep", () => {
   describe("execute()", () => {
     it("prompts for selection with choices", async () => {
       const input = {
-        grouped: {},
-        choices: [{ name: "lodash", value: { name: "lodash", version: "5.0.0" } }],
+        grouped: { major: [], minor: [], patch: [] },
+        choices: [{ name: "lodash", value: { name: "lodash", version: "5.0.0" }, checked: false }],
       };
       (mockContext.services.ncu.promptSelection as ReturnType<typeof vi.fn>).mockResolvedValue([
         { name: "lodash", version: "5.0.0" },
@@ -80,7 +80,7 @@ describe("SelectPackagesStep", () => {
     });
 
     it("exits early when no packages selected", async () => {
-      const input = { grouped: {}, choices: [] };
+      const input = { grouped: { major: [], minor: [], patch: [] }, choices: [] };
       (mockContext.services.ncu.promptSelection as ReturnType<typeof vi.fn>).mockResolvedValue([]);
 
       const result = await step.execute(input, mockContext);
@@ -90,7 +90,7 @@ describe("SelectPackagesStep", () => {
     });
 
     it("shows warning when no packages selected", async () => {
-      const input = { grouped: {}, choices: [] };
+      const input = { grouped: { major: [], minor: [], patch: [] }, choices: [] };
       (mockContext.services.ncu.promptSelection as ReturnType<typeof vi.fn>).mockResolvedValue([]);
 
       await step.execute(input, mockContext);
@@ -99,7 +99,7 @@ describe("SelectPackagesStep", () => {
     });
 
     it("continues when packages selected", async () => {
-      const input = { grouped: {}, choices: [] };
+      const input = { grouped: { major: [], minor: [], patch: [] }, choices: [] };
       const selected = [{ name: "lodash", version: "5.0.0" }];
       (mockContext.services.ncu.promptSelection as ReturnType<typeof vi.fn>).mockResolvedValue(selected);
 
@@ -109,7 +109,7 @@ describe("SelectPackagesStep", () => {
     });
 
     it("returns selected packages as data", async () => {
-      const input = { grouped: {}, choices: [] };
+      const input = { grouped: { major: [], minor: [], patch: [] }, choices: [] };
       const selected = [{ name: "lodash", version: "5.0.0" }, { name: "express", version: "4.19.0" }];
       (mockContext.services.ncu.promptSelection as ReturnType<typeof vi.fn>).mockResolvedValue(selected);
 
@@ -119,7 +119,7 @@ describe("SelectPackagesStep", () => {
     });
 
     it("updates stats with packages selected", async () => {
-      const input = { grouped: {}, choices: [] };
+      const input = { grouped: { major: [], minor: [], patch: [] }, choices: [] };
       const selected = [{ name: "lodash", version: "5.0.0" }, { name: "express", version: "4.19.0" }];
       (mockContext.services.ncu.promptSelection as ReturnType<typeof vi.fn>).mockResolvedValue(selected);
 
@@ -129,7 +129,7 @@ describe("SelectPackagesStep", () => {
     });
 
     it("shows success message with count", async () => {
-      const input = { grouped: {}, choices: [] };
+      const input = { grouped: { major: [], minor: [], patch: [] }, choices: [] };
       const selected = [{ name: "lodash", version: "5.0.0" }];
       (mockContext.services.ncu.promptSelection as ReturnType<typeof vi.fn>).mockResolvedValue(selected);
 

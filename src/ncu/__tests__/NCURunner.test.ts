@@ -38,7 +38,7 @@ describe("NCURunner", () => {
     });
 
     it("returns empty object when ncu returns null", async () => {
-      vi.mocked(ncuRun).mockResolvedValue(null);
+      vi.mocked(ncuRun).mockResolvedValue(null as any);
 
       const result = await runner.loadUpdates();
 

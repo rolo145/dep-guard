@@ -120,7 +120,7 @@ describe("TypeCheckConfirmation", () => {
 
   describe("showSuccess()", () => {
     it("updates spinner with success", () => {
-      confirmation.showSuccess(mockSpinner as ReturnType<typeof logger.spinner>);
+      confirmation.showSuccess(mockSpinner as unknown as ReturnType<typeof logger.spinner>);
 
       expect(mockSpinner.succeed).toHaveBeenCalledWith("Type checks passed");
     });
@@ -128,13 +128,13 @@ describe("TypeCheckConfirmation", () => {
 
   describe("showFailure()", () => {
     it("updates spinner with failure", () => {
-      confirmation.showFailure(mockSpinner as ReturnType<typeof logger.spinner>);
+      confirmation.showFailure(mockSpinner as unknown as ReturnType<typeof logger.spinner>);
 
       expect(mockSpinner.fail).toHaveBeenCalledWith("Type checks failed");
     });
 
     it("shows warning message", () => {
-      confirmation.showFailure(mockSpinner as ReturnType<typeof logger.spinner>);
+      confirmation.showFailure(mockSpinner as unknown as ReturnType<typeof logger.spinner>);
 
       expect(logger.warning).toHaveBeenCalledWith(
         "Type errors detected. Please review and fix them."

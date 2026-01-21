@@ -120,7 +120,7 @@ describe("LintConfirmation", () => {
 
   describe("showSuccess()", () => {
     it("updates spinner with success", () => {
-      confirmation.showSuccess(mockSpinner as ReturnType<typeof logger.spinner>);
+      confirmation.showSuccess(mockSpinner as unknown as ReturnType<typeof logger.spinner>);
 
       expect(mockSpinner.succeed).toHaveBeenCalledWith("Lint passed");
     });
@@ -128,13 +128,13 @@ describe("LintConfirmation", () => {
 
   describe("showFailure()", () => {
     it("updates spinner with failure", () => {
-      confirmation.showFailure(mockSpinner as ReturnType<typeof logger.spinner>);
+      confirmation.showFailure(mockSpinner as unknown as ReturnType<typeof logger.spinner>);
 
       expect(mockSpinner.fail).toHaveBeenCalledWith("Lint failed");
     });
 
     it("shows warning message", () => {
-      confirmation.showFailure(mockSpinner as ReturnType<typeof logger.spinner>);
+      confirmation.showFailure(mockSpinner as unknown as ReturnType<typeof logger.spinner>);
 
       expect(logger.warning).toHaveBeenCalledWith(
         "Linting errors detected. Please review and fix them."

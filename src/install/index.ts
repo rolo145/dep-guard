@@ -25,3 +25,8 @@ export { SCFWConfirmation } from "./scfw/SCFWConfirmation";
 export { NpmInstallService } from "./npm/NpmInstallService";
 export { NpmInstallRunner, type NpmInstallResult } from "./npm/NpmInstallRunner";
 export { NpmInstallConfirmation } from "./npm/NpmInstallConfirmation";
+
+// Bootstrap Install (fresh install from package.json)
+export { BootstrapInstallService } from "./bootstrap/BootstrapInstallService";
+export { BootstrapInstallRunner, type BootstrapInstallResult } from "./bootstrap/BootstrapInstallRunner";
+export { BootstrapInstallConfirmation } from "./bootstrap/BootstrapInstallConfirmation";
