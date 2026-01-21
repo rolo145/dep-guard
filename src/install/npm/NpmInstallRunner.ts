@@ -41,10 +41,11 @@ export class NpmInstallRunner {
    * Builds npm install command arguments with security flags
    *
    * @param packageSpecs - Array of package specs (e.g., ["chalk@5.0.0"])
+   * @param saveDev - Whether to add as dev dependency (optional)
    * @returns Array of command arguments for npm
    */
-  private buildInstallArgs(packageSpecs: string[]): string[] {
-    return [
+  private buildInstallArgs(packageSpecs: string[], saveDev: boolean = false): string[] {
+    const args = [
       "install",
       ...packageSpecs,
       "--save-exact",
@@ -52,16 +53,23 @@ export class NpmInstallRunner {
       "--before",
       this.context.cutoffIso,
     ];
+
+    if (saveDev) {
+      args.push("--save-dev");
+    }
+
+    return args;
   }
 
   /**
    * Installs packages using npm with security flags
    *
    * @param packageSpecs - Array of package specs (e.g., ["chalk@5.0.0"])
+   * @param saveDev - Whether to add as dev dependency (optional)
    * @returns Result object with success status
    */
-  install(packageSpecs: string[]): NpmInstallResult {
-    const args = this.buildInstallArgs(packageSpecs);
+  install(packageSpecs: string[], saveDev: boolean = false): NpmInstallResult {
+    const args = this.buildInstallArgs(packageSpecs, saveDev);
     const success = tryRunCommand("npm", args);
 
     return {
@@ -74,9 +82,10 @@ export class NpmInstallRunner {
    * Installs a single package using npm
    *
    * @param packageSpec - Package spec (e.g., "chalk@5.0.0")
+   * @param saveDev - Whether to add as dev dependency (optional)
    * @returns Result object with success status
    */
-  installSingle(packageSpec: string): NpmInstallResult {
-    return this.install([packageSpec]);
+  installSingle(packageSpec: string, saveDev: boolean = false): NpmInstallResult {
+    return this.install([packageSpec], saveDev);
   }
 }

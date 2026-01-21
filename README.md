@@ -2,10 +2,11 @@
 
 Preview release: this CLI is in early development and may change before a stable 1.0.
 
-Guardrail CLI for safer npm dependency management. dep-guard provides two commands for managing dependencies:
+Guardrail CLI for safer npm dependency management. dep-guard provides three commands for managing dependencies:
 
 1. **Fresh install** - Install all dependencies from package.json with security checks
 2. **Safe updates** - Update dependencies with time-based safety buffer, NPQ checks, and quality gates
+3. **Add package** - Add new dependencies with security validation and safety buffer checks
 
 ## Commands
 
@@ -28,6 +29,19 @@ Safe dependency updates with guardrails:
 - Reinstalls dependencies via `npm ci --ignore-scripts`
 - Optionally runs lint, typecheck, tests, and build scripts
 
+### `dep-guard add <package>`
+
+Add a new dependency with security checks:
+- Resolves package version (user-specified or latest safe version)
+- Applies safety buffer to ensure version is at least N days old (default: 7 days)
+- Checks if package already exists and prompts for action (update/keep/cancel)
+- Runs NPQ security validation and asks for confirmation
+- Installs through scfw with `--save-exact`, `--ignore-scripts`, and `--before <date>` (or `npm install` with same flags via `--allow-npm-install`)
+- Reinstalls dependencies via `npm ci --ignore-scripts`
+- Updates package.json and package-lock.json
+- Supports both regular dependencies and dev dependencies (`-D` flag)
+- Only adds one package at a time (no multiple packages)
+
 ## Requirements
 
 - Node.js >= 24
@@ -43,7 +57,8 @@ More info: https://github.com/DataDog/supply-chain-firewall
 
 **Subcommands are now required.** Previously, running `dep-guard` without arguments would start the update workflow. Now you must specify a subcommand:
 - `dep-guard update` - For the update workflow (previous default behavior)
-- `dep-guard install` - For fresh install from package.json (new feature)
+- `dep-guard install` - For fresh install from package.json
+- `dep-guard add <package>` - For adding new packages with security checks
 
 Running `dep-guard` without a subcommand will show an error message with usage instructions.
 
@@ -59,11 +74,13 @@ dep-guard <subcommand> [options]
 
 - `install` - Fresh install from package.json
 - `update` - Check for and install package updates
+- `add <package>` - Add a new package with security checks
 
 ### Options
 
-- `-d, --days <number>`: Safety buffer in days (default: 7) - applies to both install and update commands
+- `-d, --days <number>`: Safety buffer in days (default: 7) - applies to all commands
 - `--allow-npm-install`: Use npm install fallback when scfw is not available
+- `-D, --save-dev`: Add as dev dependency **[add only]**
 - `--lint <script>`: Lint script name (default: `lint`) **[update only]**
 - `--typecheck <script>`: Type check script name (default: `typecheck`) **[update only]**
 - `--test <script>`: Test script name (default: `test`) **[update only]**
@@ -94,6 +111,21 @@ dep-guard update --allow-npm-install
 
 # Update with custom script names
 dep-guard update --lint eslint --test test:all --build build:prod
+
+# Add latest safe version of a package
+dep-guard add vue
+
+# Add specific version of a package
+dep-guard add vue@3.2.0
+
+# Add scoped package as dev dependency
+dep-guard add @vue/cli -D
+
+# Add package with custom safety buffer
+dep-guard add typescript -D --days 14
+
+# Add package using npm fallback
+dep-guard add react --allow-npm-install
 ```
 
 ## Install / run (npm package)
@@ -104,11 +136,13 @@ npm install -g @roland.botka/dep-guard
 
 # then run
 dep-guard install          # fresh install
-dep-guard update          # check for updates
+dep-guard update           # check for updates
+dep-guard add vue          # add new package
 
 # or run once without installing
 npx @roland.botka/dep-guard install
 npx @roland.botka/dep-guard update
+npx @roland.botka/dep-guard add vue
 ```
 
 ## Install / run locally
@@ -126,6 +160,7 @@ npm run build
 node ./dist/index.js --help
 node ./dist/index.js install
 node ./dist/index.js update
+node ./dist/index.js add vue
 ```
 
 If you want the `dep-guard` command available on your PATH while developing:
@@ -136,6 +171,7 @@ npm link
 dep-guard --help
 dep-guard install
 dep-guard update
+dep-guard add vue
 ```
 
 ## Development

@@ -99,4 +99,144 @@ describe("ArgumentValidator", () => {
       expect(() => validator.validateString("--lint", "--other")).toThrow(MissingValueError);
     });
   });
+
+  describe("validatePackageName()", () => {
+    describe("regular packages", () => {
+      it("parses package name without version", () => {
+        const result = ArgumentValidator.validatePackageName("vue");
+        expect(result).toEqual({ name: "vue" });
+      });
+
+      it("parses package name with version", () => {
+        const result = ArgumentValidator.validatePackageName("vue@3.2.0");
+        expect(result).toEqual({ name: "vue", version: "3.2.0" });
+      });
+
+      it("parses package with prerelease version", () => {
+        const result = ArgumentValidator.validatePackageName("vue@3.2.0-beta.1");
+        expect(result).toEqual({ name: "vue", version: "3.2.0-beta.1" });
+      });
+
+      it("accepts lowercase package names", () => {
+        const result = ArgumentValidator.validatePackageName("lodash");
+        expect(result).toEqual({ name: "lodash" });
+      });
+
+      it("accepts package names with hyphens", () => {
+        const result = ArgumentValidator.validatePackageName("my-package");
+        expect(result).toEqual({ name: "my-package" });
+      });
+
+      it("accepts package names with underscores", () => {
+        const result = ArgumentValidator.validatePackageName("my_package");
+        expect(result).toEqual({ name: "my_package" });
+      });
+
+      it("accepts package names with dots", () => {
+        const result = ArgumentValidator.validatePackageName("my.package");
+        expect(result).toEqual({ name: "my.package" });
+      });
+    });
+
+    describe("scoped packages", () => {
+      it("parses scoped package without version", () => {
+        const result = ArgumentValidator.validatePackageName("@vue/cli");
+        expect(result).toEqual({ name: "@vue/cli" });
+      });
+
+      it("parses scoped package with version", () => {
+        const result = ArgumentValidator.validatePackageName("@vue/cli@5.0.0");
+        expect(result).toEqual({ name: "@vue/cli", version: "5.0.0" });
+      });
+
+      it("parses scoped package with prerelease version", () => {
+        const result = ArgumentValidator.validatePackageName("@vue/cli@5.0.0-alpha.1");
+        expect(result).toEqual({ name: "@vue/cli", version: "5.0.0-alpha.1" });
+      });
+
+      it("handles scopes with hyphens", () => {
+        const result = ArgumentValidator.validatePackageName("@my-org/my-package");
+        expect(result).toEqual({ name: "@my-org/my-package" });
+      });
+
+      it("handles scopes with underscores", () => {
+        const result = ArgumentValidator.validatePackageName("@my_org/my_package");
+        expect(result).toEqual({ name: "@my_org/my_package" });
+      });
+    });
+
+    describe("version validation", () => {
+      it("rejects version ranges with caret", () => {
+        expect(() => ArgumentValidator.validatePackageName("vue@^3.0.0")).toThrow(InvalidFormatError);
+        expect(() => ArgumentValidator.validatePackageName("vue@^3.0.0")).toThrow("not a version range");
+      });
+
+      it("rejects version ranges with tilde", () => {
+        expect(() => ArgumentValidator.validatePackageName("vue@~3.0.0")).toThrow(InvalidFormatError);
+        expect(() => ArgumentValidator.validatePackageName("vue@~3.0.0")).toThrow("not a version range");
+      });
+
+      it("rejects version ranges with greater than", () => {
+        expect(() => ArgumentValidator.validatePackageName("vue@>3.0.0")).toThrow(InvalidFormatError);
+      });
+
+      it("rejects version ranges with less than", () => {
+        expect(() => ArgumentValidator.validatePackageName("vue@<3.0.0")).toThrow(InvalidFormatError);
+      });
+
+      it("rejects version ranges with asterisk", () => {
+        expect(() => ArgumentValidator.validatePackageName("vue@*")).toThrow(InvalidFormatError);
+      });
+
+      it('rejects "latest" as version', () => {
+        expect(() => ArgumentValidator.validatePackageName("vue@latest")).toThrow(InvalidFormatError);
+        expect(() => ArgumentValidator.validatePackageName("vue@latest")).toThrow("not a version range");
+      });
+
+      it("rejects invalid semver format", () => {
+        expect(() => ArgumentValidator.validatePackageName("vue@3.2")).toThrow(InvalidFormatError);
+        expect(() => ArgumentValidator.validatePackageName("vue@3.2")).toThrow("valid semver version");
+      });
+
+      it("rejects empty version after @", () => {
+        expect(() => ArgumentValidator.validatePackageName("vue@")).toThrow(InvalidFormatError);
+      });
+    });
+
+    describe("error cases", () => {
+      it("throws InvalidFormatError for empty string", () => {
+        expect(() => ArgumentValidator.validatePackageName("")).toThrow(InvalidFormatError);
+      });
+
+      it("throws InvalidFormatError for whitespace only", () => {
+        expect(() => ArgumentValidator.validatePackageName("   ")).toThrow(InvalidFormatError);
+      });
+
+      it("throws InvalidFormatError for package name starting with dot", () => {
+        expect(() => ArgumentValidator.validatePackageName(".vue")).toThrow(InvalidFormatError);
+      });
+
+      it("throws InvalidFormatError for package name starting with underscore", () => {
+        expect(() => ArgumentValidator.validatePackageName("_vue")).toThrow(InvalidFormatError);
+      });
+
+      it("throws InvalidFormatError for invalid scoped package (missing slash)", () => {
+        expect(() => ArgumentValidator.validatePackageName("@vue")).toThrow(InvalidFormatError);
+      });
+
+      it("throws InvalidFormatError for package name too long (>214 chars)", () => {
+        const longName = "a".repeat(215);
+        expect(() => ArgumentValidator.validatePackageName(longName)).toThrow(InvalidFormatError);
+      });
+
+      it("includes package spec in error message", () => {
+        try {
+          ArgumentValidator.validatePackageName("vue@^3.0.0");
+        } catch (error) {
+          expect(error).toBeInstanceOf(InvalidFormatError);
+          expect((error as InvalidFormatError).value).toBe("vue@^3.0.0");
+        }
+      });
+    });
+  });
 });

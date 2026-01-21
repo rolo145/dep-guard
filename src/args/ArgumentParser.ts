@@ -39,6 +39,47 @@ export class ArgumentParser {
   }
 
   /**
+   * Extracts non-flag arguments (package names)
+   * Returns all arguments that are not flags or flag values
+   *
+   * Filters out:
+   * - Flags (arguments starting with -)
+   * - Values following flags that require values (--days, --lint, etc.)
+   */
+  parsePackageArgs(): string[] {
+    const result: string[] = [];
+    const flagsWithValues = [
+      "--days", "-d",
+      "--lint", "--typecheck", "--test", "--build",
+    ];
+
+    for (let i = 0; i < this.args.length; i++) {
+      const arg = this.args[i];
+
+      // Skip flags
+      if (arg.startsWith("-")) {
+        // If this flag requires a value, skip the next argument too
+        if (flagsWithValues.includes(arg)) {
+          i++; // Skip the value
+        }
+        continue;
+      }
+
+      // This is not a flag, include it
+      result.push(arg);
+    }
+
+    return result;
+  }
+
+  /**
+   * Checks if the save-dev flag is present (-D or --save-dev)
+   */
+  hasSaveDevFlag(): boolean {
+    return this.hasFlag("-D", "--save-dev");
+  }
+
+  /**
    * Finds the index of a flag in the arguments
    */
   private findFlagIndex(flag: string, shortFlag?: string): number {

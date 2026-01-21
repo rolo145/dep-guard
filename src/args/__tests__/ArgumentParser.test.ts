@@ -137,4 +137,131 @@ describe("ArgumentParser", () => {
       expect(parser.hasFlag("--help", "-h")).toBeFalsy();
     });
   });
+
+  describe("parsePackageArgs()", () => {
+    it("returns empty array when only flags present", () => {
+      const parser = new ArgumentParser(["-D", "--allow-npm-install"]);
+      const packages = parser.parsePackageArgs();
+
+      expect(packages).toEqual([]);
+    });
+
+    it("returns single package argument", () => {
+      const parser = new ArgumentParser(["vue"]);
+      const packages = parser.parsePackageArgs();
+
+      expect(packages).toEqual(["vue"]);
+    });
+
+    it("returns package with version", () => {
+      const parser = new ArgumentParser(["vue@3.2.0"]);
+      const packages = parser.parsePackageArgs();
+
+      expect(packages).toEqual(["vue@3.2.0"]);
+    });
+
+    it("returns scoped package", () => {
+      const parser = new ArgumentParser(["@vue/cli"]);
+      const packages = parser.parsePackageArgs();
+
+      expect(packages).toEqual(["@vue/cli"]);
+    });
+
+    it("returns scoped package with version", () => {
+      const parser = new ArgumentParser(["@vue/cli@5.0.0"]);
+      const packages = parser.parsePackageArgs();
+
+      expect(packages).toEqual(["@vue/cli@5.0.0"]);
+    });
+
+    it("returns package and filters out flags", () => {
+      const parser = new ArgumentParser(["vue", "-D", "--allow-npm-install"]);
+      const packages = parser.parsePackageArgs();
+
+      expect(packages).toEqual(["vue"]);
+    });
+
+    it("filters out flag values from --days", () => {
+      const parser = new ArgumentParser(["vue", "--days", "7"]);
+      const packages = parser.parsePackageArgs();
+
+      expect(packages).toEqual(["vue"]);
+    });
+
+    it("filters out flag values from -d", () => {
+      const parser = new ArgumentParser(["vue", "-d", "14"]);
+      const packages = parser.parsePackageArgs();
+
+      expect(packages).toEqual(["vue"]);
+    });
+
+    it("filters out flag values from --lint", () => {
+      const parser = new ArgumentParser(["vue", "--lint", "eslint"]);
+      const packages = parser.parsePackageArgs();
+
+      expect(packages).toEqual(["vue"]);
+    });
+
+    it("filters out multiple flag values", () => {
+      const parser = new ArgumentParser(["vue", "--days", "7", "--lint", "eslint", "-D"]);
+      const packages = parser.parsePackageArgs();
+
+      expect(packages).toEqual(["vue"]);
+    });
+
+    it("returns multiple packages when provided (for validation testing)", () => {
+      // Note: CLI validates that only one package is provided
+      // This test verifies that the parser itself doesn't reject multiple packages
+      const parser = new ArgumentParser(["vue", "react"]);
+      const packages = parser.parsePackageArgs();
+
+      expect(packages).toEqual(["vue", "react"]);
+    });
+
+    it("handles package as first argument followed by flags", () => {
+      const parser = new ArgumentParser(["typescript", "-D", "--allow-npm-install"]);
+      const packages = parser.parsePackageArgs();
+
+      expect(packages).toEqual(["typescript"]);
+    });
+
+    it("handles package with flags and flag values mixed", () => {
+      const parser = new ArgumentParser(["typescript", "-D", "--days", "14", "--allow-npm-install"]);
+      const packages = parser.parsePackageArgs();
+
+      expect(packages).toEqual(["typescript"]);
+    });
+  });
+
+  describe("hasSaveDevFlag()", () => {
+    it("returns true when -D flag is present", () => {
+      const parser = new ArgumentParser(["vue", "-D"]);
+
+      expect(parser.hasSaveDevFlag()).toBe(true);
+    });
+
+    it("returns true when --save-dev flag is present", () => {
+      const parser = new ArgumentParser(["vue", "--save-dev"]);
+
+      expect(parser.hasSaveDevFlag()).toBe(true);
+    });
+
+    it("returns false when neither flag is present", () => {
+      const parser = new ArgumentParser(["vue", "--days", "7"]);
+
+      expect(parser.hasSaveDevFlag()).toBe(false);
+    });
+
+    it("returns false when no arguments", () => {
+      const parser = new ArgumentParser([]);
+
+      expect(parser.hasSaveDevFlag()).toBe(false);
+    });
+
+    it("returns true when both -D and --save-dev present", () => {
+      const parser = new ArgumentParser(["vue", "-D", "--save-dev"]);
+
+      expect(parser.hasSaveDevFlag()).toBe(true);
+    });
+  });
 });

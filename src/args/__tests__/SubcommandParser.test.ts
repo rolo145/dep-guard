@@ -18,6 +18,13 @@ describe("SubcommandParser", () => {
         expect(result.args).toEqual([]);
       });
 
+      it('parses "add" subcommand', () => {
+        const result = SubcommandParser.parse(["add"]);
+
+        expect(result.subcommand).toBe("add");
+        expect(result.args).toEqual([]);
+      });
+
       it("returns remaining args after install subcommand", () => {
         const result = SubcommandParser.parse(["install", "--allow-npm-install"]);
 
@@ -45,6 +52,34 @@ describe("SubcommandParser", () => {
         expect(result.subcommand).toBe("update");
         expect(result.args).toEqual(["--days", "14", "--lint", "eslint", "--allow-npm-install"]);
       });
+
+      it("returns package name after add subcommand", () => {
+        const result = SubcommandParser.parse(["add", "vue"]);
+
+        expect(result.subcommand).toBe("add");
+        expect(result.args).toEqual(["vue"]);
+      });
+
+      it("returns package with version after add subcommand", () => {
+        const result = SubcommandParser.parse(["add", "vue@3.2.0"]);
+
+        expect(result.subcommand).toBe("add");
+        expect(result.args).toEqual(["vue@3.2.0"]);
+      });
+
+      it("returns package and flags after add subcommand", () => {
+        const result = SubcommandParser.parse(["add", "vue", "-D", "--days", "14"]);
+
+        expect(result.subcommand).toBe("add");
+        expect(result.args).toEqual(["vue", "-D", "--days", "14"]);
+      });
+
+      it("returns scoped package after add subcommand", () => {
+        const result = SubcommandParser.parse(["add", "@vue/cli"]);
+
+        expect(result.subcommand).toBe("add");
+        expect(result.args).toEqual(["@vue/cli"]);
+      });
     });
 
     describe("error cases", () => {
@@ -70,6 +105,7 @@ describe("SubcommandParser", () => {
           expect(error).toBeInstanceOf(SubcommandParseError);
           expect((error as Error).message).toContain("dep-guard install");
           expect((error as Error).message).toContain("dep-guard update");
+          expect((error as Error).message).toContain("dep-guard add");
         }
       });
 
@@ -80,6 +116,7 @@ describe("SubcommandParser", () => {
           expect(error).toBeInstanceOf(SubcommandParseError);
           expect((error as Error).message).toContain("install");
           expect((error as Error).message).toContain("update");
+          expect((error as Error).message).toContain("add");
         }
       });
     });

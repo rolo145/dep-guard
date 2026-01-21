@@ -37,10 +37,12 @@ Usage:
 Subcommands:
   install                   Fresh install from package.json
   update                    Check for and install package updates
+  add <package>             Add a new package with security checks
 
 Options:
   -d, --days <number>       Safety buffer in days (default: ${SAFETY_BUFFER_DAYS})
   --allow-npm-install       Use npm install fallback when scfw is not available
+  -D, --save-dev            Add as dev dependency [add only]
   --lint <script>           Lint script name (default: "${DEFAULT_SCRIPTS.lint}") [update only]
   --typecheck <script>      Type check script name (default: "${DEFAULT_SCRIPTS.typecheck}") [update only]
   --test <script>           Test script name (default: "${DEFAULT_SCRIPTS.test}") [update only]
@@ -57,6 +59,10 @@ Examples:
   dep-guard update --allow-npm-install  Update using npm install fallback
   dep-guard update --lint eslint        Use "eslint" as lint script
   dep-guard update --test test:all      Use "test:all" as test script
+  dep-guard add vue                     Add latest safe version of vue
+  dep-guard add vue@3.2.0               Add specific version of vue
+  dep-guard add @vue/cli -D             Add @vue/cli as dev dependency
+  dep-guard add typescript -D --days 14 Add typescript with 14-day buffer
 `);
   }
 }

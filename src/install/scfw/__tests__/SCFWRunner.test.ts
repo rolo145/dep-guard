@@ -86,4 +86,66 @@ describe("SCFWRunner", () => {
       expect(result.packageSpecs).toEqual(["chalk@5.0.0"]);
     });
   });
+
+  describe("--save-dev flag", () => {
+    it("includes --save-dev flag when saveDev is true", () => {
+      vi.mocked(tryRunCommand).mockReturnValue(true);
+
+      runner.install(["typescript@5.0.0"], true);
+
+      expect(tryRunCommand).toHaveBeenCalledWith("scfw", [
+        "run",
+        "npm",
+        "install",
+        "typescript@5.0.0",
+        "--save-exact",
+        "--ignore-scripts",
+        "--before",
+        "2024-01-01T00:00:00.000Z",
+        "--save-dev",
+      ]);
+    });
+
+    it("omits --save-dev flag when saveDev is false", () => {
+      vi.mocked(tryRunCommand).mockReturnValue(true);
+
+      runner.install(["typescript@5.0.0"], false);
+
+      expect(tryRunCommand).toHaveBeenCalledWith("scfw", [
+        "run",
+        "npm",
+        "install",
+        "typescript@5.0.0",
+        "--save-exact",
+        "--ignore-scripts",
+        "--before",
+        "2024-01-01T00:00:00.000Z",
+      ]);
+    });
+
+    it("omits --save-dev flag when saveDev is not provided", () => {
+      vi.mocked(tryRunCommand).mockReturnValue(true);
+
+      runner.install(["typescript@5.0.0"]);
+
+      expect(tryRunCommand).toHaveBeenCalledWith("scfw", [
+        "run",
+        "npm",
+        "install",
+        "typescript@5.0.0",
+        "--save-exact",
+        "--ignore-scripts",
+        "--before",
+        "2024-01-01T00:00:00.000Z",
+      ]);
+    });
+
+    it("includes --save-dev flag in installSingle when saveDev is true", () => {
+      vi.mocked(tryRunCommand).mockReturnValue(true);
+
+      runner.installSingle("typescript@5.0.0", true);
+
+      expect(tryRunCommand).toHaveBeenCalledWith("scfw", expect.arrayContaining(["--save-dev"]));
+    });
+  });
 });

@@ -42,10 +42,11 @@ export class SCFWRunner {
    * Builds scfw install command arguments with security flags
    *
    * @param packageSpecs - Array of package specs (e.g., ["chalk@5.0.0"])
+   * @param saveDev - Whether to add as dev dependency (optional)
    * @returns Array of command arguments for scfw
    */
-  private buildInstallArgs(packageSpecs: string[]): string[] {
-    return [
+  private buildInstallArgs(packageSpecs: string[], saveDev: boolean = false): string[] {
+    const args = [
       "run",
       "npm",
       "install",
@@ -55,16 +56,23 @@ export class SCFWRunner {
       "--before",
       this.context.cutoffIso,
     ];
+
+    if (saveDev) {
+      args.push("--save-dev");
+    }
+
+    return args;
   }
 
   /**
    * Installs packages using scfw with security flags
    *
    * @param packageSpecs - Array of package specs (e.g., ["chalk@5.0.0"])
+   * @param saveDev - Whether to add as dev dependency (optional)
    * @returns Result object with success status
    */
-  install(packageSpecs: string[]): SCFWInstallResult {
-    const args = this.buildInstallArgs(packageSpecs);
+  install(packageSpecs: string[], saveDev: boolean = false): SCFWInstallResult {
+    const args = this.buildInstallArgs(packageSpecs, saveDev);
     const success = tryRunCommand("scfw", args);
 
     return {
@@ -77,9 +85,10 @@ export class SCFWRunner {
    * Installs a single package using scfw
    *
    * @param packageSpec - Package spec (e.g., "chalk@5.0.0")
+   * @param saveDev - Whether to add as dev dependency (optional)
    * @returns Result object with success status
    */
-  installSingle(packageSpec: string): SCFWInstallResult {
-    return this.install([packageSpec]);
+  installSingle(packageSpec: string, saveDev: boolean = false): SCFWInstallResult {
+    return this.install([packageSpec], saveDev);
   }
 }

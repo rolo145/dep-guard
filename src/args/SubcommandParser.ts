@@ -6,7 +6,7 @@
  * @module args/SubcommandParser
  */
 
-export type Subcommand = "update" | "install";
+export type Subcommand = "update" | "install" | "add";
 
 export interface ParsedCommand {
   subcommand: Subcommand;
@@ -41,10 +41,11 @@ export class SubcommandParser {
     // If no args or first arg is a flag, no subcommand provided
     if (args.length === 0 || args[0].startsWith("-")) {
       throw new SubcommandParseError(
-        "Please specify a subcommand: install or update\n\n" +
+        "Please specify a subcommand: install, update, or add\n\n" +
           "Usage:\n" +
           "  dep-guard install    Fresh install from package.json\n" +
-          "  dep-guard update     Check for and install package updates\n\n" +
+          "  dep-guard update     Check for and install package updates\n" +
+          "  dep-guard add        Add a new package with security checks\n\n" +
           "Run 'dep-guard --help' for more information.",
       );
     }
@@ -53,7 +54,7 @@ export class SubcommandParser {
     const remainingArgs = args.slice(1);
 
     // Check for known subcommands
-    if (firstArg === "install" || firstArg === "update") {
+    if (firstArg === "install" || firstArg === "update" || firstArg === "add") {
       return {
         subcommand: firstArg,
         args: remainingArgs,
@@ -63,7 +64,7 @@ export class SubcommandParser {
     // Unknown subcommand
     throw new SubcommandParseError(
       `Unknown subcommand: ${firstArg}\n\n` +
-        "Valid subcommands are: install, update\n" +
+        "Valid subcommands are: install, update, add\n" +
         "Run 'dep-guard --help' for more information.",
     );
   }

@@ -15,8 +15,10 @@
  */
 import { WorkflowOrchestrator } from "./workflows";
 import { BootstrapWorkflowOrchestrator } from "./workflows/BootstrapWorkflowOrchestrator";
+import { AddWorkflowOrchestrator } from "./workflows/AddWorkflowOrchestrator";
 import { ScriptValidator } from "./quality/ScriptValidator";
 import { ArgumentParser, CLIHelper, PrerequisiteValidator, SubcommandParser } from "./args";
+import { ArgumentValidator } from "./args/ArgumentValidator";
 import { EXIT_CODE_CANCELLED, handleFatalError } from "./errors";
 
 /**
@@ -62,7 +64,7 @@ function setupGracefulShutdown(): void {
   }
 
   // Parse subcommand
-  let subcommand: "install" | "update";
+  let subcommand: "install" | "update" | "add";
   let args: string[];
 
   try {
@@ -93,6 +95,57 @@ function setupGracefulShutdown(): void {
       scripts: options.scripts,
       useNpmFallback,
     });
+    const result = await orchestrator.execute();
+    process.exit(result.exitCode);
+  } else if (subcommand === "add") {
+    // Run add package workflow
+    // Validate that exactly one package was specified
+    const packageArgs = parser.parsePackageArgs();
+
+    if (packageArgs.length === 0) {
+      console.error("Error: No package specified");
+      console.error("Usage: dep-guard add <package> [options]");
+      console.error("");
+      console.error("Examples:");
+      console.error("  dep-guard add vue");
+      console.error("  dep-guard add vue@3.2.0");
+      console.error("  dep-guard add @vue/cli -D");
+      process.exit(1);
+    }
+
+    if (packageArgs.length > 1) {
+      console.error("Error: Only one package can be added at a time");
+      console.error("Usage: dep-guard add <package> [options]");
+      console.error("");
+      console.error("Examples:");
+      console.error("  dep-guard add vue");
+      console.error("  dep-guard add vue@3.2.0");
+      process.exit(1);
+    }
+
+    // Parse and validate package specification
+    let packageSpec;
+    try {
+      packageSpec = ArgumentValidator.validatePackageName(packageArgs[0]);
+    } catch (error) {
+      if (error instanceof Error) {
+        console.error(`Error: ${error.message}`);
+        process.exit(1);
+      }
+      throw error;
+    }
+
+    const saveDev = parser.hasSaveDevFlag();
+
+    // Run add workflow
+    const orchestrator = new AddWorkflowOrchestrator({
+      packageSpec,
+      days: options.days,
+      scripts: options.scripts,
+      useNpmFallback,
+      saveDev,
+    });
+
     const result = await orchestrator.execute();
     process.exit(result.exitCode);
   } else {

@@ -25,4 +25,8 @@ export interface CliOptions {
   scripts: ScriptOptions;
   /** Allow npm install fallback when scfw is not available */
   allowNpmInstall: boolean;
+  /** Package specifications for add command (optional) */
+  packages?: string[];
+  /** Add as dev dependency (optional, for add command) */
+  saveDev?: boolean;
 }
