@@ -13,7 +13,7 @@ describe("IWorkflowStep helpers", () => {
       const data = { foo: "bar", baz: 123 };
       const result = continueWith(data);
 
-      expect(result.data).toEqual(data);
+      expect(result.data).toStrictEqual(data);
     });
 
     it("does not include exitReason", () => {
@@ -26,7 +26,7 @@ describe("IWorkflowStep helpers", () => {
       const data = [1, 2, 3];
       const result = continueWith(data);
 
-      expect(result.data).toEqual([1, 2, 3]);
+      expect(result.data).toStrictEqual([1, 2, 3]);
     });
 
     it("works with null data", () => {
@@ -54,8 +54,8 @@ describe("IWorkflowStep helpers", () => {
       const stepData = { step: "check_updates" as const, data: { lodash: "5.0.0" } };
       const result = continueWithStep(stepData);
 
-      expect(result.data).toEqual({ lodash: "5.0.0" });
-      expect(result.stepData).toEqual(stepData);
+      expect(result.data).toStrictEqual({ lodash: "5.0.0" });
+      expect(result.stepData).toStrictEqual(stepData);
     });
 
     it("works with init step", () => {
@@ -72,7 +72,7 @@ describe("IWorkflowStep helpers", () => {
       const result = continueWithStep(stepData);
 
       expect(result.stepData?.step).toBe("select");
-      expect(result.data).toEqual(packages);
+      expect(result.data).toStrictEqual(packages);
     });
   });
 

@@ -60,7 +60,7 @@ describe("SecurityValidationStep", () => {
   });
 
   it("has correct step definition", () => {
-    expect(step.stepDef).toEqual(WORKFLOW_STEPS.SECURITY);
+    expect(step.stepDef).toStrictEqual(WORKFLOW_STEPS.SECURITY);
   });
 
   describe("execute()", () => {
@@ -108,7 +108,7 @@ describe("SecurityValidationStep", () => {
 
       const result = await step.execute(selected, mockContext);
 
-      expect(result.data).toEqual(confirmed);
+      expect(result.data).toStrictEqual(confirmed);
     });
 
     it("passes all selected packages to NPQ", async () => {

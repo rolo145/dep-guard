@@ -61,7 +61,7 @@ describe("SelectPackagesStep", () => {
   });
 
   it("has correct step definition", () => {
-    expect(step.stepDef).toEqual(WORKFLOW_STEPS.SELECT);
+    expect(step.stepDef).toStrictEqual(WORKFLOW_STEPS.SELECT);
   });
 
   describe("execute()", () => {
@@ -115,7 +115,7 @@ describe("SelectPackagesStep", () => {
 
       const result = await step.execute(input, mockContext);
 
-      expect(result.data).toEqual(selected);
+      expect(result.data).toStrictEqual(selected);
     });
 
     it("updates stats with packages selected", async () => {

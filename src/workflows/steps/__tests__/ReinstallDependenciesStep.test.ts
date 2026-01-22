@@ -52,7 +52,7 @@ describe("ReinstallDependenciesStep", () => {
   });
 
   it("has correct step definition", () => {
-    expect(step.stepDef).toEqual(WORKFLOW_STEPS.REINSTALL);
+    expect(step.stepDef).toStrictEqual(WORKFLOW_STEPS.REINSTALL);
   });
 
   describe("execute()", () => {
@@ -80,7 +80,7 @@ describe("ReinstallDependenciesStep", () => {
 
       const result = await step.execute(packages, mockContext);
 
-      expect(result.data).toEqual(packages);
+      expect(result.data).toStrictEqual(packages);
     });
 
     it("calls reinstall without arguments", async () => {

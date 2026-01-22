@@ -138,7 +138,7 @@ describe("NCUConfirmation", () => {
 
       const result = await confirmation.promptSelection([]);
 
-      expect(result).toEqual(selected);
+      expect(result).toStrictEqual(selected);
     });
   });
 });

@@ -63,7 +63,7 @@ describe("NCURegistryService", () => {
     it("returns empty object for empty updates", async () => {
       const result = await service.filterUpdatesByAge({});
 
-      expect(result).toEqual({});
+      expect(result).toStrictEqual({});
     });
 
     it("includes package when safe version is available", async () => {
@@ -81,7 +81,7 @@ describe("NCURegistryService", () => {
 
       const result = await service.filterUpdatesByAge({ lodash: "5.0.0" });
 
-      expect(result).toEqual({ lodash: "5.0.0" });
+      expect(result).toStrictEqual({ lodash: "5.0.0" });
     });
 
     it("excludes package when no safe version found", async () => {
@@ -99,7 +99,7 @@ describe("NCURegistryService", () => {
 
       const result = await service.filterUpdatesByAge({ lodash: "5.0.0" });
 
-      expect(result).toEqual({});
+      expect(result).toStrictEqual({});
     });
 
     it("excludes prerelease versions", async () => {
@@ -120,7 +120,7 @@ describe("NCURegistryService", () => {
 
       const result = await service.filterUpdatesByAge({ lodash: "5.0.0-beta.1" });
 
-      expect(result).toEqual({ lodash: "4.18.0" });
+      expect(result).toStrictEqual({ lodash: "4.18.0" });
     });
 
     it("uses suggested version when fetch fails", async () => {
@@ -131,7 +131,7 @@ describe("NCURegistryService", () => {
 
       const result = await service.filterUpdatesByAge({ lodash: "5.0.0" });
 
-      expect(result).toEqual({ lodash: "5.0.0" });
+      expect(result).toStrictEqual({ lodash: "5.0.0" });
     });
 
     it("uses suggested version when response is malformed", async () => {
@@ -142,7 +142,7 @@ describe("NCURegistryService", () => {
 
       const result = await service.filterUpdatesByAge({ lodash: "5.0.0" });
 
-      expect(result).toEqual({ lodash: "5.0.0" });
+      expect(result).toStrictEqual({ lodash: "5.0.0" });
     });
 
     it("skips package when safe version matches current", async () => {
@@ -160,7 +160,7 @@ describe("NCURegistryService", () => {
 
       const result = await service.filterUpdatesByAge({ lodash: "5.0.0" });
 
-      expect(result).toEqual({});
+      expect(result).toStrictEqual({});
     });
 
     it("handles scoped packages", async () => {
@@ -180,7 +180,7 @@ describe("NCURegistryService", () => {
 
       const result = await service.filterUpdatesByAge({ "@vue/reactivity": "3.0.0" });
 
-      expect(result).toEqual({ "@vue/reactivity": "3.0.0" });
+      expect(result).toStrictEqual({ "@vue/reactivity": "3.0.0" });
       expect(mockFetch).toHaveBeenCalledWith(
         expect.stringContaining("@vue%2Freactivity"),
         expect.any(Object)
@@ -207,7 +207,7 @@ describe("NCURegistryService", () => {
 
       const result = await service.filterUpdatesByAge({ lodash: "5.0.0" });
 
-      expect(result).toEqual({ lodash: "4.19.0" });
+      expect(result).toStrictEqual({ lodash: "4.19.0" });
     });
 
     it("processes multiple packages", async () => {

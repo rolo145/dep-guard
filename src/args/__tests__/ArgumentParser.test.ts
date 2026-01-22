@@ -10,8 +10,8 @@ describe("ArgumentParser", () => {
       const options = parser.parse();
 
       expect(options.days).toBe(SAFETY_BUFFER_DAYS);
-      expect(options.scripts).toEqual(DEFAULT_SCRIPTS);
-      expect(options.allowNpmInstall).toBe(false);
+      expect(options.scripts).toStrictEqual(DEFAULT_SCRIPTS);
+      expect(options.allowNpmInstall).toBeFalsy();
     });
 
     it("parses --days with valid number", () => {
@@ -75,14 +75,14 @@ describe("ArgumentParser", () => {
       const parser = new ArgumentParser(["--allow-npm-install"]);
       const options = parser.parse();
 
-      expect(options.allowNpmInstall).toBe(true);
+      expect(options.allowNpmInstall).toBeTruthy();
     });
 
     it("parses --allow-npm-install with other options", () => {
       const parser = new ArgumentParser(["--allow-npm-install", "--days", "14"]);
       const options = parser.parse();
 
-      expect(options.allowNpmInstall).toBe(true);
+      expect(options.allowNpmInstall).toBeTruthy();
       expect(options.days).toBe(14);
     });
 
@@ -90,21 +90,21 @@ describe("ArgumentParser", () => {
       const parser = new ArgumentParser(["--dry-run"]);
       const options = parser.parse();
 
-      expect(options.dryRun).toBe(true);
+      expect(options.dryRun).toBeTruthy();
     });
 
     it("defaults dryRun to false when not provided", () => {
       const parser = new ArgumentParser([]);
       const options = parser.parse();
 
-      expect(options.dryRun).toBe(false);
+      expect(options.dryRun).toBeFalsy();
     });
 
     it("parses --dry-run with other options", () => {
       const parser = new ArgumentParser(["--dry-run", "--days", "14"]);
       const options = parser.parse();
 
-      expect(options.dryRun).toBe(true);
+      expect(options.dryRun).toBeTruthy();
       expect(options.days).toBe(14);
     });
 
@@ -112,8 +112,8 @@ describe("ArgumentParser", () => {
       const parser = new ArgumentParser(["--dry-run", "--allow-npm-install"]);
       const options = parser.parse();
 
-      expect(options.dryRun).toBe(true);
-      expect(options.allowNpmInstall).toBe(true);
+      expect(options.dryRun).toBeTruthy();
+      expect(options.allowNpmInstall).toBeTruthy();
     });
 
     it("throws InvalidFormatError for non-numeric days", () => {
@@ -173,70 +173,70 @@ describe("ArgumentParser", () => {
       const parser = new ArgumentParser(["-D", "--allow-npm-install"]);
       const packages = parser.parsePackageArgs();
 
-      expect(packages).toEqual([]);
+      expect(packages).toStrictEqual([]);
     });
 
     it("returns single package argument", () => {
       const parser = new ArgumentParser(["vue"]);
       const packages = parser.parsePackageArgs();
 
-      expect(packages).toEqual(["vue"]);
+      expect(packages).toStrictEqual(["vue"]);
     });
 
     it("returns package with version", () => {
       const parser = new ArgumentParser(["vue@3.2.0"]);
       const packages = parser.parsePackageArgs();
 
-      expect(packages).toEqual(["vue@3.2.0"]);
+      expect(packages).toStrictEqual(["vue@3.2.0"]);
     });
 
     it("returns scoped package", () => {
       const parser = new ArgumentParser(["@vue/cli"]);
       const packages = parser.parsePackageArgs();
 
-      expect(packages).toEqual(["@vue/cli"]);
+      expect(packages).toStrictEqual(["@vue/cli"]);
     });
 
     it("returns scoped package with version", () => {
       const parser = new ArgumentParser(["@vue/cli@5.0.0"]);
       const packages = parser.parsePackageArgs();
 
-      expect(packages).toEqual(["@vue/cli@5.0.0"]);
+      expect(packages).toStrictEqual(["@vue/cli@5.0.0"]);
     });
 
     it("returns package and filters out flags", () => {
       const parser = new ArgumentParser(["vue", "-D", "--allow-npm-install"]);
       const packages = parser.parsePackageArgs();
 
-      expect(packages).toEqual(["vue"]);
+      expect(packages).toStrictEqual(["vue"]);
     });
 
     it("filters out flag values from --days", () => {
       const parser = new ArgumentParser(["vue", "--days", "7"]);
       const packages = parser.parsePackageArgs();
 
-      expect(packages).toEqual(["vue"]);
+      expect(packages).toStrictEqual(["vue"]);
     });
 
     it("filters out flag values from -d", () => {
       const parser = new ArgumentParser(["vue", "-d", "14"]);
       const packages = parser.parsePackageArgs();
 
-      expect(packages).toEqual(["vue"]);
+      expect(packages).toStrictEqual(["vue"]);
     });
 
     it("filters out flag values from --lint", () => {
       const parser = new ArgumentParser(["vue", "--lint", "eslint"]);
       const packages = parser.parsePackageArgs();
 
-      expect(packages).toEqual(["vue"]);
+      expect(packages).toStrictEqual(["vue"]);
     });
 
     it("filters out multiple flag values", () => {
       const parser = new ArgumentParser(["vue", "--days", "7", "--lint", "eslint", "-D"]);
       const packages = parser.parsePackageArgs();
 
-      expect(packages).toEqual(["vue"]);
+      expect(packages).toStrictEqual(["vue"]);
     });
 
     it("returns multiple packages when provided (for validation testing)", () => {
@@ -245,21 +245,21 @@ describe("ArgumentParser", () => {
       const parser = new ArgumentParser(["vue", "react"]);
       const packages = parser.parsePackageArgs();
 
-      expect(packages).toEqual(["vue", "react"]);
+      expect(packages).toStrictEqual(["vue", "react"]);
     });
 
     it("handles package as first argument followed by flags", () => {
       const parser = new ArgumentParser(["typescript", "-D", "--allow-npm-install"]);
       const packages = parser.parsePackageArgs();
 
-      expect(packages).toEqual(["typescript"]);
+      expect(packages).toStrictEqual(["typescript"]);
     });
 
     it("handles package with flags and flag values mixed", () => {
       const parser = new ArgumentParser(["typescript", "-D", "--days", "14", "--allow-npm-install"]);
       const packages = parser.parsePackageArgs();
 
-      expect(packages).toEqual(["typescript"]);
+      expect(packages).toStrictEqual(["typescript"]);
     });
   });
 
@@ -267,31 +267,31 @@ describe("ArgumentParser", () => {
     it("returns true when -D flag is present", () => {
       const parser = new ArgumentParser(["vue", "-D"]);
 
-      expect(parser.hasSaveDevFlag()).toBe(true);
+      expect(parser.hasSaveDevFlag()).toBeTruthy();
     });
 
     it("returns true when --save-dev flag is present", () => {
       const parser = new ArgumentParser(["vue", "--save-dev"]);
 
-      expect(parser.hasSaveDevFlag()).toBe(true);
+      expect(parser.hasSaveDevFlag()).toBeTruthy();
     });
 
     it("returns false when neither flag is present", () => {
       const parser = new ArgumentParser(["vue", "--days", "7"]);
 
-      expect(parser.hasSaveDevFlag()).toBe(false);
+      expect(parser.hasSaveDevFlag()).toBeFalsy();
     });
 
     it("returns false when no arguments", () => {
       const parser = new ArgumentParser([]);
 
-      expect(parser.hasSaveDevFlag()).toBe(false);
+      expect(parser.hasSaveDevFlag()).toBeFalsy();
     });
 
     it("returns true when both -D and --save-dev present", () => {
       const parser = new ArgumentParser(["vue", "-D", "--save-dev"]);
 
-      expect(parser.hasSaveDevFlag()).toBe(true);
+      expect(parser.hasSaveDevFlag()).toBeTruthy();
     });
   });
 
@@ -341,7 +341,7 @@ describe("ArgumentParser", () => {
       const parser = new ArgumentParser(["--dry-run", "--days", "14"]);
       const options = parser.parse();
 
-      expect(options.dryRun).toBe(true);
+      expect(options.dryRun).toBeTruthy();
       expect(options.days).toBe(14);
     });
 
@@ -349,8 +349,8 @@ describe("ArgumentParser", () => {
       const parser = new ArgumentParser(["--dry-run", "--allow-npm-install"]);
       const options = parser.parse();
 
-      expect(options.dryRun).toBe(true);
-      expect(options.allowNpmInstall).toBe(true);
+      expect(options.dryRun).toBeTruthy();
+      expect(options.allowNpmInstall).toBeTruthy();
     });
 
     it("allows quality flags without --dry-run", () => {
@@ -361,7 +361,7 @@ describe("ArgumentParser", () => {
       ]);
       const options = parser.parse();
 
-      expect(options.dryRun).toBe(false);
+      expect(options.dryRun).toBeFalsy();
       expect(options.scripts.lint).toBe("eslint");
       expect(options.scripts.test).toBe("vitest");
       expect(options.scripts.build).toBe("build:prod");

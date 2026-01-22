@@ -88,7 +88,7 @@ describe("QualityRunner", () => {
 
       const result = await runner.runAll();
 
-      expect(result).toEqual({
+      expect(result).toStrictEqual({
         lint: true,
         typeCheck: false,
         tests: null,
@@ -102,7 +102,7 @@ describe("QualityRunner", () => {
 
       const result = await runner.runAll();
 
-      expect(result).toEqual({
+      expect(result).toStrictEqual({
         lint: true,
         typeCheck: true,
         tests: true,
@@ -116,7 +116,7 @@ describe("QualityRunner", () => {
 
       const result = await runner.runAll();
 
-      expect(result).toEqual({
+      expect(result).toStrictEqual({
         lint: false,
         typeCheck: false,
         tests: false,
@@ -130,7 +130,7 @@ describe("QualityRunner", () => {
 
       const result = await runner.runAll();
 
-      expect(result).toEqual({
+      expect(result).toStrictEqual({
         lint: null,
         typeCheck: null,
         tests: null,

@@ -105,8 +105,8 @@ describe("AddInstallPackageStep", () => {
 
       const result = await step.execute(confirmed);
 
-      expect(result.success).toBe(true);
-      expect(result.package?.installSuccess).toBe(true);
+      expect(result.success).toBeTruthy();
+      expect(result.package?.installSuccess).toBeTruthy();
       expect(mockSCFWRunner.installSingle).toHaveBeenCalledWith("vue@3.2.0", false);
       expect(mockCIInstall.run).toHaveBeenCalled();
     });
@@ -128,7 +128,7 @@ describe("AddInstallPackageStep", () => {
 
       const result = await step.execute(confirmed);
 
-      expect(result.success).toBe(true);
+      expect(result.success).toBeTruthy();
       expect(mockSCFWRunner.installSingle).toHaveBeenCalledWith("typescript@5.0.0", true);
     });
 
@@ -148,7 +148,7 @@ describe("AddInstallPackageStep", () => {
 
       const result = await step.execute(confirmed);
 
-      expect(result.success).toBe(false);
+      expect(result.success).toBeFalsy();
       expect(result.errorMessage).toContain("Installation failed");
       expect(mockCIInstall.run).not.toHaveBeenCalled();
     });
@@ -170,7 +170,7 @@ describe("AddInstallPackageStep", () => {
 
       const result = await step.execute(confirmed);
 
-      expect(result.success).toBe(false);
+      expect(result.success).toBeFalsy();
       expect(result.errorMessage).toContain("Failed to reinstall dependencies");
     });
   });
@@ -197,7 +197,7 @@ describe("AddInstallPackageStep", () => {
 
       const result = await step.execute(confirmed);
 
-      expect(result.success).toBe(true);
+      expect(result.success).toBeTruthy();
       expect(mockNpmRunner.installSingle).toHaveBeenCalledWith("vue@3.2.0", false);
       expect(mockSCFWRunner.installSingle).not.toHaveBeenCalled();
     });
@@ -219,7 +219,7 @@ describe("AddInstallPackageStep", () => {
 
       const result = await step.execute(confirmed);
 
-      expect(result.success).toBe(true);
+      expect(result.success).toBeTruthy();
       expect(mockNpmRunner.installSingle).toHaveBeenCalledWith("typescript@5.0.0", true);
     });
   });
@@ -246,7 +246,7 @@ describe("AddInstallPackageStep", () => {
 
       const result = await step.execute(confirmed);
 
-      expect(result.success).toBe(true);
+      expect(result.success).toBeTruthy();
       expect(mockSCFWRunner.installSingle).toHaveBeenCalledWith("@vue/cli@5.0.0", true);
     });
   });
@@ -277,7 +277,7 @@ describe("AddInstallPackageStep", () => {
 
       const result = await step.execute(confirmed);
 
-      expect(result.success).toBe(true);
+      expect(result.success).toBeTruthy();
       expect(mockSCFWRunner.installSingle).toHaveBeenCalledWith("lodash@4.17.21", false);
     });
   });

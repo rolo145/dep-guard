@@ -33,7 +33,7 @@ describe("NPQRunner", () => {
 
       const result = runner.check("lodash@5.0.0");
 
-      expect(result).toEqual({
+      expect(result).toStrictEqual({
         packageSpec: "lodash@5.0.0",
         passed: true,
       });
@@ -44,7 +44,7 @@ describe("NPQRunner", () => {
 
       const result = runner.check("malicious-pkg@1.0.0");
 
-      expect(result).toEqual({
+      expect(result).toStrictEqual({
         packageSpec: "malicious-pkg@1.0.0",
         passed: false,
       });
@@ -81,11 +81,11 @@ describe("NPQRunner", () => {
 
       const results = runner.checkBatch(["safe-pkg@1.0.0", "unsafe-pkg@1.0.0"]);
 
-      expect(results[0]).toEqual({
+      expect(results[0]).toStrictEqual({
         packageSpec: "safe-pkg@1.0.0",
         passed: true,
       });
-      expect(results[1]).toEqual({
+      expect(results[1]).toStrictEqual({
         packageSpec: "unsafe-pkg@1.0.0",
         passed: false,
       });
@@ -94,7 +94,7 @@ describe("NPQRunner", () => {
     it("returns empty array for empty input", () => {
       const results = runner.checkBatch([]);
 
-      expect(results).toEqual([]);
+      expect(results).toStrictEqual([]);
       expect(tryRunCommand).not.toHaveBeenCalled();
     });
 
@@ -104,7 +104,7 @@ describe("NPQRunner", () => {
       const specs = ["a@1.0.0", "b@2.0.0", "c@3.0.0"];
       const results = runner.checkBatch(specs);
 
-      expect(results.map((r) => r.packageSpec)).toEqual(specs);
+      expect(results.map((r) => r.packageSpec)).toStrictEqual(specs);
     });
   });
 });

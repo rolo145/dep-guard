@@ -77,8 +77,8 @@ describe("ResolveVersionStep", () => {
 
       const result = await step.execute(packageSpec);
 
-      expect(result.success).toBe(true);
-      expect(result.package).toEqual({
+      expect(result.success).toBeTruthy();
+      expect(result.package).toStrictEqual({
         name: "vue",
         version: "3.2.0",
         wasSpecified: false,
@@ -97,7 +97,7 @@ describe("ResolveVersionStep", () => {
 
       const result = await step.execute(packageSpec);
 
-      expect(result.success).toBe(false);
+      expect(result.success).toBeFalsy();
       expect(result.errorMessage).toContain("No version of vue is at least");
     });
   });
@@ -114,8 +114,8 @@ describe("ResolveVersionStep", () => {
 
       const result = await step.execute(packageSpec);
 
-      expect(result.success).toBe(true);
-      expect(result.package).toEqual({
+      expect(result.success).toBeTruthy();
+      expect(result.package).toStrictEqual({
         name: "vue",
         version: "3.2.0",
         wasSpecified: true,
@@ -137,7 +137,7 @@ describe("ResolveVersionStep", () => {
 
       const result = await step.execute(packageSpec);
 
-      expect(result.success).toBe(false);
+      expect(result.success).toBeFalsy();
       expect(result.errorMessage).toContain("cancelled");
     });
 
@@ -154,9 +154,9 @@ describe("ResolveVersionStep", () => {
 
       const result = await step.execute(packageSpec);
 
-      expect(result.success).toBe(true);
+      expect(result.success).toBeTruthy();
       expect(result.package?.version).toBe("3.3.0");
-      expect(result.package?.wasSpecified).toBe(true);
+      expect(result.package?.wasSpecified).toBeTruthy();
     });
 
     it("prompts user when version is too new and user chooses latest safe", async () => {
@@ -178,9 +178,9 @@ describe("ResolveVersionStep", () => {
 
       const result = await step.execute(packageSpec);
 
-      expect(result.success).toBe(true);
+      expect(result.success).toBeTruthy();
       expect(result.package?.version).toBe("3.2.0");
-      expect(result.package?.wasSpecified).toBe(false);
+      expect(result.package?.wasSpecified).toBeFalsy();
       expect(mockResolverService.resolveLatestSafeVersion).toHaveBeenCalledWith("vue");
     });
 
@@ -194,7 +194,7 @@ describe("ResolveVersionStep", () => {
 
       const result = await step.execute(packageSpec);
 
-      expect(result.success).toBe(false);
+      expect(result.success).toBeFalsy();
       expect(result.errorMessage).toContain("Version 99.0.0 not found");
     });
   });
@@ -209,7 +209,7 @@ describe("ResolveVersionStep", () => {
 
       const result = await step.execute(packageSpec);
 
-      expect(result.success).toBe(false);
+      expect(result.success).toBeFalsy();
       expect(result.errorMessage).toContain("Registry unavailable");
     });
   });

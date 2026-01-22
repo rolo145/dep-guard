@@ -104,64 +104,64 @@ describe("ArgumentValidator", () => {
     describe("regular packages", () => {
       it("parses package name without version", () => {
         const result = ArgumentValidator.validatePackageName("vue");
-        expect(result).toEqual({ name: "vue" });
+        expect(result).toStrictEqual({ name: "vue" });
       });
 
       it("parses package name with version", () => {
         const result = ArgumentValidator.validatePackageName("vue@3.2.0");
-        expect(result).toEqual({ name: "vue", version: "3.2.0" });
+        expect(result).toStrictEqual({ name: "vue", version: "3.2.0" });
       });
 
       it("parses package with prerelease version", () => {
         const result = ArgumentValidator.validatePackageName("vue@3.2.0-beta.1");
-        expect(result).toEqual({ name: "vue", version: "3.2.0-beta.1" });
+        expect(result).toStrictEqual({ name: "vue", version: "3.2.0-beta.1" });
       });
 
       it("accepts lowercase package names", () => {
         const result = ArgumentValidator.validatePackageName("lodash");
-        expect(result).toEqual({ name: "lodash" });
+        expect(result).toStrictEqual({ name: "lodash" });
       });
 
       it("accepts package names with hyphens", () => {
         const result = ArgumentValidator.validatePackageName("my-package");
-        expect(result).toEqual({ name: "my-package" });
+        expect(result).toStrictEqual({ name: "my-package" });
       });
 
       it("accepts package names with underscores", () => {
         const result = ArgumentValidator.validatePackageName("my_package");
-        expect(result).toEqual({ name: "my_package" });
+        expect(result).toStrictEqual({ name: "my_package" });
       });
 
       it("accepts package names with dots", () => {
         const result = ArgumentValidator.validatePackageName("my.package");
-        expect(result).toEqual({ name: "my.package" });
+        expect(result).toStrictEqual({ name: "my.package" });
       });
     });
 
     describe("scoped packages", () => {
       it("parses scoped package without version", () => {
         const result = ArgumentValidator.validatePackageName("@vue/cli");
-        expect(result).toEqual({ name: "@vue/cli" });
+        expect(result).toStrictEqual({ name: "@vue/cli" });
       });
 
       it("parses scoped package with version", () => {
         const result = ArgumentValidator.validatePackageName("@vue/cli@5.0.0");
-        expect(result).toEqual({ name: "@vue/cli", version: "5.0.0" });
+        expect(result).toStrictEqual({ name: "@vue/cli", version: "5.0.0" });
       });
 
       it("parses scoped package with prerelease version", () => {
         const result = ArgumentValidator.validatePackageName("@vue/cli@5.0.0-alpha.1");
-        expect(result).toEqual({ name: "@vue/cli", version: "5.0.0-alpha.1" });
+        expect(result).toStrictEqual({ name: "@vue/cli", version: "5.0.0-alpha.1" });
       });
 
       it("handles scopes with hyphens", () => {
         const result = ArgumentValidator.validatePackageName("@my-org/my-package");
-        expect(result).toEqual({ name: "@my-org/my-package" });
+        expect(result).toStrictEqual({ name: "@my-org/my-package" });
       });
 
       it("handles scopes with underscores", () => {
         const result = ArgumentValidator.validatePackageName("@my_org/my_package");
-        expect(result).toEqual({ name: "@my_org/my_package" });
+        expect(result).toStrictEqual({ name: "@my_org/my_package" });
       });
     });
 

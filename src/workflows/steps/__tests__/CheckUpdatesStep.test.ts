@@ -54,7 +54,7 @@ describe("CheckUpdatesStep", () => {
   });
 
   it("has correct step definition", () => {
-    expect(step.stepDef).toEqual(WORKFLOW_STEPS.CHECK_UPDATES);
+    expect(step.stepDef).toStrictEqual(WORKFLOW_STEPS.CHECK_UPDATES);
   });
 
   describe("execute()", () => {
@@ -99,7 +99,7 @@ describe("CheckUpdatesStep", () => {
 
       const result = await step.execute(undefined, mockContext);
 
-      expect(result.data).toEqual(updates);
+      expect(result.data).toStrictEqual(updates);
     });
 
     it("updates stats with packages found", async () => {

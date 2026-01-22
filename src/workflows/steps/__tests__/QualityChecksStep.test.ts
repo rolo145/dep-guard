@@ -52,7 +52,7 @@ describe("QualityChecksStep", () => {
   });
 
   it("has correct step definition", () => {
-    expect(step.stepDef).toEqual(WORKFLOW_STEPS.QUALITY);
+    expect(step.stepDef).toStrictEqual(WORKFLOW_STEPS.QUALITY);
   });
 
   describe("execute()", () => {
@@ -84,7 +84,7 @@ describe("QualityChecksStep", () => {
 
       const result = await step.execute(packages, mockContext);
 
-      expect(result.data).toEqual(packages);
+      expect(result.data).toStrictEqual(packages);
     });
 
     it("continues even when quality checks fail", async () => {

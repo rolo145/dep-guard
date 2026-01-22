@@ -39,7 +39,7 @@ describe("PrerequisiteValidator", () => {
 
       const result = PrerequisiteValidator.checkPrerequisites();
 
-      expect(result).toEqual({ scfwAvailable: true, useNpmFallback: false });
+      expect(result).toStrictEqual({ scfwAvailable: true, useNpmFallback: false });
       expect(mockExit).not.toHaveBeenCalled();
     });
 
@@ -75,7 +75,7 @@ describe("PrerequisiteValidator", () => {
 
       const result = PrerequisiteValidator.checkPrerequisites(true);
 
-      expect(result).toEqual({ scfwAvailable: false, useNpmFallback: true });
+      expect(result).toStrictEqual({ scfwAvailable: false, useNpmFallback: true });
       expect(mockExit).not.toHaveBeenCalled();
     });
 
@@ -91,7 +91,7 @@ describe("PrerequisiteValidator", () => {
 
       const result = PrerequisiteValidator.checkPrerequisites(false);
 
-      expect(result).toEqual({ scfwAvailable: true, useNpmFallback: false });
+      expect(result).toStrictEqual({ scfwAvailable: true, useNpmFallback: false });
       expect(mockExit).not.toHaveBeenCalled();
     });
   });

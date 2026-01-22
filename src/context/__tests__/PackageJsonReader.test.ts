@@ -20,7 +20,7 @@ describe("PackageJsonReader", () => {
     it("returns scripts from package.json", () => {
       const reader = new PackageJsonReader(FIXTURE_PATH);
 
-      expect(reader.scripts).toEqual({
+      expect(reader.scripts).toStrictEqual({
         build: "tsc",
         test: "vitest",
         lint: "eslint .",
@@ -38,7 +38,7 @@ describe("PackageJsonReader", () => {
     it("returns production dependencies", () => {
       const reader = new PackageJsonReader(FIXTURE_PATH);
 
-      expect(reader.dependencies).toEqual({
+      expect(reader.dependencies).toStrictEqual({
         lodash: "^4.17.21",
         express: "^4.18.0",
       });
@@ -49,7 +49,7 @@ describe("PackageJsonReader", () => {
     it("returns dev dependencies", () => {
       const reader = new PackageJsonReader(FIXTURE_PATH);
 
-      expect(reader.devDependencies).toEqual({
+      expect(reader.devDependencies).toStrictEqual({
         typescript: "^5.0.0",
         vitest: "^1.0.0",
       });
@@ -60,7 +60,7 @@ describe("PackageJsonReader", () => {
     it("returns merged dependencies and devDependencies", () => {
       const reader = new PackageJsonReader(FIXTURE_PATH);
 
-      expect(reader.allDependencies).toEqual({
+      expect(reader.allDependencies).toStrictEqual({
         lodash: "^4.17.21",
         express: "^4.18.0",
         typescript: "^5.0.0",

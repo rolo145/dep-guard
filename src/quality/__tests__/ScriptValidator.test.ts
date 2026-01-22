@@ -37,7 +37,7 @@ describe("ScriptValidator", () => {
 
       const result = ScriptValidator.validate(scriptNames);
 
-      expect(result).toEqual({
+      expect(result).toStrictEqual({
         lint: true,
         typecheck: true,
         test: true,
@@ -57,7 +57,7 @@ describe("ScriptValidator", () => {
 
       const result = ScriptValidator.validate(scriptNames);
 
-      expect(result).toEqual({
+      expect(result).toStrictEqual({
         lint: false,
         typecheck: false,
         test: false,
@@ -81,7 +81,7 @@ describe("ScriptValidator", () => {
 
       const result = ScriptValidator.validate(scriptNames);
 
-      expect(result).toEqual({
+      expect(result).toStrictEqual({
         lint: true,
         typecheck: false,
         test: true,

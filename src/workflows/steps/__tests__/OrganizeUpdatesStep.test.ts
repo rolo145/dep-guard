@@ -53,7 +53,7 @@ describe("OrganizeUpdatesStep", () => {
   });
 
   it("has correct step definition", () => {
-    expect(step.stepDef).toEqual(WORKFLOW_STEPS.ORGANIZE);
+    expect(step.stepDef).toStrictEqual(WORKFLOW_STEPS.ORGANIZE);
   });
 
   describe("execute()", () => {
@@ -99,7 +99,7 @@ describe("OrganizeUpdatesStep", () => {
 
       const result = await step.execute(updates, mockContext);
 
-      expect(result.data).toEqual({ grouped, choices });
+      expect(result.data).toStrictEqual({ grouped, choices });
     });
 
     it("shows group summary", async () => {

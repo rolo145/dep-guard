@@ -169,7 +169,7 @@ describe("NPQService", () => {
         { name: "express", version: "4.19.0" },
       ]);
 
-      expect(result).toEqual([{ name: "lodash", version: "5.0.0" }]);
+      expect(result).toStrictEqual([{ name: "lodash", version: "5.0.0" }]);
     });
 
     it("returns empty array when no packages confirmed", async () => {
@@ -180,13 +180,13 @@ describe("NPQService", () => {
         { name: "lodash", version: "5.0.0" },
       ]);
 
-      expect(result).toEqual([]);
+      expect(result).toStrictEqual([]);
     });
 
     it("returns empty array for empty selection", async () => {
       const result = await service.processSelection([]);
 
-      expect(result).toEqual([]);
+      expect(result).toStrictEqual([]);
       expect(mockRunnerInstance.check).not.toHaveBeenCalled();
     });
 
@@ -202,7 +202,7 @@ describe("NPQService", () => {
 
       const result = await service.processSelection(packages);
 
-      expect(result).toEqual(packages);
+      expect(result).toStrictEqual(packages);
     });
 
     it("includes package even if NPQ fails but user confirms", async () => {
@@ -213,7 +213,7 @@ describe("NPQService", () => {
         { name: "risky-pkg", version: "1.0.0" },
       ]);
 
-      expect(result).toEqual([{ name: "risky-pkg", version: "1.0.0" }]);
+      expect(result).toStrictEqual([{ name: "risky-pkg", version: "1.0.0" }]);
     });
   });
 });

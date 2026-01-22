@@ -54,7 +54,7 @@ describe("SafetyBufferStep", () => {
   });
 
   it("has correct step definition", () => {
-    expect(step.stepDef).toEqual(WORKFLOW_STEPS.SAFETY_BUFFER);
+    expect(step.stepDef).toStrictEqual(WORKFLOW_STEPS.SAFETY_BUFFER);
   });
 
   describe("execute()", () => {
@@ -103,7 +103,7 @@ describe("SafetyBufferStep", () => {
 
       const result = await step.execute(rawUpdates, mockContext);
 
-      expect(result.data).toEqual(filtered);
+      expect(result.data).toStrictEqual(filtered);
     });
 
     it("updates stats with packages after filter", async () => {

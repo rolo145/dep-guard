@@ -98,7 +98,7 @@ describe("NCUService", () => {
 
       const result = await service.loadUpdates();
 
-      expect(result).toEqual(updates);
+      expect(result).toStrictEqual(updates);
     });
   });
 
@@ -127,7 +127,7 @@ describe("NCUService", () => {
       const result = await service.filterByAge(updates);
 
       expect(mockRegistryInstance.filterUpdatesByAge).toHaveBeenCalledWith(updates);
-      expect(result).toEqual(filtered);
+      expect(result).toStrictEqual(filtered);
     });
   });
 
@@ -191,7 +191,7 @@ describe("NCUService", () => {
       const result = await service.promptSelection(choices);
 
       expect(mockConfirmationInstance.promptSelection).toHaveBeenCalledWith(choices);
-      expect(result).toEqual(selected);
+      expect(result).toStrictEqual(selected);
     });
   });
 });

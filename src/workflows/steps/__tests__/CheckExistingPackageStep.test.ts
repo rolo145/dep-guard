@@ -65,8 +65,8 @@ describe("CheckExistingPackageStep", () => {
 
       const result = await step.execute(resolved, false);
 
-      expect(result.shouldProceed).toBe(true);
-      expect(result.package).toEqual({
+      expect(result.shouldProceed).toBeTruthy();
+      expect(result.package).toStrictEqual({
         ...resolved,
         saveDev: false,
         existing: {
@@ -85,8 +85,8 @@ describe("CheckExistingPackageStep", () => {
 
       const result = await step.execute(resolved, true);
 
-      expect(result.shouldProceed).toBe(true);
-      expect(result.package?.saveDev).toBe(true);
+      expect(result.shouldProceed).toBeTruthy();
+      expect(result.package?.saveDev).toBeTruthy();
     });
   });
 
@@ -107,7 +107,7 @@ describe("CheckExistingPackageStep", () => {
 
       const result = await step.execute(resolved, false);
 
-      expect(result.shouldProceed).toBe(false);
+      expect(result.shouldProceed).toBeFalsy();
       expect(result.cancelReason).toContain("already installed");
     });
 
@@ -123,8 +123,8 @@ describe("CheckExistingPackageStep", () => {
 
       const result = await step.execute(resolved, false);
 
-      expect(result.shouldProceed).toBe(true);
-      expect(result.package?.existing).toEqual({
+      expect(result.shouldProceed).toBeTruthy();
+      expect(result.package?.existing).toStrictEqual({
         exists: true,
         currentVersion: "3.0.0",
         location: "dependencies",
@@ -143,7 +143,7 @@ describe("CheckExistingPackageStep", () => {
 
       const result = await step.execute(resolved, false);
 
-      expect(result.shouldProceed).toBe(false);
+      expect(result.shouldProceed).toBeFalsy();
       expect(result.cancelReason).toContain("keep current version");
     });
 
@@ -159,7 +159,7 @@ describe("CheckExistingPackageStep", () => {
 
       const result = await step.execute(resolved, false);
 
-      expect(result.shouldProceed).toBe(false);
+      expect(result.shouldProceed).toBeFalsy();
       expect(result.cancelReason).toContain("cancelled");
     });
   });
@@ -183,8 +183,8 @@ describe("CheckExistingPackageStep", () => {
 
       const result = await step.execute(resolved, true);
 
-      expect(result.shouldProceed).toBe(true);
-      expect(result.package?.existing).toEqual({
+      expect(result.shouldProceed).toBeTruthy();
+      expect(result.package?.existing).toStrictEqual({
         exists: true,
         currentVersion: "4.9.0",
         location: "devDependencies",
@@ -203,8 +203,8 @@ describe("CheckExistingPackageStep", () => {
 
       const result = await step.execute(resolved, false);
 
-      expect(result.shouldProceed).toBe(true);
-      expect(result.package?.saveDev).toBe(false);
+      expect(result.shouldProceed).toBeTruthy();
+      expect(result.package?.saveDev).toBeFalsy();
       expect(result.package?.existing.location).toBe("devDependencies");
     });
   });
@@ -226,9 +226,9 @@ describe("CheckExistingPackageStep", () => {
 
       const result = await step.execute(resolved, true);
 
-      expect(result.shouldProceed).toBe(true);
-      expect(result.package?.saveDev).toBe(true);
-      expect(result.package?.existing).toEqual({
+      expect(result.shouldProceed).toBeTruthy();
+      expect(result.package?.saveDev).toBeTruthy();
+      expect(result.package?.existing).toStrictEqual({
         exists: true,
         currentVersion: "4.17.20",
         location: "dependencies",

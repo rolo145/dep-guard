@@ -22,7 +22,7 @@ describe("ExecutionContextFactory", () => {
       });
 
       expect(context.days).toBe(14);
-      expect(context.scriptNames).toEqual(scripts);
+      expect(context.scriptNames).toStrictEqual(scripts);
     });
 
     it("creates context that reads package.json", () => {
@@ -47,7 +47,7 @@ describe("ExecutionContextFactory", () => {
     it("creates context with default script names", () => {
       const context = ExecutionContextFactory.createWithDefaults(7, FIXTURE_PATH);
 
-      expect(context.scriptNames).toEqual({
+      expect(context.scriptNames).toStrictEqual({
         lint: "lint",
         typecheck: "typecheck",
         test: "test",
@@ -72,10 +72,10 @@ describe("ExecutionContextFactory", () => {
     it("creates mock context with default values", () => {
       const mock = ExecutionContextFactory.createMock();
 
-      expect(mock.scripts).toEqual({});
-      expect(mock.allDependencies).toEqual({});
-      expect(mock.dependencies).toEqual({});
-      expect(mock.devDependencies).toEqual({});
+      expect(mock.scripts).toStrictEqual({});
+      expect(mock.allDependencies).toStrictEqual({});
+      expect(mock.dependencies).toStrictEqual({});
+      expect(mock.devDependencies).toStrictEqual({});
       expect(mock.days).toBe(7);
       expect(mock.hasScript("any")).toBeFalsy();
       expect(mock.hasPackage("any")).toBeFalsy();
@@ -89,7 +89,7 @@ describe("ExecutionContextFactory", () => {
       });
 
       expect(mock.days).toBe(14);
-      expect(mock.scripts).toEqual({ build: "npm run build" });
+      expect(mock.scripts).toStrictEqual({ build: "npm run build" });
     });
 
     it("allows overriding methods", () => {
@@ -114,7 +114,7 @@ describe("ExecutionContextFactory", () => {
     it("includes default scriptNames", () => {
       const mock = ExecutionContextFactory.createMock();
 
-      expect(mock.scriptNames).toEqual({
+      expect(mock.scriptNames).toStrictEqual({
         lint: "lint",
         typecheck: "typecheck",
         test: "test",

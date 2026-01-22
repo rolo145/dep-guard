@@ -81,7 +81,7 @@ describe("QualityService", () => {
 
       const result = await service.runAll();
 
-      expect(result).toEqual(results);
+      expect(result).toStrictEqual(results);
     });
   });
 

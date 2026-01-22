@@ -34,7 +34,7 @@ describe("PromptChoiceBuilder", () => {
 
       const result = builder.build();
 
-      expect(result).toEqual([]);
+      expect(result).toStrictEqual([]);
     });
   });
 
@@ -50,7 +50,7 @@ describe("PromptChoiceBuilder", () => {
       expect(result).toHaveLength(2);
       expect(result[0].disabled).toBe(" ");
       expect(result[0].name).toContain("[green]Patch (1)[/green]");
-      expect(result[1].value).toEqual({ name: "lodash", version: "4.17.1" });
+      expect(result[1].value).toStrictEqual({ name: "lodash", version: "4.17.1" });
     });
 
     it("skips empty patch group", () => {
@@ -59,7 +59,7 @@ describe("PromptChoiceBuilder", () => {
 
       const result = builder.addPatchGroup().build();
 
-      expect(result).toEqual([]);
+      expect(result).toStrictEqual([]);
     });
 
     it("includes npm link in package name", () => {
@@ -85,7 +85,7 @@ describe("PromptChoiceBuilder", () => {
 
       expect(result).toHaveLength(2);
       expect(result[0].name).toContain("[blue]Minor (1)[/blue]");
-      expect(result[1].value).toEqual({ name: "express", version: "4.19.0" });
+      expect(result[1].value).toStrictEqual({ name: "express", version: "4.19.0" });
     });
 
     it("skips empty minor group", () => {
@@ -94,7 +94,7 @@ describe("PromptChoiceBuilder", () => {
 
       const result = builder.addMinorGroup().build();
 
-      expect(result).toEqual([]);
+      expect(result).toStrictEqual([]);
     });
   });
 
@@ -109,7 +109,7 @@ describe("PromptChoiceBuilder", () => {
 
       expect(result).toHaveLength(2);
       expect(result[0].name).toContain("[red]Major (1)[/red]");
-      expect(result[1].value).toEqual({ name: "chalk", version: "5.0.0" });
+      expect(result[1].value).toStrictEqual({ name: "chalk", version: "5.0.0" });
     });
 
     it("skips empty major group", () => {
@@ -118,7 +118,7 @@ describe("PromptChoiceBuilder", () => {
 
       const result = builder.addMajorGroup().build();
 
-      expect(result).toEqual([]);
+      expect(result).toStrictEqual([]);
     });
   });
 
@@ -230,7 +230,7 @@ describe("PromptChoiceBuilder", () => {
 
       const result = builder.addPatchGroup().build();
 
-      expect(result[1].value).toEqual({
+      expect(result[1].value).toStrictEqual({
         name: "lodash",
         version: "4.17.21",
       });

@@ -8,35 +8,35 @@ describe("SubcommandParser", () => {
         const result = SubcommandParser.parse(["install"]);
 
         expect(result.subcommand).toBe("install");
-        expect(result.args).toEqual([]);
+        expect(result.args).toStrictEqual([]);
       });
 
       it('parses "update" subcommand', () => {
         const result = SubcommandParser.parse(["update"]);
 
         expect(result.subcommand).toBe("update");
-        expect(result.args).toEqual([]);
+        expect(result.args).toStrictEqual([]);
       });
 
       it('parses "add" subcommand', () => {
         const result = SubcommandParser.parse(["add"]);
 
         expect(result.subcommand).toBe("add");
-        expect(result.args).toEqual([]);
+        expect(result.args).toStrictEqual([]);
       });
 
       it("returns remaining args after install subcommand", () => {
         const result = SubcommandParser.parse(["install", "--allow-npm-install"]);
 
         expect(result.subcommand).toBe("install");
-        expect(result.args).toEqual(["--allow-npm-install"]);
+        expect(result.args).toStrictEqual(["--allow-npm-install"]);
       });
 
       it("returns remaining args after update subcommand", () => {
         const result = SubcommandParser.parse(["update", "--days", "14"]);
 
         expect(result.subcommand).toBe("update");
-        expect(result.args).toEqual(["--days", "14"]);
+        expect(result.args).toStrictEqual(["--days", "14"]);
       });
 
       it("handles multiple flags after subcommand", () => {
@@ -50,35 +50,35 @@ describe("SubcommandParser", () => {
         ]);
 
         expect(result.subcommand).toBe("update");
-        expect(result.args).toEqual(["--days", "14", "--lint", "eslint", "--allow-npm-install"]);
+        expect(result.args).toStrictEqual(["--days", "14", "--lint", "eslint", "--allow-npm-install"]);
       });
 
       it("returns package name after add subcommand", () => {
         const result = SubcommandParser.parse(["add", "vue"]);
 
         expect(result.subcommand).toBe("add");
-        expect(result.args).toEqual(["vue"]);
+        expect(result.args).toStrictEqual(["vue"]);
       });
 
       it("returns package with version after add subcommand", () => {
         const result = SubcommandParser.parse(["add", "vue@3.2.0"]);
 
         expect(result.subcommand).toBe("add");
-        expect(result.args).toEqual(["vue@3.2.0"]);
+        expect(result.args).toStrictEqual(["vue@3.2.0"]);
       });
 
       it("returns package and flags after add subcommand", () => {
         const result = SubcommandParser.parse(["add", "vue", "-D", "--days", "14"]);
 
         expect(result.subcommand).toBe("add");
-        expect(result.args).toEqual(["vue", "-D", "--days", "14"]);
+        expect(result.args).toStrictEqual(["vue", "-D", "--days", "14"]);
       });
 
       it("returns scoped package after add subcommand", () => {
         const result = SubcommandParser.parse(["add", "@vue/cli"]);
 
         expect(result.subcommand).toBe("add");
-        expect(result.args).toEqual(["@vue/cli"]);
+        expect(result.args).toStrictEqual(["@vue/cli"]);
       });
     });
 

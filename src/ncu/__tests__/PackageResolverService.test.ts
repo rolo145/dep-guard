@@ -72,7 +72,7 @@ describe("PackageResolverService", () => {
       const result = await service.resolveLatestSafeVersion("vue");
 
       expect(result.version).toBe("3.2.0");
-      expect(result.tooNew).toBe(false);
+      expect(result.tooNew).toBeFalsy();
       expect(result.ageInDays).toBeGreaterThan(0);
     });
 
@@ -100,7 +100,7 @@ describe("PackageResolverService", () => {
       const result = await service.resolveLatestSafeVersion("vue");
 
       expect(result.version).toBe("3.0.0");
-      expect(result.tooNew).toBe(false);
+      expect(result.tooNew).toBeFalsy();
     });
 
     it("returns null when no version meets safety buffer", async () => {
@@ -123,7 +123,7 @@ describe("PackageResolverService", () => {
       const result = await service.resolveLatestSafeVersion("vue");
 
       expect(result.version).toBeNull();
-      expect(result.tooNew).toBe(true);
+      expect(result.tooNew).toBeTruthy();
     });
 
     it("returns null when all versions are prerelease", async () => {
@@ -148,7 +148,7 @@ describe("PackageResolverService", () => {
       const result = await service.resolveLatestSafeVersion("vue");
 
       expect(result.version).toBeNull();
-      expect(result.tooNew).toBe(true);
+      expect(result.tooNew).toBeTruthy();
     });
 
     it("throws RegistryFetchError when registry returns non-ok status", async () => {
@@ -232,7 +232,7 @@ describe("PackageResolverService", () => {
       const result = await service.validateVersion("vue", "3.2.0");
 
       expect(result.version).toBe("3.2.0");
-      expect(result.tooNew).toBe(false);
+      expect(result.tooNew).toBeFalsy();
       expect(result.ageInDays).toBeGreaterThan(0);
     });
 
@@ -256,7 +256,7 @@ describe("PackageResolverService", () => {
       const result = await service.validateVersion("vue", "3.2.0");
 
       expect(result.version).toBe("3.2.0");
-      expect(result.tooNew).toBe(true);
+      expect(result.tooNew).toBeTruthy();
       expect(result.ageInDays).toBe(1);
     });
 
@@ -299,7 +299,7 @@ describe("PackageResolverService", () => {
       const result = await service.validateVersion("@vue/cli", "5.0.0");
 
       expect(result.version).toBe("5.0.0");
-      expect(result.tooNew).toBe(false);
+      expect(result.tooNew).toBeFalsy();
     });
 
     it("throws RegistryFetchError when registry returns non-ok status", async () => {

@@ -52,7 +52,7 @@ describe("InstallPackagesStep", () => {
   });
 
   it("has correct step definition", () => {
-    expect(step.stepDef).toEqual(WORKFLOW_STEPS.INSTALL);
+    expect(step.stepDef).toStrictEqual(WORKFLOW_STEPS.INSTALL);
   });
 
   describe("execute()", () => {
@@ -80,7 +80,7 @@ describe("InstallPackagesStep", () => {
 
       const result = await step.execute(packages, mockContext);
 
-      expect(result.data).toEqual(packages);
+      expect(result.data).toStrictEqual(packages);
     });
 
     it("passes multiple packages to install service", async () => {

@@ -63,7 +63,7 @@ describe("SCFWRunner", () => {
       const result = runner.install(["chalk@5.0.0"]);
 
       expect(result.success).toBeTruthy();
-      expect(result.packageSpecs).toEqual(["chalk@5.0.0"]);
+      expect(result.packageSpecs).toStrictEqual(["chalk@5.0.0"]);
     });
 
     it("returns success: false when command fails", () => {
@@ -72,7 +72,7 @@ describe("SCFWRunner", () => {
       const result = runner.install(["chalk@5.0.0"]);
 
       expect(result.success).toBeFalsy();
-      expect(result.packageSpecs).toEqual(["chalk@5.0.0"]);
+      expect(result.packageSpecs).toStrictEqual(["chalk@5.0.0"]);
     });
   });
 
@@ -83,7 +83,7 @@ describe("SCFWRunner", () => {
       const result = runner.installSingle("chalk@5.0.0");
 
       expect(tryRunCommand).toHaveBeenCalledWith("scfw", expect.arrayContaining(["chalk@5.0.0"]));
-      expect(result.packageSpecs).toEqual(["chalk@5.0.0"]);
+      expect(result.packageSpecs).toStrictEqual(["chalk@5.0.0"]);
     });
   });
 

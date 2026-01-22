@@ -34,7 +34,7 @@ describe("NCURunner", () => {
 
       const result = await runner.loadUpdates();
 
-      expect(result).toEqual(updates);
+      expect(result).toStrictEqual(updates);
     });
 
     it("returns empty object when ncu returns null", async () => {
@@ -42,7 +42,7 @@ describe("NCURunner", () => {
 
       const result = await runner.loadUpdates();
 
-      expect(result).toEqual({});
+      expect(result).toStrictEqual({});
     });
 
     it("returns empty object when ncu returns undefined", async () => {
@@ -50,7 +50,7 @@ describe("NCURunner", () => {
 
       const result = await runner.loadUpdates();
 
-      expect(result).toEqual({});
+      expect(result).toStrictEqual({});
     });
   });
 });

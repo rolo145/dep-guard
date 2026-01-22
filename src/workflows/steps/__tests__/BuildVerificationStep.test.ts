@@ -52,7 +52,7 @@ describe("BuildVerificationStep", () => {
   });
 
   it("has correct step definition", () => {
-    expect(step.stepDef).toEqual(WORKFLOW_STEPS.BUILD);
+    expect(step.stepDef).toStrictEqual(WORKFLOW_STEPS.BUILD);
   });
 
   describe("execute()", () => {
@@ -80,7 +80,7 @@ describe("BuildVerificationStep", () => {
 
       const result = await step.execute(packages, mockContext);
 
-      expect(result.data).toEqual(packages);
+      expect(result.data).toStrictEqual(packages);
     });
 
     it("continues even when build fails", async () => {

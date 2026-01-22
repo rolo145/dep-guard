@@ -22,7 +22,7 @@ describe("ExecutionContext", () => {
       });
 
       expect(context.days).toBe(14);
-      expect(context.scriptNames).toEqual(defaultScripts);
+      expect(context.scriptNames).toStrictEqual(defaultScripts);
     });
 
     it("calculates cutoff date based on days", () => {
@@ -50,7 +50,7 @@ describe("ExecutionContext", () => {
         packageJsonPath: FIXTURE_PATH,
       });
 
-      expect(context.scripts).toEqual({
+      expect(context.scripts).toStrictEqual({
         build: "tsc",
         test: "vitest",
         lint: "eslint .",
@@ -64,7 +64,7 @@ describe("ExecutionContext", () => {
         packageJsonPath: FIXTURE_PATH,
       });
 
-      expect(context.dependencies).toEqual({
+      expect(context.dependencies).toStrictEqual({
         lodash: "^4.17.21",
         express: "^4.18.0",
       });
@@ -77,7 +77,7 @@ describe("ExecutionContext", () => {
         packageJsonPath: FIXTURE_PATH,
       });
 
-      expect(context.devDependencies).toEqual({
+      expect(context.devDependencies).toStrictEqual({
         typescript: "^5.0.0",
         vitest: "^1.0.0",
       });
@@ -90,7 +90,7 @@ describe("ExecutionContext", () => {
         packageJsonPath: FIXTURE_PATH,
       });
 
-      expect(context.allDependencies).toEqual({
+      expect(context.allDependencies).toStrictEqual({
         lodash: "^4.17.21",
         express: "^4.18.0",
         typescript: "^5.0.0",
@@ -155,7 +155,7 @@ describe("ExecutionContext", () => {
         packageJsonPath: FIXTURE_PATH,
       });
 
-      expect(context.scriptNames).toEqual(customScripts);
+      expect(context.scriptNames).toStrictEqual(customScripts);
     });
   });
 

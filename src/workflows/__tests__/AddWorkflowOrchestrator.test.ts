@@ -148,7 +148,7 @@ describe("AddWorkflowOrchestrator", () => {
       const orchestrator = new AddWorkflowOrchestrator(options);
       const result = await orchestrator.execute();
 
-      expect(result.success).toBe(true);
+      expect(result.success).toBeTruthy();
       expect(result.exitCode).toBe(0);
       expect(result.package).toBeDefined();
     });
@@ -211,7 +211,7 @@ describe("AddWorkflowOrchestrator", () => {
       const orchestrator = new AddWorkflowOrchestrator(options);
       const result = await orchestrator.execute();
 
-      expect(result.success).toBe(true);
+      expect(result.success).toBeTruthy();
       expect(mockCheckExistingStep.execute).toHaveBeenCalledWith(expect.anything(), true);
     });
   });
@@ -226,7 +226,7 @@ describe("AddWorkflowOrchestrator", () => {
       const orchestrator = new AddWorkflowOrchestrator(options);
       const result = await orchestrator.execute();
 
-      expect(result.success).toBe(false);
+      expect(result.success).toBeFalsy();
       expect(result.exitCode).toBe(1);
       expect(result.errorMessage).toContain("No safe version found");
       expect(mockCheckExistingStep.execute).not.toHaveBeenCalled();
@@ -253,7 +253,7 @@ describe("AddWorkflowOrchestrator", () => {
       const orchestrator = new AddWorkflowOrchestrator(options);
       const result = await orchestrator.execute();
 
-      expect(result.success).toBe(false);
+      expect(result.success).toBeFalsy();
       expect(result.exitCode).toBe(0);
       expect(result.errorMessage).toContain("keep current version");
       expect(mockSecurityStep.execute).not.toHaveBeenCalled();
@@ -292,7 +292,7 @@ describe("AddWorkflowOrchestrator", () => {
       const orchestrator = new AddWorkflowOrchestrator(options);
       const result = await orchestrator.execute();
 
-      expect(result.success).toBe(false);
+      expect(result.success).toBeFalsy();
       expect(result.exitCode).toBe(0);
       expect(result.errorMessage).toContain("did not confirm");
       expect(mockInstallStep.execute).not.toHaveBeenCalled();
@@ -345,7 +345,7 @@ describe("AddWorkflowOrchestrator", () => {
       const orchestrator = new AddWorkflowOrchestrator(options);
       const result = await orchestrator.execute();
 
-      expect(result.success).toBe(false);
+      expect(result.success).toBeFalsy();
       expect(result.exitCode).toBe(1);
       expect(result.errorMessage).toContain("Installation failed");
     });
@@ -409,7 +409,7 @@ describe("AddWorkflowOrchestrator", () => {
       const orchestrator = new AddWorkflowOrchestrator(options);
       const result = await orchestrator.execute();
 
-      expect(result.success).toBe(true);
+      expect(result.success).toBeTruthy();
       expect(result.package?.name).toBe("@vue/cli");
     });
   });

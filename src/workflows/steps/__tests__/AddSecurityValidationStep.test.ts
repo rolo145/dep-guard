@@ -42,8 +42,8 @@ describe("AddSecurityValidationStep", () => {
 
       const result = await step.execute(packageToAdd);
 
-      expect(result.confirmed).toBe(true);
-      expect(result.package).toEqual({
+      expect(result.confirmed).toBeTruthy();
+      expect(result.package).toStrictEqual({
         ...packageToAdd,
         npqPassed: true,
         userConfirmed: true,
@@ -67,7 +67,7 @@ describe("AddSecurityValidationStep", () => {
 
       const result = await step.execute(packageToAdd);
 
-      expect(result.confirmed).toBe(false);
+      expect(result.confirmed).toBeFalsy();
       expect(result.cancelReason).toContain("did not confirm");
       expect(mockNpqService.validateAndConfirm).toHaveBeenCalledWith("vue", "3.2.0");
     });
@@ -88,7 +88,7 @@ describe("AddSecurityValidationStep", () => {
 
       const result = await step.execute(packageToAdd);
 
-      expect(result.confirmed).toBe(true);
+      expect(result.confirmed).toBeTruthy();
       expect(mockNpqService.validateAndConfirm).toHaveBeenCalledWith("@vue/cli", "5.0.0");
     });
 
@@ -110,8 +110,8 @@ describe("AddSecurityValidationStep", () => {
 
       const result = await step.execute(packageToAdd);
 
-      expect(result.confirmed).toBe(true);
-      expect(result.package).toEqual({
+      expect(result.confirmed).toBeTruthy();
+      expect(result.package).toStrictEqual({
         ...packageToAdd,
         npqPassed: true,
         userConfirmed: true,

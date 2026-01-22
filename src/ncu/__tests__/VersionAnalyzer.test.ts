@@ -52,7 +52,7 @@ describe("VersionAnalyzer", () => {
 
   describe("parseSemver()", () => {
     it("parses standard semver", () => {
-      expect(VersionAnalyzer.parseSemver("1.2.3")).toEqual({
+      expect(VersionAnalyzer.parseSemver("1.2.3")).toStrictEqual({
         major: 1,
         minor: 2,
         patch: 3,
@@ -60,7 +60,7 @@ describe("VersionAnalyzer", () => {
     });
 
     it("parses version with caret prefix", () => {
-      expect(VersionAnalyzer.parseSemver("^4.5.6")).toEqual({
+      expect(VersionAnalyzer.parseSemver("^4.5.6")).toStrictEqual({
         major: 4,
         minor: 5,
         patch: 6,
@@ -68,7 +68,7 @@ describe("VersionAnalyzer", () => {
     });
 
     it("parses version with tilde prefix", () => {
-      expect(VersionAnalyzer.parseSemver("~7.8.9")).toEqual({
+      expect(VersionAnalyzer.parseSemver("~7.8.9")).toStrictEqual({
         major: 7,
         minor: 8,
         patch: 9,
@@ -76,7 +76,7 @@ describe("VersionAnalyzer", () => {
     });
 
     it("parses version with zeros", () => {
-      expect(VersionAnalyzer.parseSemver("0.0.1")).toEqual({
+      expect(VersionAnalyzer.parseSemver("0.0.1")).toStrictEqual({
         major: 0,
         minor: 0,
         patch: 1,
@@ -164,9 +164,9 @@ describe("VersionAnalyzer", () => {
     it("returns empty arrays when no updates", () => {
       const result = VersionAnalyzer.groupByType({}, {});
 
-      expect(result.major).toEqual([]);
-      expect(result.minor).toEqual([]);
-      expect(result.patch).toEqual([]);
+      expect(result.major).toStrictEqual([]);
+      expect(result.minor).toStrictEqual([]);
+      expect(result.patch).toStrictEqual([]);
     });
 
     it("includes currentVersion and newVersion in result", () => {
@@ -175,7 +175,7 @@ describe("VersionAnalyzer", () => {
 
       const result = VersionAnalyzer.groupByType(updates, deps);
 
-      expect(result.major[0]).toEqual({
+      expect(result.major[0]).toStrictEqual({
         name: "lodash",
         currentVersion: "^4.17.0",
         newVersion: "5.0.0",

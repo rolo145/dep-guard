@@ -107,7 +107,7 @@ describe("Argument Errors", () => {
       );
       expect(error.name).toBe("IncompatibleFlagsError");
       expect(error.flag).toBe("--dry-run");
-      expect(error.conflictingFlags).toEqual(["--lint"]);
+      expect(error.conflictingFlags).toStrictEqual(["--lint"]);
     });
 
     it("formats message with multiple conflicting flags", () => {
@@ -116,7 +116,7 @@ describe("Argument Errors", () => {
       expect(error.message).toBe(
         "--dry-run cannot be used with: --lint, --test, --build. Dry-run mode exits before quality checks run."
       );
-      expect(error.conflictingFlags).toEqual(["--lint", "--test", "--build"]);
+      expect(error.conflictingFlags).toStrictEqual(["--lint", "--test", "--build"]);
     });
 
     it("extends ValidationError", () => {
@@ -136,7 +136,7 @@ describe("Argument Errors", () => {
       expect(error.name).toBe("InvalidFlagForCommandError");
       expect(error.flag).toBe("-D");
       expect(error.command).toBe("update");
-      expect(error.validCommands).toEqual(["add"]);
+      expect(error.validCommands).toStrictEqual(["add"]);
     });
 
     it("formats message with --save-dev flag", () => {
@@ -154,7 +154,7 @@ describe("Argument Errors", () => {
       expect(error.message).toBe(
         "--flag can only be used with: add, update. Current command: cmd"
       );
-      expect(error.validCommands).toEqual(["add", "update"]);
+      expect(error.validCommands).toStrictEqual(["add", "update"]);
     });
 
     it("extends ValidationError", () => {
