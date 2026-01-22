@@ -7,6 +7,7 @@
  * @module args/ArgumentParser
  */
 import { DEFAULT_SCRIPTS, SAFETY_BUFFER_DAYS } from "../defaults";
+import { exitWithError } from "../errors";
 import { ArgumentValidator } from "./ArgumentValidator";
 import { ValidationError } from "./errors";
 import type { CliOptions } from "./types";
@@ -175,8 +176,7 @@ export class ArgumentParser {
       return this.parse();
     } catch (error) {
       if (error instanceof ValidationError) {
-        console.error(`Error: ${error.message}`);
-        process.exit(1);
+        exitWithError(`Error: ${error.message}`);
       }
       throw error;
     }

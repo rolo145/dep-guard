@@ -15,6 +15,19 @@ export const EXIT_CODE_CANCELLED = 130;
 export const EXIT_CODE_ERROR = 1;
 
 /**
+ * Writes an error message to stderr and exits the process.
+ * Uses process.stderr.write() to ensure the message is flushed before exit,
+ * which is critical for tests and CI environments where console.error() may be buffered.
+ *
+ * @param message - The error message to write
+ * @param exitCode - The exit code to use (default: EXIT_CODE_ERROR)
+ */
+export function exitWithError(message: string, exitCode: number = EXIT_CODE_ERROR): never {
+  process.stderr.write(`${message}\n`);
+  process.exit(exitCode);
+}
+
+/**
  * Base error class for all CLI errors.
  *
  * All domain-specific errors should extend this class to enable
@@ -110,6 +123,5 @@ export function logCancellation(): void {
  */
 export function handleFatalError(error: unknown): never {
   const message = error instanceof Error ? error.message : String(error);
-  console.error(`\nFatal error: ${message}`);
-  process.exit(EXIT_CODE_ERROR);
+  exitWithError(`\nFatal error: ${message}`);
 }

@@ -222,36 +222,36 @@ describe("errors module", () => {
 
   describe("handleFatalError()", () => {
     let mockExit: ReturnType<typeof vi.spyOn>;
-    let consoleSpy: ReturnType<typeof vi.spyOn>;
+    let stderrSpy: ReturnType<typeof vi.spyOn>;
 
     beforeEach(() => {
       mockExit = vi.spyOn(process, "exit").mockImplementation(() => {
         throw new Error("process.exit");
       });
-      consoleSpy = vi.spyOn(console, "error").mockImplementation(() => {});
+      stderrSpy = vi.spyOn(process.stderr, "write").mockImplementation(() => true);
     });
 
     afterEach(() => {
       mockExit.mockRestore();
-      consoleSpy.mockRestore();
+      stderrSpy.mockRestore();
     });
 
     it("logs error message and exits with code 1", () => {
       const error = new Error("test error");
 
       expect(() => handleFatalError(error)).toThrow("process.exit");
-      expect(consoleSpy).toHaveBeenCalledWith("\nFatal error: test error");
+      expect(stderrSpy).toHaveBeenCalledWith("\nFatal error: test error\n");
       expect(mockExit).toHaveBeenCalledWith(EXIT_CODE_ERROR);
     });
 
     it("handles non-Error values", () => {
       expect(() => handleFatalError("string error")).toThrow("process.exit");
-      expect(consoleSpy).toHaveBeenCalledWith("\nFatal error: string error");
+      expect(stderrSpy).toHaveBeenCalledWith("\nFatal error: string error\n");
     });
 
     it("converts objects to string", () => {
       expect(() => handleFatalError({ foo: "bar" })).toThrow("process.exit");
-      expect(consoleSpy).toHaveBeenCalledWith("\nFatal error: [object Object]");
+      expect(stderrSpy).toHaveBeenCalledWith("\nFatal error: [object Object]\n");
     });
   });
 });
