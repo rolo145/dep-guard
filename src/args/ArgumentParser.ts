@@ -148,6 +148,7 @@ export class ArgumentParser {
       days: SAFETY_BUFFER_DAYS,
       scripts: { ...DEFAULT_SCRIPTS },
       allowNpmInstall: false,
+      show: false,
     };
 
     // Parse --days/-d
@@ -159,6 +160,11 @@ export class ArgumentParser {
     // Parse --allow-npm-install flag
     if (this.hasFlag("--allow-npm-install")) {
       options.allowNpmInstall = true;
+    }
+
+    // Parse --show flag
+    if (this.hasFlag("--show")) {
+      options.show = true;
     }
 
     // Parse all script options

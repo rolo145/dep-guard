@@ -43,6 +43,7 @@ Options:
   -d, --days <number>       Safety buffer in days (default: ${SAFETY_BUFFER_DAYS})
   --allow-npm-install       Use npm install fallback when scfw is not available
   -D, --save-dev            Add as dev dependency [add only]
+  --show                    Show available updates without installing (dry-run) [update only]
   --lint <script>           Lint script name (default: "${DEFAULT_SCRIPTS.lint}") [update only]
   --typecheck <script>      Type check script name (default: "${DEFAULT_SCRIPTS.typecheck}") [update only]
   --test <script>           Test script name (default: "${DEFAULT_SCRIPTS.test}") [update only]
@@ -57,6 +58,8 @@ Examples:
   dep-guard update                      Run update workflow with defaults
   dep-guard update --days 14            Update with 14-day safety buffer
   dep-guard update --allow-npm-install  Update using npm install fallback
+  dep-guard update --show               Display available updates without installing
+  dep-guard update --show --days 14     Show updates with 14-day safety buffer
   dep-guard update --lint eslint        Use "eslint" as lint script
   dep-guard update --test test:all      Use "test:all" as test script
   dep-guard add vue                     Add latest safe version of vue

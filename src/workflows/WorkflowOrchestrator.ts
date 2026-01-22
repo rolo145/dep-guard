@@ -9,14 +9,18 @@
 import type { IExecutionContext } from "../context/IExecutionContext";
 import type { WorkflowOptions, WorkflowResult, WorkflowStats, WorkflowStepDef } from "./types";
 import type { IWorkflowStep, StepContext, StepResult, WorkflowServices, StepData } from "./steps";
-import type { PackageSelection } from "../ncu/types";
+import type { PackageSelection, VersionBumpType, PackageUpdate, GroupedUpdates } from "../ncu/types";
+import type { OrganizeUpdatesOutput } from "./steps/OrganizeUpdatesStep";
 import { ExecutionContextFactory } from "../context/ExecutionContextFactory";
 import { NCUService } from "../ncu";
 import { NPQService } from "../npq";
 import { InstallService } from "../install";
 import { QualityService } from "../quality";
+import { VersionAnalyzer } from "../ncu/VersionAnalyzer";
+import { VersionFormatter } from "../ncu/VersionFormatter";
 import { logger } from "../logger";
 import { isUserCancellation, logCancellation, EXIT_CODE_CANCELLED } from "../errors";
+import chalk from "chalk";
 import {
   CheckUpdatesStep,
   SafetyBufferStep,
@@ -115,6 +119,11 @@ export class WorkflowOrchestrator {
 
       // Use stepData if provided, otherwise wrap raw data
       currentStepData = result.stepData ?? { step: "init", data: result.data as undefined };
+
+      // Intercept workflow if in show mode after organizing updates
+      if (this.options.show && step instanceof OrganizeUpdatesStep) {
+        return this.createShowModeResult(currentStepData.data as OrganizeUpdatesOutput);
+      }
     }
 
     // All steps completed successfully
@@ -230,5 +239,90 @@ export class WorkflowOrchestrator {
       reason: "completed",
       stats: this.stats,
     };
+  }
+
+  /**
+   * Creates result for show mode display.
+   * Displays available updates and exits without installing.
+   */
+  private createShowModeResult(organizedData: OrganizeUpdatesOutput): WorkflowResult {
+    this.stats.durationMs = Date.now() - this.startTime;
+
+    const { grouped } = organizedData;
+    this.displayShowModeUpdates(grouped);
+
+    return {
+      success: true,
+      exitCode: 0,
+      reason: "completed",
+      stats: this.stats,
+    };
+  }
+
+  /**
+   * Displays available updates in show mode.
+   */
+  private displayShowModeUpdates(grouped: GroupedUpdates): void {
+    logger.newLine();
+    logger.header("Available Updates", "📋");
+    logger.newLine();
+
+    const totalUpdates = grouped.major.length + grouped.minor.length + grouped.patch.length;
+
+    if (totalUpdates === 0) {
+      logger.info("No updates available");
+      return;
+    }
+
+    // Display each group
+    this.displayUpdateGroup("Patch Updates", grouped.patch, "patch", chalk.green);
+    this.displayUpdateGroup("Minor Updates", grouped.minor, "minor", chalk.blue);
+    this.displayUpdateGroup("Major Updates", grouped.major, "major", chalk.red);
+
+    // Summary
+    logger.newLine();
+    logger.summaryTable("UPDATE SUMMARY", {
+      "Total updates available": totalUpdates,
+      "Patch updates": grouped.patch.length,
+      "Minor updates": grouped.minor.length,
+      "Major updates": grouped.major.length,
+      "Safety buffer applied": `${this.options.days} days`,
+    });
+
+    logger.info("Run 'dep-guard update' without --show to install these updates");
+  }
+
+  /**
+   * Displays a single update group.
+   */
+  private displayUpdateGroup(
+    title: string,
+    packages: PackageUpdate[],
+    bumpType: VersionBumpType,
+    colorFn: (text: string) => string
+  ): void {
+    if (packages.length === 0) {
+      return;
+    }
+
+    logger.newLine();
+    logger.info(colorFn(`${title} (${packages.length})`));
+    logger.divider();
+
+    const maxNameLength = VersionAnalyzer.getMaxPackageNameLength({
+      major: bumpType === "major" ? packages : [],
+      minor: bumpType === "minor" ? packages : [],
+      patch: bumpType === "patch" ? packages : [],
+    });
+
+    packages.forEach((pkg) => {
+      const padding = " ".repeat(maxNameLength - pkg.name.length + 2);
+      const versionDisplay = VersionFormatter.formatWithHighlight(
+        pkg.currentVersion,
+        pkg.newVersion,
+        bumpType
+      );
+      console.log(`  ${pkg.name}${padding}${versionDisplay}`);
+    });
   }
 }

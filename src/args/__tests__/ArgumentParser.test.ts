@@ -86,6 +86,36 @@ describe("ArgumentParser", () => {
       expect(options.days).toBe(14);
     });
 
+    it("parses --show flag", () => {
+      const parser = new ArgumentParser(["--show"]);
+      const options = parser.parse();
+
+      expect(options.show).toBe(true);
+    });
+
+    it("defaults show to false when not provided", () => {
+      const parser = new ArgumentParser([]);
+      const options = parser.parse();
+
+      expect(options.show).toBe(false);
+    });
+
+    it("parses --show with other options", () => {
+      const parser = new ArgumentParser(["--show", "--days", "14"]);
+      const options = parser.parse();
+
+      expect(options.show).toBe(true);
+      expect(options.days).toBe(14);
+    });
+
+    it("parses --show with --allow-npm-install", () => {
+      const parser = new ArgumentParser(["--show", "--allow-npm-install"]);
+      const options = parser.parse();
+
+      expect(options.show).toBe(true);
+      expect(options.allowNpmInstall).toBe(true);
+    });
+
     it("throws InvalidFormatError for non-numeric days", () => {
       const parser = new ArgumentParser(["--days", "abc"]);
 

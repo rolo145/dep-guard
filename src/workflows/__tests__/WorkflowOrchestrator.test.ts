@@ -87,6 +87,10 @@ vi.mock("../../logger", () => ({
     warning: vi.fn(),
     success: vi.fn(),
     summaryTable: vi.fn(),
+    newLine: vi.fn(),
+    header: vi.fn(),
+    info: vi.fn(),
+    divider: vi.fn(),
   },
 }));
 
@@ -98,6 +102,7 @@ vi.mock("../../errors", () => ({
 
 import { WorkflowOrchestrator } from "../WorkflowOrchestrator";
 import * as errors from "../../errors";
+import { logger } from "../../logger";
 
 describe("WorkflowOrchestrator", () => {
   beforeEach(() => {
@@ -260,6 +265,196 @@ describe("WorkflowOrchestrator", () => {
       expect(result.stats?.packagesAfterFilter).toBe(2);
       expect(result.stats?.packagesSelected).toBe(2);
       expect(result.stats?.packagesInstalled).toBe(2);
+    });
+  });
+
+  describe("execute() with show mode", () => {
+    let consoleLogSpy: ReturnType<typeof vi.spyOn>;
+
+    beforeEach(() => {
+      // Mock console.log to prevent stdout output during tests
+      consoleLogSpy = vi.spyOn(console, "log").mockImplementation(() => {});
+    });
+
+    afterEach(() => {
+      consoleLogSpy.mockRestore();
+    });
+
+    it("returns after organizing updates when show mode is enabled", async () => {
+      const grouped = {
+        major: [{ name: "axios", currentVersion: "0.27.2", newVersion: "1.4.0" }],
+        minor: [
+          { name: "vite", currentVersion: "4.3.9", newVersion: "4.4.2" },
+          { name: "vue", currentVersion: "3.3.4", newVersion: "3.3.5" },
+        ],
+        patch: [{ name: "eslint", currentVersion: "8.45.0", newVersion: "8.45.2" }],
+      };
+
+      mockNCUService.loadUpdates.mockResolvedValue({
+        axios: "1.4.0",
+        vite: "4.4.2",
+        vue: "3.3.5",
+        eslint: "8.45.2",
+      });
+      mockNCUService.filterByAge.mockResolvedValue({
+        axios: "1.4.0",
+        vite: "4.4.2",
+        vue: "3.3.5",
+        eslint: "8.45.2",
+      });
+      mockNCUService.buildChoices.mockReturnValue({ grouped, choices: [] });
+
+      const orchestrator = new WorkflowOrchestrator({
+        days: 7,
+        scripts: { lint: "lint", typecheck: "typecheck", test: "test", build: "build" },
+        show: true,
+      });
+
+      const result = await orchestrator.execute();
+
+      expect(result.success).toBeTruthy();
+      expect(result.exitCode).toBe(0);
+      expect(result.reason).toBe("completed");
+
+      // Verify logger methods were called for display
+      expect(logger.header).toHaveBeenCalledWith("Available Updates", "📋");
+      expect(logger.summaryTable).toHaveBeenCalledWith("UPDATE SUMMARY", expect.any(Object));
+      expect(logger.info).toHaveBeenCalledWith(
+        "Run 'dep-guard update' without --show to install these updates"
+      );
+
+      // Verify no installation steps were called
+      expect(mockNCUService.promptSelection).not.toHaveBeenCalled();
+      expect(mockNPQService.processSelection).not.toHaveBeenCalled();
+      expect(mockInstallService.installPackages).not.toHaveBeenCalled();
+      expect(mockInstallService.reinstall).not.toHaveBeenCalled();
+      expect(mockQualityService.runAll).not.toHaveBeenCalled();
+      expect(mockQualityService.runBuild).not.toHaveBeenCalled();
+    });
+
+    it("displays correct summary statistics in show mode", async () => {
+      const grouped = {
+        major: [{ name: "axios", currentVersion: "0.27.2", newVersion: "1.4.0" }],
+        minor: [
+          { name: "vite", currentVersion: "4.3.9", newVersion: "4.4.2" },
+          { name: "vue", currentVersion: "3.3.4", newVersion: "3.3.5" },
+        ],
+        patch: [{ name: "eslint", currentVersion: "8.45.0", newVersion: "8.45.2" }],
+      };
+
+      mockNCUService.loadUpdates.mockResolvedValue({
+        axios: "1.4.0",
+        vite: "4.4.2",
+        vue: "3.3.5",
+        eslint: "8.45.2",
+      });
+      mockNCUService.filterByAge.mockResolvedValue({
+        axios: "1.4.0",
+        vite: "4.4.2",
+        vue: "3.3.5",
+        eslint: "8.45.2",
+      });
+      mockNCUService.buildChoices.mockReturnValue({ grouped, choices: [] });
+
+      const orchestrator = new WorkflowOrchestrator({
+        days: 14,
+        scripts: { lint: "lint", typecheck: "typecheck", test: "test", build: "build" },
+        show: true,
+      });
+
+      await orchestrator.execute();
+
+      expect(logger.summaryTable).toHaveBeenCalledWith("UPDATE SUMMARY", {
+        "Total updates available": 4,
+        "Patch updates": 1,
+        "Minor updates": 2,
+        "Major updates": 1,
+        "Safety buffer applied": "14 days",
+      });
+    });
+
+    it("exits early when no updates available even with show mode enabled", async () => {
+      mockNCUService.loadUpdates.mockResolvedValue({});
+
+      const orchestrator = new WorkflowOrchestrator({
+        days: 7,
+        scripts: { lint: "lint", typecheck: "typecheck", test: "test", build: "build" },
+        show: true,
+      });
+
+      const result = await orchestrator.execute();
+
+      expect(result.success).toBeTruthy();
+      expect(result.exitCode).toBe(0);
+      expect(result.reason).toBe("no_updates_available");
+
+      // Verify show mode display was not called (because we exited early)
+      expect(logger.header).not.toHaveBeenCalledWith("Available Updates", "📋");
+    });
+
+    it("respects custom safety buffer in show mode", async () => {
+      const grouped = {
+        major: [],
+        minor: [{ name: "vite", currentVersion: "4.3.9", newVersion: "4.4.2" }],
+        patch: [],
+      };
+
+      mockNCUService.loadUpdates.mockResolvedValue({ vite: "4.4.2" });
+      mockNCUService.filterByAge.mockResolvedValue({ vite: "4.4.2" });
+      mockNCUService.buildChoices.mockReturnValue({ grouped, choices: [] });
+
+      const orchestrator = new WorkflowOrchestrator({
+        days: 30,
+        scripts: { lint: "lint", typecheck: "typecheck", test: "test", build: "build" },
+        show: true,
+      });
+
+      await orchestrator.execute();
+
+      expect(logger.summaryTable).toHaveBeenCalledWith("UPDATE SUMMARY", {
+        "Total updates available": 1,
+        "Patch updates": 0,
+        "Minor updates": 1,
+        "Major updates": 0,
+        "Safety buffer applied": "30 days",
+      });
+    });
+
+    it("executes normally without show flag", async () => {
+      const packages = [{ name: "lodash", version: "5.0.0" }];
+
+      mockNCUService.loadUpdates.mockResolvedValue({ lodash: "5.0.0" });
+      mockNCUService.filterByAge.mockResolvedValue({ lodash: "5.0.0" });
+      mockNCUService.buildChoices.mockReturnValue({ grouped: {}, choices: [] });
+      mockNCUService.promptSelection.mockResolvedValue(packages);
+      mockNPQService.processSelection.mockResolvedValue(packages);
+      mockInstallService.installPackages.mockResolvedValue(undefined);
+      mockInstallService.reinstall.mockResolvedValue(undefined);
+      mockQualityService.runAll.mockResolvedValue({});
+      mockQualityService.runBuild.mockResolvedValue(true);
+
+      const orchestrator = new WorkflowOrchestrator({
+        days: 7,
+        scripts: { lint: "lint", typecheck: "typecheck", test: "test", build: "build" },
+        show: false,
+      });
+
+      const result = await orchestrator.execute();
+
+      expect(result.success).toBeTruthy();
+      expect(result.exitCode).toBe(0);
+      expect(result.reason).toBe("completed");
+
+      // Verify all installation steps were called
+      expect(mockNCUService.promptSelection).toHaveBeenCalled();
+      expect(mockNPQService.processSelection).toHaveBeenCalled();
+      expect(mockInstallService.installPackages).toHaveBeenCalled();
+      expect(mockInstallService.reinstall).toHaveBeenCalled();
+      expect(mockQualityService.runAll).toHaveBeenCalled();
+      expect(mockQualityService.runBuild).toHaveBeenCalled();
+
+      // Verify show mode display was not called
+      expect(logger.header).not.toHaveBeenCalledWith("Available Updates", "📋");
     });
   });
 });

@@ -14,6 +14,8 @@ export interface WorkflowOptions {
   scripts: ScriptOptions;
   /** Whether to use npm install fallback instead of scfw */
   useNpmFallback?: boolean;
+  /** Show available updates without installing (dry-run mode) */
+  show?: boolean;
 }
 
 /** Reasons workflow may exit early */

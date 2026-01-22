@@ -29,4 +29,6 @@ export interface CliOptions {
   packages?: string[];
   /** Add as dev dependency (optional, for add command) */
   saveDev?: boolean;
+  /** Show available updates without installing (optional, for update command) */
+  show?: boolean;
 }
