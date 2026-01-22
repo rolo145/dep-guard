@@ -84,39 +84,39 @@ describe("CLIHelper", () => {
       expect(output).toContain("Examples:");
     });
 
-    it("includes --show flag in options", () => {
+    it("includes --dry-run flag in options", () => {
       vi.mocked(readFileSync).mockReturnValue(JSON.stringify({ version: "1.0.0" }));
       const consoleSpy = vi.spyOn(console, "log").mockImplementation(() => {});
 
       CLIHelper.showHelp();
 
       const output = consoleSpy.mock.calls[0][0];
-      expect(output).toContain("--show");
+      expect(output).toContain("--dry-run");
       expect(output).toContain("Show available updates without installing");
     });
 
-    it("includes --show examples", () => {
+    it("includes --dry-run examples", () => {
       vi.mocked(readFileSync).mockReturnValue(JSON.stringify({ version: "1.0.0" }));
       const consoleSpy = vi.spyOn(console, "log").mockImplementation(() => {});
 
       CLIHelper.showHelp();
 
       const output = consoleSpy.mock.calls[0][0];
-      expect(output).toContain("dep-guard update --show");
-      expect(output).toContain("dep-guard update --show --days 14");
+      expect(output).toContain("dep-guard update --dry-run");
+      expect(output).toContain("dep-guard update --dry-run --days 14");
     });
 
-    it("includes [update only] tag for --show flag", () => {
+    it("includes [update only] tag for --dry-run flag", () => {
       vi.mocked(readFileSync).mockReturnValue(JSON.stringify({ version: "1.0.0" }));
       const consoleSpy = vi.spyOn(console, "log").mockImplementation(() => {});
 
       CLIHelper.showHelp();
 
       const output = consoleSpy.mock.calls[0][0];
-      // Check that --show line contains [update only] tag
-      const showFlagLine = output.split("\n").find((line: string) => line.includes("--show"));
-      expect(showFlagLine).toBeDefined();
-      expect(showFlagLine).toContain("[update only]");
+      // Check that --dry-run line contains [update only] tag
+      const dryRunFlagLine = output.split("\n").find((line: string) => line.includes("--dry-run"));
+      expect(dryRunFlagLine).toBeDefined();
+      expect(dryRunFlagLine).toContain("[update only]");
     });
   });
 });

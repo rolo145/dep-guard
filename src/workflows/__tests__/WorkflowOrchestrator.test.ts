@@ -268,7 +268,7 @@ describe("WorkflowOrchestrator", () => {
     });
   });
 
-  describe("execute() with show mode", () => {
+  describe("execute() with dryRun mode", () => {
     let consoleLogSpy: ReturnType<typeof vi.spyOn>;
 
     beforeEach(() => {
@@ -280,7 +280,7 @@ describe("WorkflowOrchestrator", () => {
       consoleLogSpy.mockRestore();
     });
 
-    it("returns after organizing updates when show mode is enabled", async () => {
+    it("returns after organizing updates when dryRun mode is enabled", async () => {
       const grouped = {
         major: [{ name: "axios", currentVersion: "0.27.2", newVersion: "1.4.0" }],
         minor: [
@@ -307,7 +307,7 @@ describe("WorkflowOrchestrator", () => {
       const orchestrator = new WorkflowOrchestrator({
         days: 7,
         scripts: { lint: "lint", typecheck: "typecheck", test: "test", build: "build" },
-        show: true,
+        dryRun: true,
       });
 
       const result = await orchestrator.execute();
@@ -320,7 +320,7 @@ describe("WorkflowOrchestrator", () => {
       expect(logger.header).toHaveBeenCalledWith("Available Updates", "📋");
       expect(logger.summaryTable).toHaveBeenCalledWith("UPDATE SUMMARY", expect.any(Object));
       expect(logger.info).toHaveBeenCalledWith(
-        "Run 'dep-guard update' without --show to install these updates"
+        "Run 'dep-guard update' without --dry-run to install these updates"
       );
 
       // Verify no installation steps were called
@@ -332,7 +332,7 @@ describe("WorkflowOrchestrator", () => {
       expect(mockQualityService.runBuild).not.toHaveBeenCalled();
     });
 
-    it("displays correct summary statistics in show mode", async () => {
+    it("displays correct summary statistics in dryRun mode", async () => {
       const grouped = {
         major: [{ name: "axios", currentVersion: "0.27.2", newVersion: "1.4.0" }],
         minor: [
@@ -359,7 +359,7 @@ describe("WorkflowOrchestrator", () => {
       const orchestrator = new WorkflowOrchestrator({
         days: 14,
         scripts: { lint: "lint", typecheck: "typecheck", test: "test", build: "build" },
-        show: true,
+        dryRun: true,
       });
 
       await orchestrator.execute();
@@ -373,13 +373,13 @@ describe("WorkflowOrchestrator", () => {
       });
     });
 
-    it("exits early when no updates available even with show mode enabled", async () => {
+    it("exits early when no updates available even with dryRun mode enabled", async () => {
       mockNCUService.loadUpdates.mockResolvedValue({});
 
       const orchestrator = new WorkflowOrchestrator({
         days: 7,
         scripts: { lint: "lint", typecheck: "typecheck", test: "test", build: "build" },
-        show: true,
+        dryRun: true,
       });
 
       const result = await orchestrator.execute();
@@ -388,11 +388,11 @@ describe("WorkflowOrchestrator", () => {
       expect(result.exitCode).toBe(0);
       expect(result.reason).toBe("no_updates_available");
 
-      // Verify show mode display was not called (because we exited early)
+      // Verify dryRun mode display was not called (because we exited early)
       expect(logger.header).not.toHaveBeenCalledWith("Available Updates", "📋");
     });
 
-    it("respects custom safety buffer in show mode", async () => {
+    it("respects custom safety buffer in dryRun mode", async () => {
       const grouped = {
         major: [],
         minor: [{ name: "vite", currentVersion: "4.3.9", newVersion: "4.4.2" }],
@@ -406,7 +406,7 @@ describe("WorkflowOrchestrator", () => {
       const orchestrator = new WorkflowOrchestrator({
         days: 30,
         scripts: { lint: "lint", typecheck: "typecheck", test: "test", build: "build" },
-        show: true,
+        dryRun: true,
       });
 
       await orchestrator.execute();
@@ -420,7 +420,7 @@ describe("WorkflowOrchestrator", () => {
       });
     });
 
-    it("executes normally without show flag", async () => {
+    it("executes normally without dryRun flag", async () => {
       const packages = [{ name: "lodash", version: "5.0.0" }];
 
       mockNCUService.loadUpdates.mockResolvedValue({ lodash: "5.0.0" });
@@ -436,7 +436,7 @@ describe("WorkflowOrchestrator", () => {
       const orchestrator = new WorkflowOrchestrator({
         days: 7,
         scripts: { lint: "lint", typecheck: "typecheck", test: "test", build: "build" },
-        show: false,
+        dryRun: false,
       });
 
       const result = await orchestrator.execute();
@@ -453,7 +453,7 @@ describe("WorkflowOrchestrator", () => {
       expect(mockQualityService.runAll).toHaveBeenCalled();
       expect(mockQualityService.runBuild).toHaveBeenCalled();
 
-      // Verify show mode display was not called
+      // Verify dryRun mode display was not called
       expect(logger.header).not.toHaveBeenCalledWith("Available Updates", "📋");
     });
   });

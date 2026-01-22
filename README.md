@@ -29,7 +29,7 @@ Safe dependency updates with guardrails:
 - Reinstalls dependencies via `npm ci --ignore-scripts`
 - Optionally runs lint, typecheck, tests, and build scripts
 
-**Show mode**: Use `--show` to preview available updates without installing them (dry-run mode)
+**Dry-run mode**: Use `--dry-run` to preview available updates without installing them
 
 ### `dep-guard add <package>`
 
@@ -83,7 +83,7 @@ dep-guard <subcommand> [options]
 - `-d, --days <number>`: Safety buffer in days (default: 7) - applies to all commands
 - `--allow-npm-install`: Use npm install fallback when scfw is not available
 - `-D, --save-dev`: Add as dev dependency **[add only]**
-- `--show`: Show available updates without installing (dry-run) **[update only]**
+- `--dry-run`: Show available updates without installing (dry-run) **[update only]**
 - `--lint <script>`: Lint script name (default: `lint`) **[update only]**
 - `--typecheck <script>`: Type check script name (default: `typecheck`) **[update only]**
 - `--test <script>`: Test script name (default: `test`) **[update only]**
@@ -95,9 +95,9 @@ dep-guard <subcommand> [options]
 
 Some flags cannot be combined due to incompatible functionality:
 
-**1. --show cannot be combined with quality check flags**
+**1. --dry-run cannot be combined with quality check flags**
 
-The `--show` flag displays available updates and exits before installation or quality checks run. Therefore, it cannot be combined with:
+The `--dry-run` flag displays available updates and exits before installation or quality checks run. Therefore, it cannot be combined with:
 - `--lint`
 - `--typecheck`
 - `--test`
@@ -105,14 +105,14 @@ The `--show` flag displays available updates and exits before installation or qu
 
 ```bash
 # ❌ These will fail with an error
-dep-guard update --show --lint eslint
-dep-guard update --show --test vitest
-dep-guard update --show --lint eslint --test jest
+dep-guard update --dry-run --lint eslint
+dep-guard update --dry-run --test vitest
+dep-guard update --dry-run --lint eslint --test jest
 
 # ✅ These work fine
-dep-guard update --show                    # Show mode alone
-dep-guard update --show --days 14          # Show with compatible flags
-dep-guard update --lint eslint --test jest # Quality checks without show
+dep-guard update --dry-run                    # Dry-run mode alone
+dep-guard update --dry-run --days 14          # Dry-run with compatible flags
+dep-guard update --lint eslint --test jest # Quality checks without dry-run
 ```
 
 **2. -D/--save-dev can only be used with the add command**
@@ -150,10 +150,10 @@ dep-guard update
 dep-guard update --days 14
 
 # Preview available updates without installing (dry-run)
-dep-guard update --show
+dep-guard update --dry-run
 
 # Preview updates with custom safety buffer
-dep-guard update --show --days 14
+dep-guard update --dry-run --days 14
 
 # Update using npm install fallback
 dep-guard update --allow-npm-install

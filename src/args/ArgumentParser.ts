@@ -149,8 +149,8 @@ export class ArgumentParser {
    * @throws InvalidFlagForCommandError if command-specific flags are misused
    */
   private validateFlagCombinations(options: CliOptions): void {
-    // --show cannot be used with custom quality check scripts
-    if (options.show) {
+    // --dry-run cannot be used with custom quality check scripts
+    if (options.dryRun) {
       const conflictingFlags: string[] = [];
 
       if (options.scripts.lint !== DEFAULT_SCRIPTS.lint) {
@@ -167,7 +167,7 @@ export class ArgumentParser {
       }
 
       if (conflictingFlags.length > 0) {
-        throw new IncompatibleFlagsError("--show", conflictingFlags);
+        throw new IncompatibleFlagsError("--dry-run", conflictingFlags);
       }
     }
 
@@ -190,7 +190,7 @@ export class ArgumentParser {
       days: SAFETY_BUFFER_DAYS,
       scripts: { ...DEFAULT_SCRIPTS },
       allowNpmInstall: false,
-      show: false,
+      dryRun: false,
     };
 
     // Parse --days/-d
@@ -204,9 +204,9 @@ export class ArgumentParser {
       options.allowNpmInstall = true;
     }
 
-    // Parse --show flag
-    if (this.hasFlag("--show")) {
-      options.show = true;
+    // Parse --dry-run flag
+    if (this.hasFlag("--dry-run")) {
+      options.dryRun = true;
     }
 
     // Parse all script options

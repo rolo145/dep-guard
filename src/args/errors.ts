@@ -84,7 +84,7 @@ export class IncompatibleFlagsError extends ValidationError {
     const flagList = conflictingFlags.join(", ");
     super(
       flag,
-      `${flag} cannot be used with: ${flagList}. Show mode exits before quality checks run.`
+      `${flag} cannot be used with: ${flagList}. Dry-run mode exits before quality checks run.`
     );
     this.name = "IncompatibleFlagsError";
     this.conflictingFlags = conflictingFlags;

@@ -157,7 +157,7 @@ function setupGracefulShutdown(): void {
       days: options.days,
       scripts: options.scripts,
       useNpmFallback,
-      show: options.show,
+      dryRun: options.dryRun,
     });
     const result = await orchestrator.execute();
     process.exit(result.exitCode);

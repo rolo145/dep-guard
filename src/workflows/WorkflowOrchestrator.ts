@@ -120,9 +120,9 @@ export class WorkflowOrchestrator {
       // Use stepData if provided, otherwise wrap raw data
       currentStepData = result.stepData ?? { step: "init", data: result.data as undefined };
 
-      // Intercept workflow if in show mode after organizing updates
-      if (this.options.show && step instanceof OrganizeUpdatesStep) {
-        return this.createShowModeResult(currentStepData.data as OrganizeUpdatesOutput);
+      // Intercept workflow if in dry-run mode after organizing updates
+      if (this.options.dryRun && step instanceof OrganizeUpdatesStep) {
+        return this.createDryRunResult(currentStepData.data as OrganizeUpdatesOutput);
       }
     }
 
@@ -242,14 +242,14 @@ export class WorkflowOrchestrator {
   }
 
   /**
-   * Creates result for show mode display.
+   * Creates result for dry-run mode display.
    * Displays available updates and exits without installing.
    */
-  private createShowModeResult(organizedData: OrganizeUpdatesOutput): WorkflowResult {
+  private createDryRunResult(organizedData: OrganizeUpdatesOutput): WorkflowResult {
     this.stats.durationMs = Date.now() - this.startTime;
 
     const { grouped } = organizedData;
-    this.displayShowModeUpdates(grouped);
+    this.displayDryRunUpdates(grouped);
 
     return {
       success: true,
@@ -260,9 +260,9 @@ export class WorkflowOrchestrator {
   }
 
   /**
-   * Displays available updates in show mode.
+   * Displays available updates in dry-run mode.
    */
-  private displayShowModeUpdates(grouped: GroupedUpdates): void {
+  private displayDryRunUpdates(grouped: GroupedUpdates): void {
     logger.newLine();
     logger.header("Available Updates", "📋");
     logger.newLine();
@@ -289,7 +289,7 @@ export class WorkflowOrchestrator {
       "Safety buffer applied": `${this.options.days} days`,
     });
 
-    logger.info("Run 'dep-guard update' without --show to install these updates");
+    logger.info("Run 'dep-guard update' without --dry-run to install these updates");
   }
 
   /**

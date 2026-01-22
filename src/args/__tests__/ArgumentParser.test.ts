@@ -86,33 +86,33 @@ describe("ArgumentParser", () => {
       expect(options.days).toBe(14);
     });
 
-    it("parses --show flag", () => {
-      const parser = new ArgumentParser(["--show"]);
+    it("parses --dry-run flag", () => {
+      const parser = new ArgumentParser(["--dry-run"]);
       const options = parser.parse();
 
-      expect(options.show).toBe(true);
+      expect(options.dryRun).toBe(true);
     });
 
-    it("defaults show to false when not provided", () => {
+    it("defaults dryRun to false when not provided", () => {
       const parser = new ArgumentParser([]);
       const options = parser.parse();
 
-      expect(options.show).toBe(false);
+      expect(options.dryRun).toBe(false);
     });
 
-    it("parses --show with other options", () => {
-      const parser = new ArgumentParser(["--show", "--days", "14"]);
+    it("parses --dry-run with other options", () => {
+      const parser = new ArgumentParser(["--dry-run", "--days", "14"]);
       const options = parser.parse();
 
-      expect(options.show).toBe(true);
+      expect(options.dryRun).toBe(true);
       expect(options.days).toBe(14);
     });
 
-    it("parses --show with --allow-npm-install", () => {
-      const parser = new ArgumentParser(["--show", "--allow-npm-install"]);
+    it("parses --dry-run with --allow-npm-install", () => {
+      const parser = new ArgumentParser(["--dry-run", "--allow-npm-install"]);
       const options = parser.parse();
 
-      expect(options.show).toBe(true);
+      expect(options.dryRun).toBe(true);
       expect(options.allowNpmInstall).toBe(true);
     });
 
@@ -296,36 +296,36 @@ describe("ArgumentParser", () => {
   });
 
   describe("validateFlagCombinations()", () => {
-    it("throws IncompatibleFlagsError when --show used with --lint", () => {
-      const parser = new ArgumentParser(["--show", "--lint", "eslint"]);
+    it("throws IncompatibleFlagsError when --dry-run used with --lint", () => {
+      const parser = new ArgumentParser(["--dry-run", "--lint", "eslint"]);
 
       expect(() => parser.parse()).toThrow(IncompatibleFlagsError);
       expect(() => parser.parse()).toThrow(
-        "--show cannot be used with: --lint"
+        "--dry-run cannot be used with: --lint"
       );
     });
 
-    it("throws IncompatibleFlagsError when --show used with --typecheck", () => {
-      const parser = new ArgumentParser(["--show", "--typecheck", "tsc"]);
+    it("throws IncompatibleFlagsError when --dry-run used with --typecheck", () => {
+      const parser = new ArgumentParser(["--dry-run", "--typecheck", "tsc"]);
 
       expect(() => parser.parse()).toThrow(IncompatibleFlagsError);
     });
 
-    it("throws IncompatibleFlagsError when --show used with --test", () => {
-      const parser = new ArgumentParser(["--show", "--test", "vitest"]);
+    it("throws IncompatibleFlagsError when --dry-run used with --test", () => {
+      const parser = new ArgumentParser(["--dry-run", "--test", "vitest"]);
 
       expect(() => parser.parse()).toThrow(IncompatibleFlagsError);
     });
 
-    it("throws IncompatibleFlagsError when --show used with --build", () => {
-      const parser = new ArgumentParser(["--show", "--build", "build:prod"]);
+    it("throws IncompatibleFlagsError when --dry-run used with --build", () => {
+      const parser = new ArgumentParser(["--dry-run", "--build", "build:prod"]);
 
       expect(() => parser.parse()).toThrow(IncompatibleFlagsError);
     });
 
-    it("throws IncompatibleFlagsError when --show used with multiple quality flags", () => {
+    it("throws IncompatibleFlagsError when --dry-run used with multiple quality flags", () => {
       const parser = new ArgumentParser([
-        "--show",
+        "--dry-run",
         "--lint", "eslint",
         "--test", "vitest",
         "--build", "build:prod"
@@ -333,27 +333,27 @@ describe("ArgumentParser", () => {
 
       expect(() => parser.parse()).toThrow(IncompatibleFlagsError);
       expect(() => parser.parse()).toThrow(
-        "--show cannot be used with: --lint, --test, --build"
+        "--dry-run cannot be used with: --lint, --test, --build"
       );
     });
 
-    it("allows --show with --days", () => {
-      const parser = new ArgumentParser(["--show", "--days", "14"]);
+    it("allows --dry-run with --days", () => {
+      const parser = new ArgumentParser(["--dry-run", "--days", "14"]);
       const options = parser.parse();
 
-      expect(options.show).toBe(true);
+      expect(options.dryRun).toBe(true);
       expect(options.days).toBe(14);
     });
 
-    it("allows --show with --allow-npm-install", () => {
-      const parser = new ArgumentParser(["--show", "--allow-npm-install"]);
+    it("allows --dry-run with --allow-npm-install", () => {
+      const parser = new ArgumentParser(["--dry-run", "--allow-npm-install"]);
       const options = parser.parse();
 
-      expect(options.show).toBe(true);
+      expect(options.dryRun).toBe(true);
       expect(options.allowNpmInstall).toBe(true);
     });
 
-    it("allows quality flags without --show", () => {
+    it("allows quality flags without --dry-run", () => {
       const parser = new ArgumentParser([
         "--lint", "eslint",
         "--test", "vitest",
@@ -361,7 +361,7 @@ describe("ArgumentParser", () => {
       ]);
       const options = parser.parse();
 
-      expect(options.show).toBe(false);
+      expect(options.dryRun).toBe(false);
       expect(options.scripts.lint).toBe("eslint");
       expect(options.scripts.test).toBe("vitest");
       expect(options.scripts.build).toBe("build:prod");

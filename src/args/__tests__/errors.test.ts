@@ -100,27 +100,27 @@ describe("Argument Errors", () => {
 
   describe("IncompatibleFlagsError", () => {
     it("formats message with single conflicting flag", () => {
-      const error = new IncompatibleFlagsError("--show", ["--lint"]);
+      const error = new IncompatibleFlagsError("--dry-run", ["--lint"]);
 
       expect(error.message).toBe(
-        "--show cannot be used with: --lint. Show mode exits before quality checks run."
+        "--dry-run cannot be used with: --lint. Dry-run mode exits before quality checks run."
       );
       expect(error.name).toBe("IncompatibleFlagsError");
-      expect(error.flag).toBe("--show");
+      expect(error.flag).toBe("--dry-run");
       expect(error.conflictingFlags).toEqual(["--lint"]);
     });
 
     it("formats message with multiple conflicting flags", () => {
-      const error = new IncompatibleFlagsError("--show", ["--lint", "--test", "--build"]);
+      const error = new IncompatibleFlagsError("--dry-run", ["--lint", "--test", "--build"]);
 
       expect(error.message).toBe(
-        "--show cannot be used with: --lint, --test, --build. Show mode exits before quality checks run."
+        "--dry-run cannot be used with: --lint, --test, --build. Dry-run mode exits before quality checks run."
       );
       expect(error.conflictingFlags).toEqual(["--lint", "--test", "--build"]);
     });
 
     it("extends ValidationError", () => {
-      const error = new IncompatibleFlagsError("--show", ["--lint"]);
+      const error = new IncompatibleFlagsError("--dry-run", ["--lint"]);
 
       expect(error).toBeInstanceOf(ValidationError);
     });
