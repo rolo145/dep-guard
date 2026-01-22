@@ -92,9 +92,9 @@ describe("CheckExistingPackageStep", () => {
 
   describe("execute() - package exists in dependencies", () => {
     beforeEach(() => {
-      mockContext.dependencies = {
+      Object.assign(mockContext.dependencies, {
         vue: "3.0.0",
-      };
+      });
     });
 
     it("does not proceed when same version in same location", async () => {
@@ -166,9 +166,9 @@ describe("CheckExistingPackageStep", () => {
 
   describe("execute() - package exists in devDependencies", () => {
     beforeEach(() => {
-      mockContext.devDependencies = {
+      Object.assign(mockContext.devDependencies, {
         typescript: "4.9.0",
-      };
+      });
     });
 
     it("detects package in devDependencies", async () => {
@@ -211,9 +211,9 @@ describe("CheckExistingPackageStep", () => {
 
   describe("edge cases", () => {
     it("handles package existing in dependencies when adding to devDependencies", async () => {
-      mockContext.dependencies = {
+      Object.assign(mockContext.dependencies, {
         lodash: "4.17.20",
-      };
+      });
 
       const resolved: ResolvedPackage = {
         name: "lodash",

@@ -78,7 +78,7 @@ function setupGracefulShutdown(): void {
     throw error;
   }
 
-  const parser = new ArgumentParser(args);
+  const parser = new ArgumentParser(args, subcommand);
 
   // Parse CLI options
   const options = parser.parseOrExit();

@@ -29,6 +29,8 @@ Safe dependency updates with guardrails:
 - Reinstalls dependencies via `npm ci --ignore-scripts`
 - Optionally runs lint, typecheck, tests, and build scripts
 
+**Show mode**: Use `--show` to preview available updates without installing them (dry-run mode)
+
 ### `dep-guard add <package>`
 
 Add a new dependency with security checks:
@@ -81,12 +83,53 @@ dep-guard <subcommand> [options]
 - `-d, --days <number>`: Safety buffer in days (default: 7) - applies to all commands
 - `--allow-npm-install`: Use npm install fallback when scfw is not available
 - `-D, --save-dev`: Add as dev dependency **[add only]**
+- `--show`: Show available updates without installing (dry-run) **[update only]**
 - `--lint <script>`: Lint script name (default: `lint`) **[update only]**
 - `--typecheck <script>`: Type check script name (default: `typecheck`) **[update only]**
 - `--test <script>`: Test script name (default: `test`) **[update only]**
 - `--build <script>`: Build script name (default: `build`) **[update only]**
 - `-v, --version`: Show version
 - `-h, --help`: Show help
+
+### Flag Validation Rules
+
+Some flags cannot be combined due to incompatible functionality:
+
+**1. --show cannot be combined with quality check flags**
+
+The `--show` flag displays available updates and exits before installation or quality checks run. Therefore, it cannot be combined with:
+- `--lint`
+- `--typecheck`
+- `--test`
+- `--build`
+
+```bash
+# ❌ These will fail with an error
+dep-guard update --show --lint eslint
+dep-guard update --show --test vitest
+dep-guard update --show --lint eslint --test jest
+
+# ✅ These work fine
+dep-guard update --show                    # Show mode alone
+dep-guard update --show --days 14          # Show with compatible flags
+dep-guard update --lint eslint --test jest # Quality checks without show
+```
+
+**2. -D/--save-dev can only be used with the add command**
+
+The `-D`/`--save-dev` flag is specific to adding packages and cannot be used with `update` or `install`:
+
+```bash
+# ❌ These will fail with an error
+dep-guard update -D
+dep-guard install --save-dev
+
+# ✅ These work fine
+dep-guard add vue -D                    # Add as dev dependency
+dep-guard add typescript --save-dev     # Add as dev dependency
+dep-guard update --days 14              # Update without -D
+dep-guard install                       # Install without -D
+```
 
 ### Examples
 
@@ -105,6 +148,12 @@ dep-guard update
 
 # Update with a 14-day safety buffer
 dep-guard update --days 14
+
+# Preview available updates without installing (dry-run)
+dep-guard update --show
+
+# Preview updates with custom safety buffer
+dep-guard update --show --days 14
 
 # Update using npm install fallback
 dep-guard update --allow-npm-install

@@ -9,8 +9,9 @@
 import { DEFAULT_SCRIPTS, SAFETY_BUFFER_DAYS } from "../defaults";
 import { exitWithError } from "../errors";
 import { ArgumentValidator } from "./ArgumentValidator";
-import { ValidationError } from "./errors";
+import { ValidationError, IncompatibleFlagsError, InvalidFlagForCommandError } from "./errors";
 import type { CliOptions } from "./types";
+import type { Subcommand } from "./SubcommandParser";
 
 /** Script flags that can be configured via CLI */
 const SCRIPT_FLAGS = ["lint", "typecheck", "test", "build"] as const;
@@ -26,10 +27,12 @@ type ScriptFlag = typeof SCRIPT_FLAGS[number];
 export class ArgumentParser {
   private args: string[];
   private validator: ArgumentValidator;
+  private subcommand?: Subcommand;
 
-  constructor(args: string[]) {
+  constructor(args: string[], subcommand?: Subcommand) {
     this.args = args;
     this.validator = new ArgumentValidator();
+    this.subcommand = subcommand;
   }
 
   /**
@@ -139,6 +142,45 @@ export class ArgumentParser {
   }
 
   /**
+   * Validates that incompatible flag combinations are not used
+   *
+   * @param options - Parsed CLI options to validate
+   * @throws IncompatibleFlagsError if incompatible flags are detected
+   * @throws InvalidFlagForCommandError if command-specific flags are misused
+   */
+  private validateFlagCombinations(options: CliOptions): void {
+    // --show cannot be used with custom quality check scripts
+    if (options.show) {
+      const conflictingFlags: string[] = [];
+
+      if (options.scripts.lint !== DEFAULT_SCRIPTS.lint) {
+        conflictingFlags.push("--lint");
+      }
+      if (options.scripts.typecheck !== DEFAULT_SCRIPTS.typecheck) {
+        conflictingFlags.push("--typecheck");
+      }
+      if (options.scripts.test !== DEFAULT_SCRIPTS.test) {
+        conflictingFlags.push("--test");
+      }
+      if (options.scripts.build !== DEFAULT_SCRIPTS.build) {
+        conflictingFlags.push("--build");
+      }
+
+      if (conflictingFlags.length > 0) {
+        throw new IncompatibleFlagsError("--show", conflictingFlags);
+      }
+    }
+
+    // --save-dev/-D can only be used with the "add" command
+    if (this.subcommand && this.subcommand !== "add") {
+      if (this.hasSaveDevFlag()) {
+        const flag = this.hasFlag("-D") ? "-D" : "--save-dev";
+        throw new InvalidFlagForCommandError(flag, this.subcommand, ["add"]);
+      }
+    }
+  }
+
+  /**
    * Parses all arguments and returns CLI options
    *
    * @throws ValidationError if any argument is invalid
@@ -169,6 +211,9 @@ export class ArgumentParser {
 
     // Parse all script options
     this.parseScriptOptions(options.scripts);
+
+    // Validate flag combinations
+    this.validateFlagCombinations(options);
 
     return options;
   }

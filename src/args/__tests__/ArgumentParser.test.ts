@@ -1,6 +1,6 @@
 import { describe, it, expect } from "vitest";
 import { ArgumentParser } from "../ArgumentParser";
-import { InvalidFormatError, MissingValueError } from "../errors";
+import { InvalidFormatError, MissingValueError, IncompatibleFlagsError, InvalidFlagForCommandError } from "../errors";
 import { DEFAULT_SCRIPTS, SAFETY_BUFFER_DAYS } from "../../defaults";
 
 describe("ArgumentParser", () => {
@@ -292,6 +292,151 @@ describe("ArgumentParser", () => {
       const parser = new ArgumentParser(["vue", "-D", "--save-dev"]);
 
       expect(parser.hasSaveDevFlag()).toBe(true);
+    });
+  });
+
+  describe("validateFlagCombinations()", () => {
+    it("throws IncompatibleFlagsError when --show used with --lint", () => {
+      const parser = new ArgumentParser(["--show", "--lint", "eslint"]);
+
+      expect(() => parser.parse()).toThrow(IncompatibleFlagsError);
+      expect(() => parser.parse()).toThrow(
+        "--show cannot be used with: --lint"
+      );
+    });
+
+    it("throws IncompatibleFlagsError when --show used with --typecheck", () => {
+      const parser = new ArgumentParser(["--show", "--typecheck", "tsc"]);
+
+      expect(() => parser.parse()).toThrow(IncompatibleFlagsError);
+    });
+
+    it("throws IncompatibleFlagsError when --show used with --test", () => {
+      const parser = new ArgumentParser(["--show", "--test", "vitest"]);
+
+      expect(() => parser.parse()).toThrow(IncompatibleFlagsError);
+    });
+
+    it("throws IncompatibleFlagsError when --show used with --build", () => {
+      const parser = new ArgumentParser(["--show", "--build", "build:prod"]);
+
+      expect(() => parser.parse()).toThrow(IncompatibleFlagsError);
+    });
+
+    it("throws IncompatibleFlagsError when --show used with multiple quality flags", () => {
+      const parser = new ArgumentParser([
+        "--show",
+        "--lint", "eslint",
+        "--test", "vitest",
+        "--build", "build:prod"
+      ]);
+
+      expect(() => parser.parse()).toThrow(IncompatibleFlagsError);
+      expect(() => parser.parse()).toThrow(
+        "--show cannot be used with: --lint, --test, --build"
+      );
+    });
+
+    it("allows --show with --days", () => {
+      const parser = new ArgumentParser(["--show", "--days", "14"]);
+      const options = parser.parse();
+
+      expect(options.show).toBe(true);
+      expect(options.days).toBe(14);
+    });
+
+    it("allows --show with --allow-npm-install", () => {
+      const parser = new ArgumentParser(["--show", "--allow-npm-install"]);
+      const options = parser.parse();
+
+      expect(options.show).toBe(true);
+      expect(options.allowNpmInstall).toBe(true);
+    });
+
+    it("allows quality flags without --show", () => {
+      const parser = new ArgumentParser([
+        "--lint", "eslint",
+        "--test", "vitest",
+        "--build", "build:prod"
+      ]);
+      const options = parser.parse();
+
+      expect(options.show).toBe(false);
+      expect(options.scripts.lint).toBe("eslint");
+      expect(options.scripts.test).toBe("vitest");
+      expect(options.scripts.build).toBe("build:prod");
+    });
+  });
+
+  describe("command-specific flag validation", () => {
+    it("throws InvalidFlagForCommandError when -D used with update command", () => {
+      const parser = new ArgumentParser(["-D"], "update");
+
+      expect(() => parser.parse()).toThrow(InvalidFlagForCommandError);
+      expect(() => parser.parse()).toThrow(
+        "-D can only be used with: add. Current command: update"
+      );
+    });
+
+    it("throws InvalidFlagForCommandError when --save-dev used with update command", () => {
+      const parser = new ArgumentParser(["--save-dev"], "update");
+
+      expect(() => parser.parse()).toThrow(InvalidFlagForCommandError);
+      expect(() => parser.parse()).toThrow(
+        "--save-dev can only be used with: add. Current command: update"
+      );
+    });
+
+    it("throws InvalidFlagForCommandError when -D used with install command", () => {
+      const parser = new ArgumentParser(["-D"], "install");
+
+      expect(() => parser.parse()).toThrow(InvalidFlagForCommandError);
+      expect(() => parser.parse()).toThrow(
+        "-D can only be used with: add. Current command: install"
+      );
+    });
+
+    it("throws InvalidFlagForCommandError when --save-dev used with install command", () => {
+      const parser = new ArgumentParser(["--save-dev"], "install");
+
+      expect(() => parser.parse()).toThrow(InvalidFlagForCommandError);
+      expect(() => parser.parse()).toThrow(
+        "--save-dev can only be used with: add. Current command: install"
+      );
+    });
+
+    it("allows -D with add command", () => {
+      const parser = new ArgumentParser(["-D"], "add");
+      const options = parser.parse();
+
+      expect(options).toBeDefined();
+    });
+
+    it("allows --save-dev with add command", () => {
+      const parser = new ArgumentParser(["--save-dev"], "add");
+      const options = parser.parse();
+
+      expect(options).toBeDefined();
+    });
+
+    it("allows -D when no subcommand is specified", () => {
+      const parser = new ArgumentParser(["-D"]);
+      const options = parser.parse();
+
+      expect(options).toBeDefined();
+    });
+
+    it("allows --save-dev when no subcommand is specified", () => {
+      const parser = new ArgumentParser(["--save-dev"]);
+      const options = parser.parse();
+
+      expect(options).toBeDefined();
+    });
+
+    it("throws InvalidFlagForCommandError when -D used with update and other flags", () => {
+      const parser = new ArgumentParser(["-D", "--days", "14"], "update");
+
+      expect(() => parser.parse()).toThrow(InvalidFlagForCommandError);
     });
   });
 });

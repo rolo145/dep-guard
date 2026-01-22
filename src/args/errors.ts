@@ -73,3 +73,39 @@ export class OutOfRangeError extends ValidationError {
     this.max = max;
   }
 }
+
+/**
+ * Error thrown when incompatible flags are used together
+ */
+export class IncompatibleFlagsError extends ValidationError {
+  readonly conflictingFlags: string[];
+
+  constructor(flag: string, conflictingFlags: string[]) {
+    const flagList = conflictingFlags.join(", ");
+    super(
+      flag,
+      `${flag} cannot be used with: ${flagList}. Show mode exits before quality checks run.`
+    );
+    this.name = "IncompatibleFlagsError";
+    this.conflictingFlags = conflictingFlags;
+  }
+}
+
+/**
+ * Error thrown when a flag is used with the wrong command
+ */
+export class InvalidFlagForCommandError extends ValidationError {
+  readonly command: string;
+  readonly validCommands: string[];
+
+  constructor(flag: string, command: string, validCommands: string[]) {
+    const commandList = validCommands.join(", ");
+    super(
+      flag,
+      `${flag} can only be used with: ${commandList}. Current command: ${command}`
+    );
+    this.name = "InvalidFlagForCommandError";
+    this.command = command;
+    this.validCommands = validCommands;
+  }
+}

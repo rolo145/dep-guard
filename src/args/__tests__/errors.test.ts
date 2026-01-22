@@ -4,6 +4,8 @@ import {
   MissingValueError,
   InvalidFormatError,
   OutOfRangeError,
+  IncompatibleFlagsError,
+  InvalidFlagForCommandError,
 } from "../errors";
 
 describe("Argument Errors", () => {
@@ -92,6 +94,72 @@ describe("Argument Errors", () => {
 
     it("is an instance of ValidationError", () => {
       const error = new OutOfRangeError("--days", -5, 0);
+      expect(error).toBeInstanceOf(ValidationError);
+    });
+  });
+
+  describe("IncompatibleFlagsError", () => {
+    it("formats message with single conflicting flag", () => {
+      const error = new IncompatibleFlagsError("--show", ["--lint"]);
+
+      expect(error.message).toBe(
+        "--show cannot be used with: --lint. Show mode exits before quality checks run."
+      );
+      expect(error.name).toBe("IncompatibleFlagsError");
+      expect(error.flag).toBe("--show");
+      expect(error.conflictingFlags).toEqual(["--lint"]);
+    });
+
+    it("formats message with multiple conflicting flags", () => {
+      const error = new IncompatibleFlagsError("--show", ["--lint", "--test", "--build"]);
+
+      expect(error.message).toBe(
+        "--show cannot be used with: --lint, --test, --build. Show mode exits before quality checks run."
+      );
+      expect(error.conflictingFlags).toEqual(["--lint", "--test", "--build"]);
+    });
+
+    it("extends ValidationError", () => {
+      const error = new IncompatibleFlagsError("--show", ["--lint"]);
+
+      expect(error).toBeInstanceOf(ValidationError);
+    });
+  });
+
+  describe("InvalidFlagForCommandError", () => {
+    it("formats message with single valid command", () => {
+      const error = new InvalidFlagForCommandError("-D", "update", ["add"]);
+
+      expect(error.message).toBe(
+        "-D can only be used with: add. Current command: update"
+      );
+      expect(error.name).toBe("InvalidFlagForCommandError");
+      expect(error.flag).toBe("-D");
+      expect(error.command).toBe("update");
+      expect(error.validCommands).toEqual(["add"]);
+    });
+
+    it("formats message with --save-dev flag", () => {
+      const error = new InvalidFlagForCommandError("--save-dev", "install", ["add"]);
+
+      expect(error.message).toBe(
+        "--save-dev can only be used with: add. Current command: install"
+      );
+      expect(error.command).toBe("install");
+    });
+
+    it("formats message with multiple valid commands", () => {
+      const error = new InvalidFlagForCommandError("--flag", "cmd", ["add", "update"]);
+
+      expect(error.message).toBe(
+        "--flag can only be used with: add, update. Current command: cmd"
+      );
+      expect(error.validCommands).toEqual(["add", "update"]);
+    });
+
+    it("extends ValidationError", () => {
+      const error = new InvalidFlagForCommandError("-D", "update", ["add"]);
+
       expect(error).toBeInstanceOf(ValidationError);
     });
   });
