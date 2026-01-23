@@ -9,6 +9,8 @@
 import { BootstrapInstallRunner } from "./BootstrapInstallRunner";
 import { BootstrapInstallConfirmation } from "./BootstrapInstallConfirmation";
 import type { IExecutionContext } from "../../context/IExecutionContext";
+import { InstallationFailureError } from "../../errors";
+import type { ServiceResult } from "../../types/ServiceResult";
 
 /**
  * Service for orchestrating fresh install workflow from package.json.
@@ -34,9 +36,9 @@ export class BootstrapInstallService {
    * 3. Execute install command
    * 4. Show result
    *
-   * @returns True if install succeeded, false if failed, null if skipped
+   * @returns ServiceResult - true if succeeded, false if failed, null if skipped
    */
-  async run(): Promise<boolean | null> {
+  async run(): Promise<ServiceResult> {
     this.confirmation.showHeader();
 
     const shouldRun = await this.confirmation.confirmRun();
@@ -53,6 +55,6 @@ export class BootstrapInstallService {
     }
 
     this.confirmation.showFailure(spinner);
-    process.exit(1);
+    throw new InstallationFailureError("Bootstrap installation failed");
   }
 }

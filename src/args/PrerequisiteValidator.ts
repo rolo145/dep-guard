@@ -9,6 +9,7 @@
 import { spawnSync } from "child_process";
 import chalk from "chalk";
 import { logger } from "../logger";
+import { PrerequisiteError } from "../errors";
 
 /**
  * Result of prerequisite check
@@ -52,7 +53,9 @@ export class PrerequisiteValidator {
         logger.header("Invalid Flag Usage", "❌");
         logger.error("--allow-npm-install can only be used when scfw is NOT installed");
         logger.info("Since scfw is available, please run without this flag to use scfw");
-        process.exit(1);
+        throw new PrerequisiteError(
+          "--allow-npm-install flag is invalid when scfw is available"
+        );
       }
       return { scfwAvailable: true, useNpmFallback: false };
     }
@@ -67,7 +70,7 @@ export class PrerequisiteValidator {
       return { scfwAvailable: false, useNpmFallback: true };
     }
 
-    // scfw not available and no fallback flag - exit with error
+    // scfw not available and no fallback flag - throw error
     logger.header("Missing Required Security Tool", "❌");
     logger.warning("dep-guard requires scfw (Datadog's Supply Chain Firewall) to be installed:");
     logger.newLine();
@@ -81,6 +84,6 @@ export class PrerequisiteValidator {
     logger.newLine();
     logger.info("For more information, see: https://github.com/DataDog/supply-chain-firewall");
 
-    process.exit(1);
+    throw new PrerequisiteError("scfw is not installed and --allow-npm-install was not specified");
   }
 }

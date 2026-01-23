@@ -156,15 +156,13 @@ describe("NpmInstallService", () => {
       expect(mockConfirmationInstance.showFailure).toHaveBeenCalledWith(mockSpinner);
     });
 
-    it("exits with code 1 when installation fails", async () => {
+    it("throws InstallationFailureError when installation fails", async () => {
       mockConfirmationInstance.confirmInstall.mockResolvedValue(true);
       mockRunnerInstance.install.mockReturnValue({ success: false, packageSpecs: [] });
 
       await expect(service.install([{ name: "chalk", version: "5.0.0" }])).rejects.toThrow(
-        "process.exit(1)"
+        "npm installation failed"
       );
-
-      expect(mockExit).toHaveBeenCalledWith(1);
     });
   });
 

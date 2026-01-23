@@ -54,18 +54,20 @@ describe("PrerequisiteValidator", () => {
       });
     });
 
-    it("exits with code 1 when scfw is not available and allowNpmInstall is false", () => {
+    it("throws PrerequisiteError when scfw is not available and allowNpmInstall is false", () => {
       vi.mocked(spawnSync).mockReturnValue({ status: 1 } as ReturnType<typeof spawnSync>);
 
-      expect(() => PrerequisiteValidator.checkPrerequisites()).toThrow();
-      expect(mockExit).toHaveBeenCalledWith(1);
+      expect(() => PrerequisiteValidator.checkPrerequisites()).toThrow(
+        "scfw is not installed and --allow-npm-install was not specified"
+      );
     });
 
-    it("exits when scfw command returns null status", () => {
+    it("throws PrerequisiteError when scfw command returns null status", () => {
       vi.mocked(spawnSync).mockReturnValue({ status: null } as ReturnType<typeof spawnSync>);
 
-      expect(() => PrerequisiteValidator.checkPrerequisites()).toThrow();
-      expect(mockExit).toHaveBeenCalledWith(1);
+      expect(() => PrerequisiteValidator.checkPrerequisites()).toThrow(
+        "scfw is not installed and --allow-npm-install was not specified"
+      );
     });
   });
 
@@ -79,11 +81,12 @@ describe("PrerequisiteValidator", () => {
       expect(mockExit).not.toHaveBeenCalled();
     });
 
-    it("exits with code 1 when scfw IS available and allowNpmInstall is true", () => {
+    it("throws PrerequisiteError when scfw IS available and allowNpmInstall is true", () => {
       vi.mocked(spawnSync).mockReturnValue({ status: 0 } as ReturnType<typeof spawnSync>);
 
-      expect(() => PrerequisiteValidator.checkPrerequisites(true)).toThrow();
-      expect(mockExit).toHaveBeenCalledWith(1);
+      expect(() => PrerequisiteValidator.checkPrerequisites(true)).toThrow(
+        "--allow-npm-install flag is invalid when scfw is available"
+      );
     });
 
     it("returns scfwAvailable: true when scfw is available and allowNpmInstall is false", () => {

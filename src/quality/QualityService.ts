@@ -9,6 +9,7 @@
 import type { IExecutionContext } from "../context/IExecutionContext";
 import { QualityRunner, QualityCheckResults } from "./QualityRunner";
 import { QualityConfirmation } from "./QualityConfirmation";
+import type { ServiceResult } from "../types/ServiceResult";
 
 /**
  * Service for orchestrating quality checks.
@@ -44,36 +45,36 @@ export class QualityService {
   /**
    * Runs the linter
    *
-   * @returns True if passed, false if failed, null if skipped
+   * @returns ServiceResult - true if passed, false if failed, null if skipped
    */
-  async runLint(): Promise<boolean | null> {
+  async runLint(): Promise<ServiceResult> {
     return this.runner.runLint();
   }
 
   /**
    * Runs type checking
    *
-   * @returns True if passed, false if failed, null if skipped
+   * @returns ServiceResult - true if passed, false if failed, null if skipped
    */
-  async runTypeCheck(): Promise<boolean | null> {
+  async runTypeCheck(): Promise<ServiceResult> {
     return this.runner.runTypeCheck();
   }
 
   /**
    * Runs tests
    *
-   * @returns True if passed, false if failed, null if skipped
+   * @returns ServiceResult - true if passed, false if failed, null if skipped
    */
-  async runTests(): Promise<boolean | null> {
+  async runTests(): Promise<ServiceResult> {
     return this.runner.runTests();
   }
 
   /**
    * Runs the build script
    *
-   * @returns True if passed, false if failed, null if skipped
+   * @returns ServiceResult - true if passed, false if failed, null if skipped
    */
-  async runBuild(): Promise<boolean | null> {
+  async runBuild(): Promise<ServiceResult> {
     return this.runner.runBuild();
   }
 }

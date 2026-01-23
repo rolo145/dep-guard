@@ -12,6 +12,7 @@ import type { PackageSelection } from "../../ncu";
 import type { IExecutionContext } from "../../context/IExecutionContext";
 import { NpmInstallRunner } from "./NpmInstallRunner";
 import { NpmInstallConfirmation } from "./NpmInstallConfirmation";
+import { InstallationFailureError } from "../../errors";
 
 /**
  * Service for orchestrating npm install workflow (fallback mode).
@@ -39,7 +40,7 @@ export class NpmInstallService {
    *
    * @param packages - Array of packages to install
    * @returns True if installation succeeded, false if skipped
-   * @throws Exits process if installation fails
+   * @throws InstallationFailureError if installation fails
    */
   async install(packages: PackageSelection[]): Promise<boolean> {
     const packageSpecs = packages.map(({ name, version }) => `${name}@${version}`);
@@ -61,7 +62,7 @@ export class NpmInstallService {
     }
 
     this.confirmation.showFailure(spinner);
-    process.exit(1);
+    throw new InstallationFailureError("npm installation failed");
   }
 
   /**

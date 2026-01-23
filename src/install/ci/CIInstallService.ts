@@ -8,6 +8,8 @@
  */
 import { CIInstallRunner } from "./CIInstallRunner";
 import { CIInstallConfirmation } from "./CIInstallConfirmation";
+import { InstallationFailureError } from "../../errors";
+import type { ServiceResult } from "../../types/ServiceResult";
 
 /**
  * Service for orchestrating dependency reinstall workflow.
@@ -24,9 +26,9 @@ export class CIInstallService {
   /**
    * Reinstalls dependencies with npm ci
    *
-   * @returns True if reinstall succeeded, false if failed, null if skipped
+   * @returns ServiceResult - true if succeeded, false if failed, null if skipped
    */
-  async run(): Promise<boolean | null> {
+  async run(): Promise<ServiceResult> {
     this.confirmation.showHeader();
 
     const shouldRun = await this.confirmation.confirmRun();
@@ -43,6 +45,6 @@ export class CIInstallService {
     }
 
     this.confirmation.showFailure(spinner);
-    process.exit(1);
+    throw new InstallationFailureError("CI reinstall failed");
   }
 }

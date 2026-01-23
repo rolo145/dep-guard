@@ -147,13 +147,11 @@ describe("BootstrapInstallService", () => {
       expect(mockConfirmationInstance.showFailure).toHaveBeenCalledWith(mockSpinner);
     });
 
-    it("exits with code 1 when installation fails", async () => {
+    it("throws InstallationFailureError when installation fails", async () => {
       mockConfirmationInstance.confirmRun.mockResolvedValue(true);
       mockRunnerInstance.run.mockReturnValue({ success: false });
 
-      await expect(service.run()).rejects.toThrow("process.exit(1)");
-
-      expect(mockExit).toHaveBeenCalledWith(1);
+      await expect(service.run()).rejects.toThrow("Bootstrap installation failed");
     });
 
     it("does not show success/failure when user declines", async () => {

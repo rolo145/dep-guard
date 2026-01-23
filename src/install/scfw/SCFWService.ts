@@ -10,6 +10,7 @@ import type { PackageSelection } from "../../ncu";
 import type { IExecutionContext } from "../../context/IExecutionContext";
 import { SCFWRunner } from "./SCFWRunner";
 import { SCFWConfirmation } from "./SCFWConfirmation";
+import { InstallationFailureError } from "../../errors";
 
 /**
  * Service for orchestrating scfw installation workflow.
@@ -37,7 +38,7 @@ export class SCFWService {
    *
    * @param packages - Array of packages to install
    * @returns True if installation succeeded, false if skipped
-   * @throws Exits process if installation fails
+   * @throws InstallationFailureError if installation fails
    */
   async install(packages: PackageSelection[]): Promise<boolean> {
     const packageSpecs = packages.map(({ name, version }) => `${name}@${version}`);
@@ -59,7 +60,7 @@ export class SCFWService {
     }
 
     this.confirmation.showFailure(spinner);
-    process.exit(1);
+    throw new InstallationFailureError("SCFW installation failed");
   }
 
   /**

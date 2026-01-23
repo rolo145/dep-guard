@@ -64,6 +64,31 @@ export class UserCancellationError extends CLIError {
 }
 
 /**
+ * Error thrown when installation fails.
+ *
+ * Thrown by install services when npm/scfw installation fails.
+ */
+export class InstallationFailureError extends CLIError {
+  constructor(message: string) {
+    super(message);
+    this.name = "InstallationFailureError";
+  }
+}
+
+/**
+ * Error thrown when required prerequisites are missing.
+ *
+ * Thrown by PrerequisiteValidator when scfw is not available
+ * and --allow-npm-install is not used.
+ */
+export class PrerequisiteError extends CLIError {
+  constructor(message: string) {
+    super(message);
+    this.name = "PrerequisiteError";
+  }
+}
+
+/**
  * Checks if an error represents user cancellation from prompt libraries.
  *
  * @param error - The error to check

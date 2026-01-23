@@ -9,6 +9,7 @@
 import type { PackageSelection } from "../ncu";
 import type { IExecutionContext } from "../context/IExecutionContext";
 import { InstallRunner } from "./InstallRunner";
+import type { ServiceResult } from "../types/ServiceResult";
 
 /**
  * Service for orchestrating the complete install workflow.
@@ -61,9 +62,9 @@ export class InstallService {
   /**
    * Runs CI reinstall only
    *
-   * @returns True if succeeded, false if failed, null if skipped
+   * @returns ServiceResult - true if succeeded, false if failed, null if skipped
    */
-  async reinstall(): Promise<boolean | null> {
+  async reinstall(): Promise<ServiceResult> {
     return await this.runner.runCI();
   }
 }

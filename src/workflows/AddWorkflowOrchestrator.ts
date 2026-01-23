@@ -11,7 +11,7 @@
  *
  * @module workflows/AddWorkflowOrchestrator
  */
-import type { AddWorkflowOptions, AddWorkflowResult } from "./add/types";
+import type { AddWorkflowOptions, AddWorkflowResult, InstalledPackage } from "./add/types";
 import { ExecutionContextFactory } from "../context/ExecutionContextFactory";
 import { isUserCancellation, logCancellation, EXIT_CODE_CANCELLED } from "../errors";
 import { ResolveVersionStep } from "./steps/ResolveVersionStep";
@@ -138,7 +138,7 @@ export class AddWorkflowOrchestrator {
   /**
    * Creates a success result.
    */
-  private createSuccessResult(installedPackage: any): AddWorkflowResult {
+  private createSuccessResult(installedPackage: InstalledPackage): AddWorkflowResult {
     return {
       success: true,
       exitCode: 0,
