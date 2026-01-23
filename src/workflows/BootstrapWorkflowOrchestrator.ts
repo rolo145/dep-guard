@@ -8,10 +8,11 @@
  */
 import type { WorkflowResult, WorkflowStats } from "./types";
 import { BootstrapInstallService } from "../install/bootstrap/BootstrapInstallService";
-import { isUserCancellation, logCancellation, EXIT_CODE_CANCELLED } from "../errors";
+import { isUserCancellation, logCancellation } from "../errors";
 import type { IExecutionContext } from "../context/IExecutionContext";
 import type { ScriptOptions } from "../args/types";
 import { ExecutionContextFactory } from "../context/ExecutionContextFactory";
+import { ResultFactory } from "./ResultFactory";
 
 export interface BootstrapWorkflowOptions {
   /** Number of days for safety buffer (default: 7) */
@@ -116,47 +117,27 @@ export class BootstrapWorkflowOrchestrator {
    * Creates a success result after install completes.
    */
   private createSuccessResult(): WorkflowResult {
-    return {
-      success: true,
-      exitCode: 0,
-      reason: "completed",
-      stats: this.createStats(),
-    };
+    return ResultFactory.success("completed", this.createStats());
   }
 
   /**
    * Creates a skipped result when user declines install.
    */
   private createSkippedResult(): WorkflowResult {
-    return {
-      success: true,
-      exitCode: 0,
-      reason: "no_packages_selected",
-      stats: this.createStats(),
-    };
+    return ResultFactory.earlyExit("no_packages_selected", this.createStats());
   }
 
   /**
    * Creates a failure result when install fails.
    */
   private createFailureResult(): WorkflowResult {
-    return {
-      success: false,
-      exitCode: 1,
-      reason: "completed",
-      stats: this.createStats(),
-    };
+    return ResultFactory.failure("completed", this.createStats());
   }
 
   /**
    * Creates a cancellation result with standard SIGINT exit code.
    */
   private createCancellationResult(): WorkflowResult {
-    return {
-      success: false,
-      exitCode: EXIT_CODE_CANCELLED,
-      reason: "user_cancelled",
-      stats: this.createStats(),
-    };
+    return ResultFactory.cancelled(this.createStats());
   }
 }

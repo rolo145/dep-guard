@@ -14,6 +14,7 @@
 import type { ScriptOptions } from "../args/types";
 import type { IExecutionContext } from "./IExecutionContext";
 import { PackageJsonReader, type PackageJson } from "./PackageJsonReader";
+import { ONE_DAY_MS } from "../constants/time";
 
 /**
  * Options for creating an ExecutionContext
@@ -62,7 +63,6 @@ export class ExecutionContext implements IExecutionContext {
     this.packageReader = new PackageJsonReader(options.packageJsonPath);
 
     // Calculate cutoff date once
-    const ONE_DAY_MS = 24 * 60 * 60 * 1000;
     this.cutoffDate = new Date(Date.now() - options.days * ONE_DAY_MS);
     this.cutoffIsoString = this.cutoffDate.toISOString();
   }

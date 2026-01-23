@@ -19,8 +19,9 @@ import { QualityService } from "../quality";
 import { VersionAnalyzer } from "../ncu/VersionAnalyzer";
 import { VersionFormatter } from "../ncu/VersionFormatter";
 import { logger } from "../logger";
-import { isUserCancellation, logCancellation, EXIT_CODE_CANCELLED } from "../errors";
+import { isUserCancellation, logCancellation } from "../errors";
 import chalk from "chalk";
+import { ResultFactory } from "./ResultFactory";
 import {
   CheckUpdatesStep,
   SafetyBufferStep,
@@ -196,13 +197,7 @@ export class WorkflowOrchestrator {
    */
   private createEarlyExitResult(reason: WorkflowResult["reason"]): WorkflowResult {
     this.stats.durationMs = Date.now() - this.startTime;
-
-    return {
-      success: true,
-      exitCode: 0,
-      reason,
-      stats: this.stats,
-    };
+    return ResultFactory.earlyExit(reason, this.stats);
   }
 
   /**
@@ -210,13 +205,7 @@ export class WorkflowOrchestrator {
    */
   private createCancellationResult(): WorkflowResult {
     this.stats.durationMs = Date.now() - this.startTime;
-
-    return {
-      success: false,
-      exitCode: EXIT_CODE_CANCELLED,
-      reason: "user_cancelled",
-      stats: this.stats,
-    };
+    return ResultFactory.cancelled(this.stats);
   }
 
   /**
@@ -233,12 +222,7 @@ export class WorkflowOrchestrator {
       "Time taken": `${(this.stats.durationMs / 1000).toFixed(1)}s`,
     });
 
-    return {
-      success: true,
-      exitCode: 0,
-      reason: "completed",
-      stats: this.stats,
-    };
+    return ResultFactory.success("completed", this.stats);
   }
 
   /**
@@ -251,12 +235,7 @@ export class WorkflowOrchestrator {
     const { grouped } = organizedData;
     this.displayDryRunUpdates(grouped);
 
-    return {
-      success: true,
-      exitCode: 0,
-      reason: "completed",
-      stats: this.stats,
-    };
+    return ResultFactory.success("completed", this.stats);
   }
 
   /**

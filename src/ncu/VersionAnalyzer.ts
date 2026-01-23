@@ -8,6 +8,7 @@
  * @module ncu/VersionAnalyzer
  */
 import type { VersionBumpType, GroupedUpdates, PackageUpdate } from "./types";
+import { STABLE_VERSION_PATTERN } from "../constants/semver";
 
 interface SemverParts {
   major: number;
@@ -69,7 +70,7 @@ export class VersionAnalyzer {
    */
   static parseSemver(version: string): SemverParts | null {
     const cleaned = VersionAnalyzer.cleanVersion(version);
-    if (!/^\d+\.\d+\.\d+$/.test(cleaned)) {
+    if (!STABLE_VERSION_PATTERN.test(cleaned)) {
       return null;
     }
 

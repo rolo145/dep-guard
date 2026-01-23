@@ -7,6 +7,7 @@
  * @module context/PackageJsonReader
  */
 import fs from "fs";
+import { FILES } from "../constants/files";
 
 /**
  * Parsed package.json structure
@@ -26,7 +27,7 @@ export interface PackageJson {
 export class PackageJsonReader {
   private readonly data: PackageJson;
 
-  constructor(path: string = "package.json") {
+  constructor(path: string = FILES.PACKAGE_JSON) {
     const content = fs.readFileSync(path, "utf8");
     this.data = JSON.parse(content);
   }

@@ -7,6 +7,7 @@
  * @module args/ArgumentValidator
  */
 import { InvalidFormatError, MissingValueError, OutOfRangeError } from "./errors";
+import { SEMVER_PATTERN } from "../constants/semver";
 
 /**
  * Represents a parsed package specification
@@ -216,8 +217,7 @@ export class ArgumentValidator {
 
     // Validate semver-like format (basic check)
     // Accept formats like: 1.2.3, 1.2.3-alpha, 1.2.3-beta.1, etc.
-    const semverPattern = /^\d+\.\d+\.\d+(-[\w.]+)?$/;
-    if (!semverPattern.test(version)) {
+    if (!SEMVER_PATTERN.test(version)) {
       throw new InvalidFormatError(
         "package",
         fullSpec,
