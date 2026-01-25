@@ -84,7 +84,9 @@ function setupGracefulShutdown(): void {
   const options = parser.parseOrExit();
 
   // Ensure required security tools (scfw) are installed or fallback is allowed
-  const { useNpmFallback } = PrerequisiteValidator.checkPrerequisites(options.allowNpmInstall);
+  const useNpmFallback = (subcommand === "update" && options.dryRun)
+    ? false
+    : PrerequisiteValidator.checkPrerequisites(options.allowNpmInstall).useNpmFallback;
 
   // Route to appropriate workflow based on subcommand
   if (subcommand === "install") {

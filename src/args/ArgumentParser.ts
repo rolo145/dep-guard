@@ -149,6 +149,11 @@ export class ArgumentParser {
    * @throws InvalidFlagForCommandError if command-specific flags are misused
    */
   private validateFlagCombinations(options: CliOptions): void {
+    // --dry-run can only be used with the "update" command
+    if (options.dryRun && this.subcommand && this.subcommand !== "update") {
+      throw new InvalidFlagForCommandError("--dry-run", this.subcommand, ["update"]);
+    }
+
     // --dry-run cannot be used with custom quality check scripts
     if (options.dryRun) {
       const conflictingFlags: string[] = [];

@@ -46,5 +46,17 @@
   "homepage": "https://github.com/rolo145/dep-guard",
   "bugs": {
     "url": "https://github.com/rolo145/dep-guard/issues"
-  }
+  },
+  "keywords": [
+    "npm",
+    "dependencies",
+    "security",
+    "supply-chain",
+    "cli",
+    "dep-guard",
+    "package-manager",
+    "updates",
+    "scfw",
+    "npq"
+  ]
 }

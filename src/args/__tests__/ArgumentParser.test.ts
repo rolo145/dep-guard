@@ -405,6 +405,31 @@ describe("ArgumentParser", () => {
       );
     });
 
+    it("throws InvalidFlagForCommandError when --dry-run used with install command", () => {
+      const parser = new ArgumentParser(["--dry-run"], "install");
+
+      expect(() => parser.parse()).toThrow(InvalidFlagForCommandError);
+      expect(() => parser.parse()).toThrow(
+        "--dry-run can only be used with: update. Current command: install"
+      );
+    });
+
+    it("throws InvalidFlagForCommandError when --dry-run used with add command", () => {
+      const parser = new ArgumentParser(["--dry-run"], "add");
+
+      expect(() => parser.parse()).toThrow(InvalidFlagForCommandError);
+      expect(() => parser.parse()).toThrow(
+        "--dry-run can only be used with: update. Current command: add"
+      );
+    });
+
+    it("allows --dry-run with update command", () => {
+      const parser = new ArgumentParser(["--dry-run"], "update");
+      const options = parser.parse();
+
+      expect(options.dryRun).toBeTruthy();
+    });
+
     it("allows -D with add command", () => {
       const parser = new ArgumentParser(["-D"], "add");
       const options = parser.parse();
