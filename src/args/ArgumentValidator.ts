@@ -88,6 +88,22 @@ export class ArgumentValidator {
    * @throws InvalidFormatError if package specification is invalid
    */
   static validatePackageName(packageSpec: string): PackageSpec {
+    this.validateNonEmpty(packageSpec);
+
+    if (packageSpec.startsWith("@")) {
+      return this.parseScopedPackage(packageSpec);
+    }
+
+    return this.parseRegularPackage(packageSpec);
+  }
+
+  /**
+   * Validates that package specification is non-empty.
+   *
+   * @param packageSpec - The package specification string
+   * @throws InvalidFormatError if empty or whitespace-only
+   */
+  private static validateNonEmpty(packageSpec: string): void {
     if (!packageSpec || packageSpec.trim() === "") {
       throw new InvalidFormatError(
         "package",
@@ -95,54 +111,63 @@ export class ArgumentValidator {
         "a non-empty package name",
       );
     }
+  }
 
-    // Handle scoped packages (@scope/name or @scope/name@version)
-    if (packageSpec.startsWith("@")) {
-      // Find the last @ symbol (version separator)
-      const lastAtIndex = packageSpec.lastIndexOf("@");
+  /**
+   * Parses scoped package specification (@scope/name or @scope/name@version).
+   *
+   * @param packageSpec - The scoped package specification string
+   * @returns Parsed package specification
+   * @throws InvalidFormatError if format is invalid
+   */
+  private static parseScopedPackage(packageSpec: string): PackageSpec {
+    // Find the last @ symbol (version separator)
+    const lastAtIndex = packageSpec.lastIndexOf("@");
 
-      // If there's only one @, it's just the scoped package name
-      if (lastAtIndex === 0) {
-        // Validate the scoped package name format
-        if (!this.isValidPackageName(packageSpec)) {
-          throw new InvalidFormatError(
-            "package",
-            packageSpec,
-            "a valid package name (e.g., '@vue/cli' or '@vue/cli@5.0.0')",
-          );
-        }
-        return {
-          name: packageSpec,
-        };
-      }
-
-      // Split at the last @ to separate name and version
-      const name = packageSpec.substring(0, lastAtIndex);
-      const version = packageSpec.substring(lastAtIndex + 1);
-
-      // Validate the scoped package name format
-      if (!this.isValidPackageName(name)) {
+    // If there's only one @, it's just the scoped package name
+    if (lastAtIndex === 0) {
+      if (!this.isValidPackageName(packageSpec)) {
         throw new InvalidFormatError(
           "package",
           packageSpec,
           "a valid package name (e.g., '@vue/cli' or '@vue/cli@5.0.0')",
         );
       }
-
-      // Validate version if provided
-      if (version) {
-        this.validateVersionFormat(version, packageSpec);
-        return { name, version };
-      }
-
-      return { name };
+      return { name: packageSpec };
     }
 
-    // Handle non-scoped packages (name or name@version)
+    // Split at the last @ to separate name and version
+    const name = packageSpec.substring(0, lastAtIndex);
+    const version = packageSpec.substring(lastAtIndex + 1);
+
+    if (!this.isValidPackageName(name)) {
+      throw new InvalidFormatError(
+        "package",
+        packageSpec,
+        "a valid package name (e.g., '@vue/cli' or '@vue/cli@5.0.0')",
+      );
+    }
+
+    if (version) {
+      this.validateVersionFormat(version, packageSpec);
+      return { name, version };
+    }
+
+    return { name };
+  }
+
+  /**
+   * Parses regular (non-scoped) package specification (name or name@version).
+   *
+   * @param packageSpec - The package specification string
+   * @returns Parsed package specification
+   * @throws InvalidFormatError if format is invalid
+   */
+  private static parseRegularPackage(packageSpec: string): PackageSpec {
     const atIndex = packageSpec.indexOf("@");
 
+    // No version specified
     if (atIndex === -1) {
-      // No version specified
       if (!this.isValidPackageName(packageSpec)) {
         throw new InvalidFormatError(
           "package",

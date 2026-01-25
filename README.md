@@ -1,7 +1,5 @@
 # dep-guard
 
-Preview release: this CLI is in early development and may change before a stable 1.0.
-
 Guardrail CLI for safer npm dependency management. dep-guard provides three commands for managing dependencies:
 
 1. **Fresh install** - Install all dependencies from package.json with security checks
@@ -48,21 +46,12 @@ Add a new dependency with security checks:
 
 - Node.js >= 24
 - npm
-- `scfw` installed (Supply Chain Firewall) - recommended but optional
+- `scfw` installed (Supply Chain Firewall) - recommended (strongly) but optional
   - `pipx install scfw` (recommended)
   - or `pip install scfw`
   - If scfw is not installed, use `--allow-npm-install` to fall back to npm install
 
 More info: https://github.com/DataDog/supply-chain-firewall
-
-## Breaking Changes (v0.1.0-preview.2+)
-
-**Subcommands are now required.** Previously, running `dep-guard` without arguments would start the update workflow. Now you must specify a subcommand:
-- `dep-guard update` - For the update workflow (previous default behavior)
-- `dep-guard install` - For fresh install from package.json
-- `dep-guard add <package>` - For adding new packages with security checks
-
-Running `dep-guard` without a subcommand will show an error message with usage instructions.
 
 ## Usage
 

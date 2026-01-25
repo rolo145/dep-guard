@@ -1,6 +1,6 @@
 {
   "name": "@roland.botka/dep-guard",
-  "version": "0.1.0-preview.2",
+  "version": "1.0.0",
   "author": "Roland Botka",
   "description": "Guardrail for safe npm dependency updates",
   "type": "module",
