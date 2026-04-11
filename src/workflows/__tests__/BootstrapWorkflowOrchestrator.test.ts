@@ -115,7 +115,7 @@ describe("BootstrapWorkflowOrchestrator", () => {
     it("includes duration in stats", async () => {
       mockServiceInstance.run.mockImplementation(() => {
         return new Promise((resolve) => {
-          setTimeout(() => resolve(true), 10);
+          setTimeout(() => resolve(true), 20);
         });
       });
 
