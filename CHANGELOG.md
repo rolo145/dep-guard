@@ -1,3 +1,23 @@
+## [1.0.2] - 2026-04-16
+
+### Fixed
+
+- Updated README to reflect current version
+
+[1.0.2]: https://github.com/rolo145/dep-guard/compare/v1.0.1...v1.0.2
+
+---
+
+## [1.0.1] - 2026-04-11
+
+### Fixed
+
+- Fix version sorting to prevent downgrades on parallel release branches
+
+[1.0.1]: https://github.com/rolo145/dep-guard/compare/v1.0.0...v1.0.1
+
+---
+
 ## [1.0.0] - 2026-01-25
 
 Initial stable release of **dep-guard**, a guardrail CLI for safer npm dependency management.

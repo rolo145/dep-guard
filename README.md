@@ -5,7 +5,7 @@ dep-guard provides secure workflows for installing, updating, and adding npm dep
 
 > dep-guard is intentionally opinionated: it favors security and explicit decisions over speed and convenience.
 
-This is the first **stable (1.0.0)** release. Commands and flags are considered stable across 1.x versions.
+This is a **stable (1.0.2)** release. Commands and flags are considered stable across 1.x versions.
 
 ---
 
