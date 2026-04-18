@@ -16,6 +16,9 @@
 import { WorkflowOrchestrator } from "./workflows";
 import { BootstrapWorkflowOrchestrator } from "./workflows/BootstrapWorkflowOrchestrator";
 import { AddWorkflowOrchestrator } from "./workflows/AddWorkflowOrchestrator";
+import { NpqWorkflowOrchestrator } from "./workflows/NpqWorkflowOrchestrator";
+import { ScfwWorkflowOrchestrator } from "./workflows/ScfwWorkflowOrchestrator";
+import { QualityWorkflowOrchestrator } from "./workflows/QualityWorkflowOrchestrator";
 import { ScriptValidator } from "./quality/ScriptValidator";
 import { ArgumentParser, CLIHelper, PrerequisiteValidator, SubcommandParser } from "./args";
 import { ArgumentValidator } from "./args/ArgumentValidator";
@@ -64,7 +67,7 @@ function setupGracefulShutdown(): void {
   }
 
   // Parse subcommand
-  let subcommand: "install" | "update" | "add";
+  let subcommand: "install" | "update" | "add" | "npq" | "scfw" | "quality";
   let args: string[];
 
   try {
@@ -83,8 +86,13 @@ function setupGracefulShutdown(): void {
   // Parse CLI options
   const options = parser.parseOrExit();
 
-  // Ensure required security tools (scfw) are installed or fallback is allowed
-  const useNpmFallback = (subcommand === "update" && options.dryRun)
+  // Ensure required security tools (scfw) are installed or fallback is allowed.
+  // npq, quality, and update --dry-run don't use scfw, so skip the prerequisite check.
+  const skipPrerequisiteCheck =
+    subcommand === "npq" ||
+    subcommand === "quality" ||
+    (subcommand === "update" && options.dryRun);
+  const useNpmFallback = skipPrerequisiteCheck
     ? false
     : PrerequisiteValidator.checkPrerequisites(options.allowNpmInstall).useNpmFallback;
 
@@ -150,6 +158,71 @@ function setupGracefulShutdown(): void {
 
     const result = await orchestrator.execute();
     process.exit(result.exitCode);
+  } else if (subcommand === "npq") {
+    // Run NPQ security check on a single package
+    const packageArgs = parser.parsePackageArgs();
+
+    if (packageArgs.length === 0) {
+      exitWithError(
+        "Error: No package specified\n" +
+        "Usage: dep-guard npq <package@version> [--json]\n" +
+        "\n" +
+        "Example:\n" +
+        "  dep-guard npq lodash@4.17.21\n" +
+        "  dep-guard npq lodash@4.17.21 --json"
+      );
+    }
+
+    if (packageArgs.length > 1) {
+      exitWithError(
+        "Error: Only one package can be checked at a time\n" +
+        "Usage: dep-guard npq <package@version> [--json]\n" +
+        "\n" +
+        "Example:\n" +
+        "  dep-guard npq lodash@4.17.21\n" +
+        "  dep-guard npq lodash@4.17.21 --json"
+      );
+    }
+
+    const orchestrator = new NpqWorkflowOrchestrator({
+      packageSpec: packageArgs[0],
+      json: options.json ?? false,
+    });
+    const result = await orchestrator.execute();
+    process.exit(result.exitCode);
+  } else if (subcommand === "scfw") {
+    // Install packages via SCFW
+    const packageArgs = parser.parsePackageArgs();
+
+    if (packageArgs.length === 0) {
+      exitWithError(
+        "Error: No packages specified\n" +
+        "Usage: dep-guard scfw <package@version> [package@version...] [--json]\n" +
+        "\n" +
+        "Example:\n" +
+        "  dep-guard scfw lodash@4.17.21\n" +
+        "  dep-guard scfw lodash@4.17.21 chalk@5.0.0 --json"
+      );
+    }
+
+    const orchestrator = new ScfwWorkflowOrchestrator({
+      packageSpecs: packageArgs,
+      useNpmFallback,
+      days: options.days,
+      scripts: options.scripts,
+      json: options.json ?? false,
+    });
+    const result = await orchestrator.execute();
+    process.exit(result.exitCode);
+  } else if (subcommand === "quality") {
+    // Run quality checks standalone
+    const orchestrator = new QualityWorkflowOrchestrator({
+      scripts: options.scripts,
+      days: options.days,
+      json: options.json ?? false,
+    });
+    const result = await orchestrator.execute();
+    process.exit(result.exitCode);
   } else {
     // Run update workflow
     // Validate configured script names and warn about missing ones
@@ -160,6 +233,7 @@ function setupGracefulShutdown(): void {
       scripts: options.scripts,
       useNpmFallback,
       dryRun: options.dryRun,
+      json: options.json,
     });
     const result = await orchestrator.execute();
     process.exit(result.exitCode);

@@ -233,7 +233,22 @@ export class WorkflowOrchestrator {
     this.stats.durationMs = Date.now() - this.startTime;
 
     const { grouped } = organizedData;
-    this.displayDryRunUpdates(grouped);
+
+    if (this.options.json) {
+      const updates = [
+        ...grouped.patch.map((p) => ({ package: p.name, current: p.currentVersion, latest: p.newVersion, type: "patch" as const })),
+        ...grouped.minor.map((p) => ({ package: p.name, current: p.currentVersion, latest: p.newVersion, type: "minor" as const })),
+        ...grouped.major.map((p) => ({ package: p.name, current: p.currentVersion, latest: p.newVersion, type: "major" as const })),
+      ];
+      const output = {
+        updates,
+        safetyBufferDays: this.options.days,
+        filteredCount: updates.length,
+      };
+      process.stdout.write(JSON.stringify(output, null, 2) + "\n");
+    } else {
+      this.displayDryRunUpdates(grouped);
+    }
 
     return ResultFactory.success("completed", this.stats);
   }

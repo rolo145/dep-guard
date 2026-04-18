@@ -13,6 +13,7 @@ export const FILES = {
   PACKAGE_JSON: "package.json",
   PACKAGE_LOCK_JSON: "package-lock.json",
   NODE_MODULES: "node_modules",
+  ALLOWLIST: "dep-guard-allowlist.json",
 } as const;
 
 /** Type for file name values */

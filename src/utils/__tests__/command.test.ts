@@ -4,7 +4,7 @@ vi.mock("child_process", () => ({
   spawnSync: vi.fn(),
 }));
 
-import { tryRunCommand } from "../command";
+import { tryRunCommand, runWithOutput } from "../command";
 import { spawnSync } from "child_process";
 
 describe("command utilities", () => {
@@ -100,6 +100,91 @@ describe("command utilities", () => {
         "echo",
         ["hello world", "foo=bar", "--flag=value"],
         { stdio: "inherit", shell: false }
+      );
+    });
+  });
+
+  describe("runWithOutput()", () => {
+    it("calls spawnSync with pipe stdio and encoding", () => {
+      vi.mocked(spawnSync).mockReturnValue({ status: 0, stdout: "", stderr: "" } as any);
+
+      runWithOutput("npm", ["--version"]);
+
+      expect(spawnSync).toHaveBeenCalledWith(
+        "npm",
+        ["--version"],
+        { stdio: "pipe", shell: false, encoding: "utf-8" }
+      );
+    });
+
+    it("returns success: true when command exits with code 0", () => {
+      vi.mocked(spawnSync).mockReturnValue({ status: 0, stdout: "1.0.0\n", stderr: "" } as any);
+
+      const result = runWithOutput("npm", ["--version"]);
+
+      expect(result.success).toBe(true);
+    });
+
+    it("returns success: false when command exits with non-zero code", () => {
+      vi.mocked(spawnSync).mockReturnValue({ status: 1, stdout: "", stderr: "error" } as any);
+
+      const result = runWithOutput("npm", ["bad-command"]);
+
+      expect(result.success).toBe(false);
+    });
+
+    it("returns combined stdout and stderr as output", () => {
+      vi.mocked(spawnSync).mockReturnValue({
+        status: 1,
+        stdout: "warning: something\n",
+        stderr: "error: bad package\n",
+      } as any);
+
+      const result = runWithOutput("npq", ["install", "bad@1.0.0", "--dry-run"]);
+
+      expect(result.output).toContain("warning: something");
+      expect(result.output).toContain("error: bad package");
+    });
+
+    it("returns empty string when stdout and stderr are empty", () => {
+      vi.mocked(spawnSync).mockReturnValue({ status: 0, stdout: "", stderr: "" } as any);
+
+      const result = runWithOutput("npm", ["--version"]);
+
+      expect(result.output).toBe("");
+    });
+
+    it("trims whitespace from output", () => {
+      vi.mocked(spawnSync).mockReturnValue({
+        status: 0,
+        stdout: "  output line  \n",
+        stderr: "",
+      } as any);
+
+      const result = runWithOutput("cmd", []);
+
+      expect(result.output).toBe("output line");
+    });
+
+    it("handles null stdout and stderr gracefully", () => {
+      vi.mocked(spawnSync).mockReturnValue({ status: 0, stdout: null, stderr: null } as any);
+
+      const result = runWithOutput("cmd", []);
+
+      expect(result.output).toBe("");
+      expect(result.success).toBe(true);
+    });
+
+    it("throws when spawnSync returns an error (e.g. ENOENT)", () => {
+      vi.mocked(spawnSync).mockReturnValue({
+        status: null,
+        stdout: null,
+        stderr: null,
+        error: new Error("spawn npq ENOENT"),
+      } as any);
+
+      expect(() => runWithOutput("npq", ["install", "lodash@4.17.21", "--dry-run"])).toThrow(
+        'Failed to spawn "npq": spawn npq ENOENT'
       );
     });
   });

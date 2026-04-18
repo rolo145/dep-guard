@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 
 const mockRunnerInstance = {
-  check: vi.fn(),
+  checkCapturingOutput: vi.fn(),
   checkBatch: vi.fn(),
 };
 
@@ -14,7 +14,7 @@ const mockConfirmationInstance = {
 
 vi.mock("../NPQRunner", () => ({
   NPQRunner: class {
-    check = mockRunnerInstance.check;
+    checkCapturingOutput = mockRunnerInstance.checkCapturingOutput;
     checkBatch = mockRunnerInstance.checkBatch;
   },
 }));
@@ -58,23 +58,23 @@ describe("NPQService", () => {
 
   describe("runSecurityCheck()", () => {
     it("shows check started message", () => {
-      mockRunnerInstance.check.mockReturnValue({ packageSpec: "lodash@5.0.0", passed: true });
+      mockRunnerInstance.checkCapturingOutput.mockReturnValue({ packageSpec: "lodash@5.0.0", passed: true, outputLines: [] });
 
       service.runSecurityCheck("lodash@5.0.0");
 
       expect(mockConfirmationInstance.showCheckStarted).toHaveBeenCalledWith("lodash@5.0.0");
     });
 
-    it("runs NPQ check", () => {
-      mockRunnerInstance.check.mockReturnValue({ packageSpec: "lodash@5.0.0", passed: true });
+    it("runs NPQ check via checkCapturingOutput", () => {
+      mockRunnerInstance.checkCapturingOutput.mockReturnValue({ packageSpec: "lodash@5.0.0", passed: true, outputLines: [] });
 
       service.runSecurityCheck("lodash@5.0.0");
 
-      expect(mockRunnerInstance.check).toHaveBeenCalledWith("lodash@5.0.0");
+      expect(mockRunnerInstance.checkCapturingOutput).toHaveBeenCalledWith("lodash@5.0.0");
     });
 
     it("displays result", () => {
-      mockRunnerInstance.check.mockReturnValue({ packageSpec: "lodash@5.0.0", passed: true });
+      mockRunnerInstance.checkCapturingOutput.mockReturnValue({ packageSpec: "lodash@5.0.0", passed: true, outputLines: [] });
 
       service.runSecurityCheck("lodash@5.0.0");
 
@@ -82,7 +82,7 @@ describe("NPQService", () => {
     });
 
     it("returns true when check passes", () => {
-      mockRunnerInstance.check.mockReturnValue({ packageSpec: "lodash@5.0.0", passed: true });
+      mockRunnerInstance.checkCapturingOutput.mockReturnValue({ packageSpec: "lodash@5.0.0", passed: true, outputLines: [] });
 
       const result = service.runSecurityCheck("lodash@5.0.0");
 
@@ -90,17 +90,42 @@ describe("NPQService", () => {
     });
 
     it("returns false when check fails", () => {
-      mockRunnerInstance.check.mockReturnValue({ packageSpec: "malicious@1.0.0", passed: false });
+      mockRunnerInstance.checkCapturingOutput.mockReturnValue({ packageSpec: "malicious@1.0.0", passed: false, outputLines: ["Supply Chain Security - Malware detected"] });
 
       const result = service.runSecurityCheck("malicious@1.0.0");
 
       expect(result).toBeFalsy();
     });
+
+    it("prints captured issue lines to console", () => {
+      const consoleSpy = vi.spyOn(console, "log").mockImplementation(() => {});
+      mockRunnerInstance.checkCapturingOutput.mockReturnValue({
+        packageSpec: "pkg@1.0.0",
+        passed: false,
+        outputLines: ["Supply Chain Security - No provenance", "Package Health - Old package"],
+      });
+
+      service.runSecurityCheck("pkg@1.0.0");
+
+      expect(consoleSpy).toHaveBeenCalledWith("  Supply Chain Security - No provenance");
+      expect(consoleSpy).toHaveBeenCalledWith("  Package Health - Old package");
+      consoleSpy.mockRestore();
+    });
+
+    it("does not print anything when there are no issues", () => {
+      const consoleSpy = vi.spyOn(console, "log").mockImplementation(() => {});
+      mockRunnerInstance.checkCapturingOutput.mockReturnValue({ packageSpec: "safe@1.0.0", passed: true, outputLines: [] });
+
+      service.runSecurityCheck("safe@1.0.0");
+
+      expect(consoleSpy).not.toHaveBeenCalled();
+      consoleSpy.mockRestore();
+    });
   });
 
   describe("validateAndConfirm()", () => {
     it("shows package header", async () => {
-      mockRunnerInstance.check.mockReturnValue({ packageSpec: "lodash@5.0.0", passed: true });
+      mockRunnerInstance.checkCapturingOutput.mockReturnValue({ packageSpec: "lodash@5.0.0", passed: true, outputLines: [] });
       mockConfirmationInstance.confirm.mockResolvedValue(true);
 
       await service.validateAndConfirm("lodash", "5.0.0");
@@ -109,16 +134,16 @@ describe("NPQService", () => {
     });
 
     it("runs security check with correct package spec", async () => {
-      mockRunnerInstance.check.mockReturnValue({ packageSpec: "lodash@5.0.0", passed: true });
+      mockRunnerInstance.checkCapturingOutput.mockReturnValue({ packageSpec: "lodash@5.0.0", passed: true, outputLines: [] });
       mockConfirmationInstance.confirm.mockResolvedValue(true);
 
       await service.validateAndConfirm("lodash", "5.0.0");
 
-      expect(mockRunnerInstance.check).toHaveBeenCalledWith("lodash@5.0.0");
+      expect(mockRunnerInstance.checkCapturingOutput).toHaveBeenCalledWith("lodash@5.0.0");
     });
 
     it("passes NPQ result to confirmation", async () => {
-      mockRunnerInstance.check.mockReturnValue({ packageSpec: "lodash@5.0.0", passed: true });
+      mockRunnerInstance.checkCapturingOutput.mockReturnValue({ packageSpec: "lodash@5.0.0", passed: true, outputLines: [] });
       mockConfirmationInstance.confirm.mockResolvedValue(true);
 
       await service.validateAndConfirm("lodash", "5.0.0");
@@ -127,7 +152,7 @@ describe("NPQService", () => {
     });
 
     it("returns true when user confirms", async () => {
-      mockRunnerInstance.check.mockReturnValue({ packageSpec: "lodash@5.0.0", passed: true });
+      mockRunnerInstance.checkCapturingOutput.mockReturnValue({ packageSpec: "lodash@5.0.0", passed: true, outputLines: [] });
       mockConfirmationInstance.confirm.mockResolvedValue(true);
 
       const result = await service.validateAndConfirm("lodash", "5.0.0");
@@ -136,7 +161,7 @@ describe("NPQService", () => {
     });
 
     it("returns false when user declines", async () => {
-      mockRunnerInstance.check.mockReturnValue({ packageSpec: "lodash@5.0.0", passed: true });
+      mockRunnerInstance.checkCapturingOutput.mockReturnValue({ packageSpec: "lodash@5.0.0", passed: true, outputLines: [] });
       mockConfirmationInstance.confirm.mockResolvedValue(false);
 
       const result = await service.validateAndConfirm("lodash", "5.0.0");
@@ -147,7 +172,7 @@ describe("NPQService", () => {
 
   describe("processSelection()", () => {
     it("processes each selected package", async () => {
-      mockRunnerInstance.check.mockReturnValue({ packageSpec: "test", passed: true });
+      mockRunnerInstance.checkCapturingOutput.mockReturnValue({ packageSpec: "test", passed: true, outputLines: [] });
       mockConfirmationInstance.confirm.mockResolvedValue(true);
 
       await service.processSelection([
@@ -159,7 +184,7 @@ describe("NPQService", () => {
     });
 
     it("returns confirmed packages", async () => {
-      mockRunnerInstance.check.mockReturnValue({ packageSpec: "test", passed: true });
+      mockRunnerInstance.checkCapturingOutput.mockReturnValue({ packageSpec: "test", passed: true, outputLines: [] });
       mockConfirmationInstance.confirm
         .mockResolvedValueOnce(true)
         .mockResolvedValueOnce(false);
@@ -173,7 +198,7 @@ describe("NPQService", () => {
     });
 
     it("returns empty array when no packages confirmed", async () => {
-      mockRunnerInstance.check.mockReturnValue({ packageSpec: "test", passed: false });
+      mockRunnerInstance.checkCapturingOutput.mockReturnValue({ packageSpec: "test", passed: false, outputLines: [] });
       mockConfirmationInstance.confirm.mockResolvedValue(false);
 
       const result = await service.processSelection([
@@ -187,11 +212,11 @@ describe("NPQService", () => {
       const result = await service.processSelection([]);
 
       expect(result).toStrictEqual([]);
-      expect(mockRunnerInstance.check).not.toHaveBeenCalled();
+      expect(mockRunnerInstance.checkCapturingOutput).not.toHaveBeenCalled();
     });
 
     it("processes packages in order", async () => {
-      mockRunnerInstance.check.mockReturnValue({ packageSpec: "test", passed: true });
+      mockRunnerInstance.checkCapturingOutput.mockReturnValue({ packageSpec: "test", passed: true, outputLines: [] });
       mockConfirmationInstance.confirm.mockResolvedValue(true);
 
       const packages = [
@@ -206,7 +231,7 @@ describe("NPQService", () => {
     });
 
     it("includes package even if NPQ fails but user confirms", async () => {
-      mockRunnerInstance.check.mockReturnValue({ packageSpec: "test", passed: false });
+      mockRunnerInstance.checkCapturingOutput.mockReturnValue({ packageSpec: "test", passed: false, outputLines: ["Supply Chain Security - Malware detected"] });
       mockConfirmationInstance.confirm.mockResolvedValue(true);
 
       const result = await service.processSelection([

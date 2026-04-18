@@ -41,9 +41,13 @@ export class NPQService {
   runSecurityCheck(packageSpec: string): boolean {
     this.confirmation.showCheckStarted(packageSpec);
 
-    const result = this.runner.check(packageSpec);
-    this.confirmation.displayResult(packageSpec, result.passed);
+    // Use checkCapturingOutput so pass/fail is determined by parsed output lines
+    // rather than exit code (NPQ always exits 0 in --dry-run mode).
+    // Print captured issue lines to the terminal to replicate the stdio:inherit behaviour.
+    const result = this.runner.checkCapturingOutput(packageSpec);
+    result.outputLines.forEach((line) => console.log("  " + line));
 
+    this.confirmation.displayResult(packageSpec, result.passed);
     return result.passed;
   }
 

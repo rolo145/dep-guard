@@ -6,7 +6,7 @@
  * @module args/SubcommandParser
  */
 
-export type Subcommand = "update" | "install" | "add";
+export type Subcommand = "update" | "install" | "add" | "npq" | "scfw" | "quality";
 
 export interface ParsedCommand {
   subcommand: Subcommand;
@@ -41,11 +41,14 @@ export class SubcommandParser {
     // If no args or first arg is a flag, no subcommand provided
     if (args.length === 0 || args[0].startsWith("-")) {
       throw new SubcommandParseError(
-        "Please specify a subcommand: install, update, or add\n\n" +
+        "Please specify a subcommand: install, update, add, npq, scfw, or quality\n\n" +
           "Usage:\n" +
           "  dep-guard install    Fresh install from package.json\n" +
           "  dep-guard update     Check for and install package updates\n" +
-          "  dep-guard add        Add a new package with security checks\n\n" +
+          "  dep-guard add        Add a new package with security checks\n" +
+          "  dep-guard npq        Run NPQ security check on a package\n" +
+          "  dep-guard scfw       Install packages via SCFW\n" +
+          "  dep-guard quality    Run quality checks\n\n" +
           "Run 'dep-guard --help' for more information.",
       );
     }
@@ -54,9 +57,10 @@ export class SubcommandParser {
     const remainingArgs = args.slice(1);
 
     // Check for known subcommands
-    if (firstArg === "install" || firstArg === "update" || firstArg === "add") {
+    const knownSubcommands: Subcommand[] = ["install", "update", "add", "npq", "scfw", "quality"];
+    if (knownSubcommands.includes(firstArg as Subcommand)) {
       return {
-        subcommand: firstArg,
+        subcommand: firstArg as Subcommand,
         args: remainingArgs,
       };
     }
@@ -64,7 +68,7 @@ export class SubcommandParser {
     // Unknown subcommand
     throw new SubcommandParseError(
       `Unknown subcommand: ${firstArg}\n\n` +
-        "Valid subcommands are: install, update, add\n" +
+        "Valid subcommands are: install, update, add, npq, scfw, quality\n" +
         "Run 'dep-guard --help' for more information.",
     );
   }

@@ -268,6 +268,96 @@ describe("WorkflowOrchestrator", () => {
     });
   });
 
+  describe("execute() with dryRun + json mode", () => {
+    let stdoutSpy: ReturnType<typeof vi.spyOn>;
+
+    beforeEach(() => {
+      stdoutSpy = vi.spyOn(process.stdout, "write").mockImplementation(() => true);
+    });
+
+    afterEach(() => {
+      stdoutSpy.mockRestore();
+    });
+
+    it("outputs valid JSON with updates array when dryRun + json enabled", async () => {
+      const grouped = {
+        major: [{ name: "axios", currentVersion: "0.27.2", newVersion: "1.4.0" }],
+        minor: [{ name: "vite", currentVersion: "4.3.9", newVersion: "4.4.2" }],
+        patch: [{ name: "eslint", currentVersion: "8.45.0", newVersion: "8.45.2" }],
+      };
+
+      mockNCUService.loadUpdates.mockResolvedValue({ axios: "1.4.0", vite: "4.4.2", eslint: "8.45.2" });
+      mockNCUService.filterByAge.mockResolvedValue({ axios: "1.4.0", vite: "4.4.2", eslint: "8.45.2" });
+      mockNCUService.buildChoices.mockReturnValue({ grouped, choices: [] });
+
+      const orchestrator = new WorkflowOrchestrator({
+        days: 7,
+        scripts: { lint: "lint", typecheck: "typecheck", test: "test", build: "build" },
+        dryRun: true,
+        json: true,
+      });
+
+      const result = await orchestrator.execute();
+
+      expect(result.exitCode).toBe(0);
+      expect(stdoutSpy).toHaveBeenCalledOnce();
+      const output = JSON.parse(stdoutSpy.mock.calls[0][0] as string);
+      expect(output.safetyBufferDays).toBe(7);
+      expect(output.filteredCount).toBe(3);
+      expect(output.updates).toHaveLength(3);
+    });
+
+    it("includes correct type labels for each update in JSON output", async () => {
+      const grouped = {
+        major: [{ name: "axios", currentVersion: "0.27.2", newVersion: "1.4.0" }],
+        minor: [{ name: "vite", currentVersion: "4.3.9", newVersion: "4.4.2" }],
+        patch: [{ name: "eslint", currentVersion: "8.45.0", newVersion: "8.45.2" }],
+      };
+
+      mockNCUService.loadUpdates.mockResolvedValue({ axios: "1.4.0", vite: "4.4.2", eslint: "8.45.2" });
+      mockNCUService.filterByAge.mockResolvedValue({ axios: "1.4.0", vite: "4.4.2", eslint: "8.45.2" });
+      mockNCUService.buildChoices.mockReturnValue({ grouped, choices: [] });
+
+      const orchestrator = new WorkflowOrchestrator({
+        days: 7,
+        scripts: { lint: "lint", typecheck: "typecheck", test: "test", build: "build" },
+        dryRun: true,
+        json: true,
+      });
+
+      await orchestrator.execute();
+
+      const output = JSON.parse(stdoutSpy.mock.calls[0][0] as string);
+      const types = output.updates.map((u: any) => u.type);
+      expect(types).toContain("major");
+      expect(types).toContain("minor");
+      expect(types).toContain("patch");
+    });
+
+    it("does not call logger display methods in JSON mode", async () => {
+      const grouped = {
+        major: [],
+        minor: [{ name: "vite", currentVersion: "4.3.9", newVersion: "4.4.2" }],
+        patch: [],
+      };
+
+      mockNCUService.loadUpdates.mockResolvedValue({ vite: "4.4.2" });
+      mockNCUService.filterByAge.mockResolvedValue({ vite: "4.4.2" });
+      mockNCUService.buildChoices.mockReturnValue({ grouped, choices: [] });
+
+      const orchestrator = new WorkflowOrchestrator({
+        days: 7,
+        scripts: { lint: "lint", typecheck: "typecheck", test: "test", build: "build" },
+        dryRun: true,
+        json: true,
+      });
+
+      await orchestrator.execute();
+
+      expect(logger.header).not.toHaveBeenCalledWith("Available Updates", "📋");
+    });
+  });
+
   describe("execute() with dryRun mode", () => {
     let consoleLogSpy: ReturnType<typeof vi.spyOn>;
 

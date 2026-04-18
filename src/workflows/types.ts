@@ -16,6 +16,8 @@ export interface WorkflowOptions {
   useNpmFallback?: boolean;
   /** Show available updates without installing (dry-run mode) */
   dryRun?: boolean;
+  /** Output results as JSON instead of human-readable */
+  json?: boolean;
 }
 
 /** Reasons workflow may exit early */

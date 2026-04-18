@@ -103,7 +103,7 @@ describe("CLIHelper", () => {
 
       const output = consoleSpy.mock.calls[0][0];
       expect(output).toContain("dep-guard update --dry-run");
-      expect(output).toContain("dep-guard update --dry-run --days 14");
+      expect(output).toContain("dep-guard update --dry-run --json");
     });
 
     it("includes [update only] tag for --dry-run flag", () => {

@@ -33,3 +33,25 @@ export function tryRunCommand(
   const result = spawnSync(cmd, args, options);
   return result.status === 0;
 }
+
+/**
+ * Runs a command synchronously and captures its output
+ * @param cmd - command to execute
+ * @param args - command arguments
+ * @returns success status and captured stdout+stderr text
+ */
+export function runWithOutput(cmd: string, args: string[]): { success: boolean; output: string } {
+  const result = spawnSync(cmd, args, { stdio: "pipe", shell: false, encoding: "utf-8" });
+
+  if (result.error) {
+    throw new Error(`Failed to spawn "${cmd}": ${result.error.message}`);
+  }
+
+  const stdout = (result.stdout as string) || "";
+  const stderr = (result.stderr as string) || "";
+  const output = [stdout, stderr].filter(Boolean).join("\n").trim();
+  return {
+    success: result.status === 0,
+    output,
+  };
+}

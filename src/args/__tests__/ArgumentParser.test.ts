@@ -1,6 +1,6 @@
 import { describe, it, expect } from "vitest";
 import { ArgumentParser } from "../ArgumentParser";
-import { InvalidFormatError, MissingValueError, IncompatibleFlagsError, InvalidFlagForCommandError } from "../errors";
+import { ValidationError, InvalidFormatError, MissingValueError, IncompatibleFlagsError, InvalidFlagForCommandError } from "../errors";
 import { DEFAULT_SCRIPTS, SAFETY_BUFFER_DAYS } from "../../defaults";
 
 describe("ArgumentParser", () => {
@@ -462,6 +462,60 @@ describe("ArgumentParser", () => {
       const parser = new ArgumentParser(["-D", "--days", "14"], "update");
 
       expect(() => parser.parse()).toThrow(InvalidFlagForCommandError);
+    });
+
+    it("throws InvalidFlagForCommandError when --json used with install command", () => {
+      const parser = new ArgumentParser(["--json"], "install");
+
+      expect(() => parser.parse()).toThrow(InvalidFlagForCommandError);
+      expect(() => parser.parse()).toThrow(
+        "--json can only be used with: npq, scfw, quality, update. Current command: install"
+      );
+    });
+
+    it("throws InvalidFlagForCommandError when --json used with add command", () => {
+      const parser = new ArgumentParser(["--json"], "add");
+
+      expect(() => parser.parse()).toThrow(InvalidFlagForCommandError);
+      expect(() => parser.parse()).toThrow(
+        "--json can only be used with: npq, scfw, quality, update. Current command: add"
+      );
+    });
+
+    it("throws ValidationError when --json used with update but without --dry-run", () => {
+      const parser = new ArgumentParser(["--json"], "update");
+
+      expect(() => parser.parse()).toThrow(ValidationError);
+      expect(() => parser.parse()).toThrow("--json requires --dry-run when used with the update command");
+    });
+
+    it("allows --json with update and --dry-run", () => {
+      const parser = new ArgumentParser(["--json", "--dry-run"], "update");
+      const options = parser.parse();
+
+      expect(options.json).toBe(true);
+      expect(options.dryRun).toBe(true);
+    });
+
+    it("allows --json with npq", () => {
+      const parser = new ArgumentParser(["--json"], "npq");
+      const options = parser.parse();
+
+      expect(options.json).toBe(true);
+    });
+
+    it("allows --json with scfw", () => {
+      const parser = new ArgumentParser(["--json"], "scfw");
+      const options = parser.parse();
+
+      expect(options.json).toBe(true);
+    });
+
+    it("allows --json with quality", () => {
+      const parser = new ArgumentParser(["--json"], "quality");
+      const options = parser.parse();
+
+      expect(options.json).toBe(true);
     });
   });
 });

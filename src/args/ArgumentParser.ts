@@ -183,6 +183,16 @@ export class ArgumentParser {
         throw new InvalidFlagForCommandError(flag, this.subcommand, ["add"]);
       }
     }
+
+    // --json is only valid for npq, scfw, quality, and update
+    if (options.json && this.subcommand && !["npq", "scfw", "quality", "update"].includes(this.subcommand)) {
+      throw new InvalidFlagForCommandError("--json", this.subcommand, ["npq", "scfw", "quality", "update"]);
+    }
+
+    // --json on update only makes sense with --dry-run (the interactive update has no JSON output)
+    if (options.json && this.subcommand === "update" && !options.dryRun) {
+      throw new ValidationError("--json", "--json requires --dry-run when used with the update command");
+    }
   }
 
   /**
@@ -212,6 +222,11 @@ export class ArgumentParser {
     // Parse --dry-run flag
     if (this.hasFlag("--dry-run")) {
       options.dryRun = true;
+    }
+
+    // Parse --json flag
+    if (this.hasFlag("--json")) {
+      options.json = true;
     }
 
     // Parse all script options

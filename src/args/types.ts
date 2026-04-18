@@ -31,4 +31,6 @@ export interface CliOptions {
   saveDev?: boolean;
   /** Show available updates without installing - dry-run mode (optional, for update command) */
   dryRun?: boolean;
+  /** Output results as JSON instead of human-readable format */
+  json?: boolean;
 }

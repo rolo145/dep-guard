@@ -38,34 +38,38 @@ Subcommands:
   install                   Fresh install from package.json
   update                    Check for and install package updates
   add <package>             Add a new package with security checks
+  npq <package@version>     Run NPQ security check on a package
+  scfw <package@version...> Install packages via SCFW (supply chain firewall)
+  quality                   Run quality checks (lint, typecheck, test, build)
 
 Options:
   -d, --days <number>       Safety buffer in days (default: ${SAFETY_BUFFER_DAYS})
   --allow-npm-install       Use npm install fallback when scfw is not available
   -D, --save-dev            Add as dev dependency [add only]
-  --dry-run                 Show available updates without installing (dry-run) [update only]
-  --lint <script>           Lint script name (default: "${DEFAULT_SCRIPTS.lint}") [update only]
-  --typecheck <script>      Type check script name (default: "${DEFAULT_SCRIPTS.typecheck}") [update only]
-  --test <script>           Test script name (default: "${DEFAULT_SCRIPTS.test}") [update only]
-  --build <script>          Build script name (default: "${DEFAULT_SCRIPTS.build}") [update only]
+  --dry-run                 Show available updates without installing [update only]
+  --json                    Output results as JSON [npq, scfw, quality, update --dry-run]
+  --lint <script>           Lint script name (default: "${DEFAULT_SCRIPTS.lint}") [update, quality]
+  --typecheck <script>      Type check script name (default: "${DEFAULT_SCRIPTS.typecheck}") [update, quality]
+  --test <script>           Test script name (default: "${DEFAULT_SCRIPTS.test}") [update, quality]
+  --build <script>          Build script name (default: "${DEFAULT_SCRIPTS.build}") [update, quality]
   -v, --version             Show version number
   -h, --help                Show this help message
 
 Examples:
-  dep-guard install                     Fresh install from package.json
-  dep-guard install --days 14           Fresh install with 14-day safety buffer
-  dep-guard install --allow-npm-install Use npm fallback for fresh install
-  dep-guard update                      Run update workflow with defaults
-  dep-guard update --days 14            Update with 14-day safety buffer
-  dep-guard update --allow-npm-install  Update using npm install fallback
-  dep-guard update --dry-run            Show available updates without installing
-  dep-guard update --dry-run --days 14  Show updates with 14-day safety buffer
-  dep-guard update --lint eslint        Use "eslint" as lint script
-  dep-guard update --test test:all      Use "test:all" as test script
-  dep-guard add vue                     Add latest safe version of vue
-  dep-guard add vue@3.2.0               Add specific version of vue
-  dep-guard add @vue/cli -D             Add @vue/cli as dev dependency
-  dep-guard add typescript -D --days 14 Add typescript with 14-day buffer
+  dep-guard install                          Fresh install from package.json
+  dep-guard install --days 14               Fresh install with 14-day safety buffer
+  dep-guard update                          Run update workflow with defaults
+  dep-guard update --dry-run                Show available updates without installing
+  dep-guard update --dry-run --json         Show available updates as JSON
+  dep-guard add vue                         Add latest safe version of vue
+  dep-guard add vue@3.2.0                   Add specific version of vue
+  dep-guard add @vue/cli -D                 Add @vue/cli as dev dependency
+  dep-guard npq lodash@4.17.21              Check lodash with NPQ security scanner
+  dep-guard npq lodash@4.17.21 --json       Check lodash and output JSON result
+  dep-guard scfw lodash@4.17.21             Install lodash via SCFW
+  dep-guard scfw lodash@4.17.21 chalk@5.0.0 --json  Install multiple packages, JSON output
+  dep-guard quality                         Run all quality checks
+  dep-guard quality --json                  Run quality checks and output JSON
 `);
   }
 }
