@@ -1,11 +1,3 @@
-/**
- * NCU Service
- *
- * Orchestrates npm-check-updates workflow including loading updates,
- * filtering, grouping, and prompting user selection.
- *
- * @module ncu/NCUService
- */
 import type { GroupedUpdates, PackageSelection } from "./types";
 import type { PromptChoice } from "./PromptChoiceBuilder";
 import type { IExecutionContext } from "../context/IExecutionContext";
@@ -20,20 +12,12 @@ export interface NCUGroupingResult {
   choices: PromptChoice[];
 }
 
-/**
- * Service for orchestrating npm-check-updates workflow.
- */
 export class NCUService {
   private readonly context: IExecutionContext;
   private runner: NCURunner;
   private confirmation: NCUConfirmation;
   private registry: NCURegistryService;
 
-  /**
-   * Creates a new NCUService instance.
-   *
-   * @param context - Workflow context for accessing configuration and dependencies
-   */
   constructor(context: IExecutionContext) {
     this.context = context;
     this.runner = new NCURunner();
@@ -41,9 +25,6 @@ export class NCUService {
     this.registry = new NCURegistryService(context);
   }
 
-  /**
-   * Loads raw updates from npm-check-updates
-   */
   async loadUpdates(): Promise<Record<string, string>> {
     const spinner = this.confirmation.showQueryingUpdates();
     const updates = await this.runner.loadUpdates();
@@ -51,44 +32,26 @@ export class NCUService {
     return updates;
   }
 
-  /**
-   * Displays message for no updates
-   */
   showNoUpdates(): void {
     this.confirmation.showNoUpdates();
   }
 
-  /**
-   * Displays count of potential updates
-   */
   showPotentialUpdates(count: number): void {
     this.confirmation.showPotentialUpdates(count);
   }
 
-  /**
-   * Filters updates by safety buffer
-   */
   async filterByAge(updates: Record<string, string>): Promise<Record<string, string>> {
     return this.registry.filterUpdatesByAge(updates);
   }
 
-  /**
-   * Displays message for no safe updates
-   */
   showNoSafeUpdates(days: number): void {
     this.confirmation.showNoSafeUpdates(days);
   }
 
-  /**
-   * Displays count of safe updates
-   */
   showSafeUpdates(count: number): void {
     this.confirmation.showSafeUpdates(count);
   }
 
-  /**
-   * Groups updates by bump type and builds prompt choices
-   */
   buildChoices(
     updates: Record<string, string>,
     allDependencies: Record<string, string>,
@@ -103,16 +66,10 @@ export class NCUService {
     return { grouped, choices };
   }
 
-  /**
-   * Displays summary of grouped updates
-   */
   showGroupSummary(grouped: GroupedUpdates): void {
     this.confirmation.showGroupSummary(grouped);
   }
 
-  /**
-   * Prompts user to select packages
-   */
   async promptSelection(choices: PromptChoice[]): Promise<PackageSelection[]> {
     return this.confirmation.promptSelection(choices);
   }

@@ -1,13 +1,3 @@
-/**
- * Resolve Version Step
- *
- * Step 1 of add workflow: Resolves the package version
- * - If user specifies version, validates it exists and meets safety buffer
- * - If user doesn't specify version, fetches latest safe version
- * - Handles cases where version is too new
- *
- * @module workflows/steps/ResolveVersionStep
- */
 import type { PackageSpec, ResolvedPackage } from "../add/types";
 import type { IExecutionContext } from "../../context/IExecutionContext";
 import { PackageResolverService } from "../../ncu/PackageResolverService";
@@ -15,21 +5,12 @@ import { logger } from "../../logger";
 import chalk from "chalk";
 import { select } from "@inquirer/prompts";
 
-/**
- * Result of version resolution
- */
 export interface ResolveVersionResult {
-  /** Whether resolution was successful */
   success: boolean;
-  /** Resolved package (if successful) */
   package?: ResolvedPackage;
-  /** Error message (if failed) */
   errorMessage?: string;
 }
 
-/**
- * Resolves package version based on user input and safety buffer
- */
 export class ResolveVersionStep {
   private readonly context: IExecutionContext;
   private readonly resolver: PackageResolverService;
@@ -39,12 +20,6 @@ export class ResolveVersionStep {
     this.resolver = new PackageResolverService(context);
   }
 
-  /**
-   * Executes version resolution
-   *
-   * @param packageSpec - Package specification from user
-   * @returns Resolution result
-   */
   async execute(packageSpec: PackageSpec): Promise<ResolveVersionResult> {
     const spinner = logger.spinner(`Resolving version for ${packageSpec.name}...`);
 

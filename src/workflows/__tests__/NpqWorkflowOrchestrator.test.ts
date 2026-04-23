@@ -2,6 +2,8 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 
 vi.mock("../../npq/NPQRunner");
 vi.mock("../../allowlist/AllowlistReader");
+vi.mock("../../ncu/PackageResolverService");
+vi.mock("../../context/ExecutionContextFactory");
 vi.mock("../../logger", () => ({
   logger: {
     header: vi.fn(),
@@ -16,6 +18,8 @@ vi.mock("../../logger", () => ({
 import { NpqWorkflowOrchestrator } from "../NpqWorkflowOrchestrator";
 import { NPQRunner } from "../../npq/NPQRunner";
 import { AllowlistReader } from "../../allowlist/AllowlistReader";
+import { PackageResolverService } from "../../ncu/PackageResolverService";
+import { ExecutionContextFactory } from "../../context/ExecutionContextFactory";
 
 describe("NpqWorkflowOrchestrator", () => {
   let mockRunner: { checkCapturingOutput: ReturnType<typeof vi.fn> };
@@ -39,6 +43,21 @@ describe("NpqWorkflowOrchestrator", () => {
       return mockAllowlist;
     } as any);
 
+    vi.mocked(ExecutionContextFactory.createWithDefaults).mockReturnValue({
+      cutoff: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000),
+      cutoffIso: new Date().toISOString(),
+      days: 7,
+      allDependencies: {},
+      dependencies: {},
+      devDependencies: {},
+      scripts: {},
+      scriptNames: { lint: "lint", typecheck: "typecheck", test: "test", build: "build" },
+      raw: {},
+      hasScript: vi.fn(),
+      hasPackage: vi.fn(),
+      getPackageVersion: vi.fn(),
+    });
+
     stdoutSpy = vi.spyOn(process.stdout, "write").mockImplementation(() => true);
   });
 
@@ -54,6 +73,7 @@ describe("NpqWorkflowOrchestrator", () => {
       const orchestrator = new NpqWorkflowOrchestrator({
         packageSpec: "lodash@4.17.21",
         json: true,
+        days: 7,
       });
 
       const result = await orchestrator.execute();
@@ -85,6 +105,7 @@ describe("NpqWorkflowOrchestrator", () => {
       const orchestrator = new NpqWorkflowOrchestrator({
         packageSpec: "lodash@4.17.21",
         json: true,
+        days: 7,
       });
 
       const result = await orchestrator.execute();
@@ -111,6 +132,7 @@ describe("NpqWorkflowOrchestrator", () => {
       const orchestrator = new NpqWorkflowOrchestrator({
         packageSpec: "risky@1.0.0",
         json: true,
+        days: 7,
       });
 
       const result = await orchestrator.execute();
@@ -136,6 +158,7 @@ describe("NpqWorkflowOrchestrator", () => {
       const orchestrator = new NpqWorkflowOrchestrator({
         packageSpec: "pkg@1.0.0",
         json: true,
+        days: 7,
       });
 
       const result = await orchestrator.execute();
@@ -147,7 +170,6 @@ describe("NpqWorkflowOrchestrator", () => {
     });
 
     it("does not include issues when NPQ passes", async () => {
-      // When NPQ passes, outputLines is empty (no ERROR/WARNING lines found)
       mockRunner.checkCapturingOutput.mockReturnValue({
         packageSpec: "safe@1.0.0",
         passed: true,
@@ -158,6 +180,7 @@ describe("NpqWorkflowOrchestrator", () => {
       const orchestrator = new NpqWorkflowOrchestrator({
         packageSpec: "safe@1.0.0",
         json: true,
+        days: 7,
       });
 
       await orchestrator.execute();
@@ -176,6 +199,7 @@ describe("NpqWorkflowOrchestrator", () => {
       const orchestrator = new NpqWorkflowOrchestrator({
         packageSpec: "lodash@4.17.21",
         json: true,
+        days: 7,
       });
 
       const result = await orchestrator.execute();
@@ -195,6 +219,7 @@ describe("NpqWorkflowOrchestrator", () => {
       const orchestrator = new NpqWorkflowOrchestrator({
         packageSpec: "lodash@4.17.21",
         json: false,
+        days: 7,
       });
 
       const result = await orchestrator.execute();
@@ -216,6 +241,7 @@ describe("NpqWorkflowOrchestrator", () => {
       const orchestrator = new NpqWorkflowOrchestrator({
         packageSpec: "lodash@4.17.21",
         json: false,
+        days: 7,
       });
 
       await orchestrator.execute();
@@ -234,6 +260,7 @@ describe("NpqWorkflowOrchestrator", () => {
       const orchestrator = new NpqWorkflowOrchestrator({
         packageSpec: "lodash@4.17.21",
         json: false,
+        days: 7,
       });
 
       const result = await orchestrator.execute();
@@ -254,6 +281,7 @@ describe("NpqWorkflowOrchestrator", () => {
       const orchestrator = new NpqWorkflowOrchestrator({
         packageSpec: "lodash@4.17.21",
         json: true,
+        days: 7,
       });
 
       await orchestrator.execute();
@@ -272,6 +300,7 @@ describe("NpqWorkflowOrchestrator", () => {
       const orchestrator = new NpqWorkflowOrchestrator({
         packageSpec: "@vue/reactivity@3.0.0",
         json: true,
+        days: 7,
       });
 
       await orchestrator.execute();
@@ -279,9 +308,16 @@ describe("NpqWorkflowOrchestrator", () => {
       expect(mockAllowlist.check).toHaveBeenCalledWith("@vue/reactivity", ["Warning"]);
     });
 
-    it("handles package spec without version", async () => {
+    it("resolves latest safe version when no version is specified", async () => {
+      const mockResolver = {
+        resolveLatestSafeVersion: vi.fn().mockResolvedValue({ version: "4.17.21", ageInDays: 30 }),
+      };
+      vi.mocked(PackageResolverService).mockImplementation(function (this: any) {
+        return mockResolver;
+      } as any);
+
       mockRunner.checkCapturingOutput.mockReturnValue({
-        packageSpec: "lodash",
+        packageSpec: "lodash@4.17.21",
         passed: true,
         outputLines: [],
       });
@@ -290,11 +326,37 @@ describe("NpqWorkflowOrchestrator", () => {
       const orchestrator = new NpqWorkflowOrchestrator({
         packageSpec: "lodash",
         json: true,
+        days: 7,
       });
 
       await orchestrator.execute();
 
+      expect(mockResolver.resolveLatestSafeVersion).toHaveBeenCalledWith("lodash");
       expect(mockAllowlist.check).toHaveBeenCalledWith("lodash", []);
+      const output = JSON.parse(stdoutSpy.mock.calls[0][0] as string);
+      expect(output.package).toBe("lodash@4.17.21");
+    });
+
+    it("exits 1 when no safe version found for bare package name", async () => {
+      const mockResolver = {
+        resolveLatestSafeVersion: vi.fn().mockResolvedValue({ version: null, tooNew: true }),
+      };
+      vi.mocked(PackageResolverService).mockImplementation(function (this: any) {
+        return mockResolver;
+      } as any);
+
+      const orchestrator = new NpqWorkflowOrchestrator({
+        packageSpec: "lodash",
+        json: true,
+        days: 7,
+      });
+
+      const result = await orchestrator.execute();
+
+      expect(result.exitCode).toBe(1);
+      const output = JSON.parse(stdoutSpy.mock.calls[0][0] as string);
+      expect(output.passed).toBe(false);
+      expect(output.requiresUserDecision).toBe(true);
     });
   });
 });

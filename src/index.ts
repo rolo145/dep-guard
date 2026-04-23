@@ -1,18 +1,3 @@
-/**
- * dep-guard CLI Entry Point
- *
- * Main entry point for the dep-guard command-line tool.
- * Provides safe, security-focused npm dependency management with:
- * - Fresh install from package.json (install subcommand)
- * - Safe dependency updates (update subcommand)
- * - Configurable safety buffer for new versions
- * - NPQ security validation
- * - scfw secure installation
- * - Interactive package selection
- * - Quality checks and build verification
- *
- * @module index
- */
 import { WorkflowOrchestrator } from "./workflows";
 import { BootstrapWorkflowOrchestrator } from "./workflows/BootstrapWorkflowOrchestrator";
 import { AddWorkflowOrchestrator } from "./workflows/AddWorkflowOrchestrator";
@@ -24,9 +9,6 @@ import { ArgumentParser, CLIHelper, PrerequisiteValidator, SubcommandParser } fr
 import { ArgumentValidator } from "./args/ArgumentValidator";
 import { EXIT_CODE_CANCELLED, exitWithError, handleFatalError } from "./errors";
 
-/**
- * Handle graceful shutdown on Ctrl+C (SIGINT) and SIGTERM
- */
 function setupGracefulShutdown(): void {
   const handleShutdown = (signal: string): void => {
     console.log(`\n\nReceived ${signal}. Shutting down gracefully...`);
@@ -38,18 +20,7 @@ function setupGracefulShutdown(): void {
   process.on("SIGTERM", () => handleShutdown("SIGTERM"));
 }
 
-/**
- * Main CLI execution
- *
- * 1. Sets up graceful shutdown handlers
- * 2. Handles --version/-v and --help/-h flags (before subcommand parsing)
- * 3. Parses subcommand (install or update)
- * 4. Parses CLI options
- * 5. Validates required security tools are installed (scfw)
- * 6. Executes appropriate workflow based on subcommand
- */
 (async () => {
-  // Setup Ctrl+C handler
   setupGracefulShutdown();
 
   const rawArgs = process.argv.slice(2);
@@ -83,11 +54,9 @@ function setupGracefulShutdown(): void {
 
   const parser = new ArgumentParser(args, subcommand);
 
-  // Parse CLI options
   const options = parser.parseOrExit();
 
-  // Ensure required security tools (scfw) are installed or fallback is allowed.
-  // npq, quality, and update --dry-run don't use scfw, so skip the prerequisite check.
+  // npq, quality, and update --dry-run don't shell out to scfw, so skip the check.
   const skipPrerequisiteCheck =
     subcommand === "npq" ||
     subcommand === "quality" ||
@@ -96,9 +65,7 @@ function setupGracefulShutdown(): void {
     ? false
     : PrerequisiteValidator.checkPrerequisites(options.allowNpmInstall).useNpmFallback;
 
-  // Route to appropriate workflow based on subcommand
   if (subcommand === "install") {
-    // Run fresh install workflow
     const orchestrator = new BootstrapWorkflowOrchestrator({
       days: options.days,
       scripts: options.scripts,
@@ -107,8 +74,6 @@ function setupGracefulShutdown(): void {
     const result = await orchestrator.execute();
     process.exit(result.exitCode);
   } else if (subcommand === "add") {
-    // Run add package workflow
-    // Validate that exactly one package was specified
     const packageArgs = parser.parsePackageArgs();
 
     if (packageArgs.length === 0) {
@@ -134,7 +99,6 @@ function setupGracefulShutdown(): void {
       );
     }
 
-    // Parse and validate package specification
     let packageSpec;
     try {
       packageSpec = ArgumentValidator.validatePackageName(packageArgs[0]);
@@ -146,8 +110,6 @@ function setupGracefulShutdown(): void {
     }
 
     const saveDev = parser.hasSaveDevFlag();
-
-    // Run add workflow
     const orchestrator = new AddWorkflowOrchestrator({
       packageSpec,
       days: options.days,
@@ -159,16 +121,15 @@ function setupGracefulShutdown(): void {
     const result = await orchestrator.execute();
     process.exit(result.exitCode);
   } else if (subcommand === "npq") {
-    // Run NPQ security check on a single package
     const packageArgs = parser.parsePackageArgs();
 
     if (packageArgs.length === 0) {
       exitWithError(
         "Error: No package specified\n" +
-        "Usage: dep-guard npq <package@version> [--json]\n" +
+        "Usage: dep-guard npq <package[@version]> [--json]\n" +
         "\n" +
         "Example:\n" +
-        "  dep-guard npq lodash@4.17.21\n" +
+        "  dep-guard npq lodash\n" +
         "  dep-guard npq lodash@4.17.21 --json"
       );
     }
@@ -176,22 +137,33 @@ function setupGracefulShutdown(): void {
     if (packageArgs.length > 1) {
       exitWithError(
         "Error: Only one package can be checked at a time\n" +
-        "Usage: dep-guard npq <package@version> [--json]\n" +
+        "Usage: dep-guard npq <package[@version]> [--json]\n" +
         "\n" +
         "Example:\n" +
-        "  dep-guard npq lodash@4.17.21\n" +
+        "  dep-guard npq lodash\n" +
         "  dep-guard npq lodash@4.17.21 --json"
       );
     }
 
+    let packageSpec: string;
+    try {
+      const parsed = ArgumentValidator.validatePackageName(packageArgs[0]);
+      packageSpec = parsed.version ? `${parsed.name}@${parsed.version}` : parsed.name;
+    } catch (error) {
+      if (error instanceof Error) {
+        exitWithError(`Error: ${error.message}`);
+      }
+      throw error;
+    }
+
     const orchestrator = new NpqWorkflowOrchestrator({
-      packageSpec: packageArgs[0],
+      packageSpec,
       json: options.json ?? false,
+      days: options.days,
     });
     const result = await orchestrator.execute();
     process.exit(result.exitCode);
   } else if (subcommand === "scfw") {
-    // Install packages via SCFW
     const packageArgs = parser.parsePackageArgs();
 
     if (packageArgs.length === 0) {
@@ -215,7 +187,6 @@ function setupGracefulShutdown(): void {
     const result = await orchestrator.execute();
     process.exit(result.exitCode);
   } else if (subcommand === "quality") {
-    // Run quality checks standalone
     const orchestrator = new QualityWorkflowOrchestrator({
       scripts: options.scripts,
       days: options.days,
@@ -224,8 +195,6 @@ function setupGracefulShutdown(): void {
     const result = await orchestrator.execute();
     process.exit(result.exitCode);
   } else {
-    // Run update workflow
-    // Validate configured script names and warn about missing ones
     ScriptValidator.validate(options.scripts);
 
     const orchestrator = new WorkflowOrchestrator({

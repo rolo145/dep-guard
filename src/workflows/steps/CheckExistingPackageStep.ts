@@ -1,35 +1,15 @@
-/**
- * Check Existing Package Step
- *
- * Step 2 of add workflow: Checks if package already exists in package.json
- * - Checks both dependencies and devDependencies
- * - If exists, shows current version vs. new version
- * - Offers options: Update / Keep current / Cancel
- * - Handles changing dep type (regular ↔ dev)
- *
- * @module workflows/steps/CheckExistingPackageStep
- */
 import type { ResolvedPackage, PackageToAdd, ExistingPackageInfo } from "../add/types";
 import type { IExecutionContext } from "../../context/IExecutionContext";
 import { logger } from "../../logger";
 import chalk from "chalk";
 import { select } from "@inquirer/prompts";
 
-/**
- * Result of existing package check
- */
 export interface CheckExistingResult {
-  /** Whether to proceed with installation */
   shouldProceed: boolean;
-  /** Package to add (if proceeding) */
   package?: PackageToAdd;
-  /** Reason for not proceeding (if cancelled) */
   cancelReason?: string;
 }
 
-/**
- * Checks if package exists and handles conflicts
- */
 export class CheckExistingPackageStep {
   private readonly context: IExecutionContext;
 
@@ -37,13 +17,6 @@ export class CheckExistingPackageStep {
     this.context = context;
   }
 
-  /**
-   * Executes existing package check
-   *
-   * @param resolved - Resolved package from previous step
-   * @param saveDev - Whether to save as dev dependency
-   * @returns Check result
-   */
   async execute(resolved: ResolvedPackage, saveDev: boolean): Promise<CheckExistingResult> {
     // Check if package exists
     const existing = this.getExistingPackageInfo(resolved.name);
@@ -148,9 +121,6 @@ export class CheckExistingPackageStep {
     };
   }
 
-  /**
-   * Gets information about existing package
-   */
   private getExistingPackageInfo(packageName: string): ExistingPackageInfo {
     // Check dependencies
     if (this.context.dependencies[packageName]) {

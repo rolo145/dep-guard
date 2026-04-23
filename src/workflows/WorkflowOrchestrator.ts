@@ -1,11 +1,3 @@
-/**
- * Workflow Orchestrator
- *
- * Main orchestration class for the safe package update workflow.
- * Coordinates step execution and manages workflow state.
- *
- * @module workflows/WorkflowOrchestrator
- */
 import type { IExecutionContext } from "../context/IExecutionContext";
 import type { WorkflowOptions, WorkflowResult, WorkflowStats, WorkflowStepDef } from "./types";
 import type { IWorkflowStep, StepContext, StepResult, WorkflowServices, StepData } from "./steps";
@@ -34,15 +26,6 @@ import {
   BuildVerificationStep,
 } from "./steps";
 
-/**
- * Orchestrates the update workflow by executing steps in sequence.
- *
- * The orchestrator is responsible for:
- * - Creating the workflow context and services
- * - Instantiating and executing steps in order
- * - Managing state (stats) across steps
- * - Handling early exits and final results
- */
 export class WorkflowOrchestrator {
   private readonly options: WorkflowOptions;
   private readonly context: IExecutionContext;
@@ -50,11 +33,6 @@ export class WorkflowOrchestrator {
   private readonly stats: WorkflowStats;
   private readonly startTime: number;
 
-  /**
-   * Creates a new WorkflowOrchestrator instance.
-   *
-   * @param options - Workflow configuration options
-   */
   constructor(options: WorkflowOptions) {
     this.options = options;
     this.startTime = Date.now();
@@ -72,13 +50,6 @@ export class WorkflowOrchestrator {
     this.stats = this.initializeStats();
   }
 
-  /**
-   * Executes the complete update workflow.
-   *
-   * Handles user cancellation (Ctrl+C) gracefully.
-   *
-   * @returns Promise resolving to workflow result
-   */
   async execute(): Promise<WorkflowResult> {
     try {
       return await this.runSteps();
@@ -87,9 +58,6 @@ export class WorkflowOrchestrator {
     }
   }
 
-  /**
-   * Runs all workflow steps in sequence.
-   */
   private async runSteps(): Promise<WorkflowResult> {
     const stepContext = this.createStepContext();
 
@@ -131,12 +99,6 @@ export class WorkflowOrchestrator {
     return this.createSuccessResult(currentStepData.data as PackageSelection[]);
   }
 
-  /**
-   * Handles user cancellation (Ctrl+C) during prompts.
-   *
-   * @param error - The caught error
-   * @returns WorkflowResult if user cancelled, otherwise re-throws
-   */
   private handleUserCancellation(error: unknown): WorkflowResult {
     if (isUserCancellation(error)) {
       logCancellation();
@@ -147,9 +109,6 @@ export class WorkflowOrchestrator {
     throw error;
   }
 
-  /**
-   * Creates all workflow services.
-   */
   private createServices(): WorkflowServices {
     return {
       ncu: new NCUService(this.context),
@@ -159,9 +118,6 @@ export class WorkflowOrchestrator {
     };
   }
 
-  /**
-   * Initializes workflow statistics.
-   */
   private initializeStats(): WorkflowStats {
     return {
       packagesFound: 0,
@@ -173,9 +129,6 @@ export class WorkflowOrchestrator {
     };
   }
 
-  /**
-   * Creates the context passed to each step.
-   */
   private createStepContext(): StepContext {
     return {
       workflow: this.context,
@@ -185,32 +138,20 @@ export class WorkflowOrchestrator {
     };
   }
 
-  /**
-   * Logs a workflow step.
-   */
   private logStep(stepDef: WorkflowStepDef): void {
     logger.step(stepDef.num, stepDef.total, stepDef.label);
   }
 
-  /**
-   * Creates an early exit result.
-   */
   private createEarlyExitResult(reason: WorkflowResult["reason"]): WorkflowResult {
     this.stats.durationMs = Date.now() - this.startTime;
     return ResultFactory.earlyExit(reason, this.stats);
   }
 
-  /**
-   * Creates a cancellation result with standard SIGINT exit code.
-   */
   private createCancellationResult(): WorkflowResult {
     this.stats.durationMs = Date.now() - this.startTime;
     return ResultFactory.cancelled(this.stats);
   }
 
-  /**
-   * Creates a success result after all steps complete.
-   */
   private createSuccessResult(packagesToInstall: PackageSelection[]): WorkflowResult {
     this.stats.durationMs = Date.now() - this.startTime;
     this.stats.packagesInstalled = packagesToInstall.length;
@@ -225,10 +166,6 @@ export class WorkflowOrchestrator {
     return ResultFactory.success("completed", this.stats);
   }
 
-  /**
-   * Creates result for dry-run mode display.
-   * Displays available updates and exits without installing.
-   */
   private createDryRunResult(organizedData: OrganizeUpdatesOutput): WorkflowResult {
     this.stats.durationMs = Date.now() - this.startTime;
 
@@ -253,9 +190,6 @@ export class WorkflowOrchestrator {
     return ResultFactory.success("completed", this.stats);
   }
 
-  /**
-   * Displays available updates in dry-run mode.
-   */
   private displayDryRunUpdates(grouped: GroupedUpdates): void {
     logger.newLine();
     logger.header("Available Updates", "📋");
@@ -286,9 +220,6 @@ export class WorkflowOrchestrator {
     logger.info("Run 'dep-guard update' without --dry-run to install these updates");
   }
 
-  /**
-   * Displays a single update group.
-   */
   private displayUpdateGroup(
     title: string,
     packages: PackageUpdate[],

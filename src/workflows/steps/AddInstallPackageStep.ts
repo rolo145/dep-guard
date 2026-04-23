@@ -1,13 +1,3 @@
-/**
- * Add Install Package Step
- *
- * Step 4 of add workflow: Installs the package
- * - Installs package using scfw or npm (with --save-dev if needed)
- * - Runs npm ci to reinstall all dependencies
- * - Updates package.json and package-lock.json
- *
- * @module workflows/steps/AddInstallPackageStep
- */
 import type { ConfirmedPackage, InstalledPackage } from "../add/types";
 import type { IExecutionContext } from "../../context/IExecutionContext";
 import { SCFWRunner } from "../../install/scfw/SCFWRunner";
@@ -16,21 +6,12 @@ import { CIInstallService } from "../../install/ci/CIInstallService";
 import { logger } from "../../logger";
 import chalk from "chalk";
 
-/**
- * Result of package installation
- */
 export interface InstallResult {
-  /** Whether installation was successful */
   success: boolean;
-  /** Installed package (if successful) */
   package?: InstalledPackage;
-  /** Error message (if failed) */
   errorMessage?: string;
 }
 
-/**
- * Installs package and reinstalls dependencies
- */
 export class AddInstallPackageStep {
   private readonly context: IExecutionContext;
   private readonly scfwRunner: SCFWRunner | null;
@@ -50,12 +31,6 @@ export class AddInstallPackageStep {
     }
   }
 
-  /**
-   * Executes package installation
-   *
-   * @param confirmed - Confirmed package from previous step
-   * @returns Installation result
-   */
   async execute(confirmed: ConfirmedPackage): Promise<InstallResult> {
     const packageSpec = `${confirmed.name}@${confirmed.version}`;
 
@@ -103,9 +78,6 @@ export class AddInstallPackageStep {
     };
   }
 
-  /**
-   * Installs a single package using scfw or npm
-   */
   private installPackage(packageSpec: string, saveDev: boolean): { success: boolean } {
     if (this.npmRunner) {
       return this.npmRunner.installSingle(packageSpec, saveDev);
@@ -118,9 +90,6 @@ export class AddInstallPackageStep {
     return { success: false };
   }
 
-  /**
-   * Shows installation summary
-   */
   private showSummary(pkg: ConfirmedPackage): void {
     const location = pkg.saveDev ? "devDependencies" : "dependencies";
 
