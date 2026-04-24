@@ -31,6 +31,9 @@ export function tryRunCommand(
   options: SpawnSyncOptions = SPAWN_OPTIONS,
 ): boolean {
   const result = spawnSync(cmd, args, options);
+  if (result.error) {
+    throw new Error(`Failed to spawn "${cmd}": ${result.error.message}`);
+  }
   return result.status === 0;
 }
 

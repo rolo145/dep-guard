@@ -13,6 +13,8 @@ import type { IExecutionContext } from "../context/IExecutionContext";
 import type { ScriptOptions } from "../args/types";
 import { ExecutionContextFactory } from "../context/ExecutionContextFactory";
 import { ResultFactory } from "./ResultFactory";
+import { DEFAULT_SCRIPTS } from "../defaults";
+import { logger } from "../logger";
 
 export interface BootstrapWorkflowOptions {
   /** Number of days for safety buffer (default: 7) */
@@ -45,6 +47,19 @@ export class BootstrapWorkflowOrchestrator {
       days: options.days,
       scripts: options.scripts,
     });
+    this.warnIfScriptFlagsProvided(options.scripts);
+  }
+
+  private warnIfScriptFlagsProvided(scripts: ScriptOptions): void {
+    const nonDefaultFlags = (Object.keys(DEFAULT_SCRIPTS) as (keyof ScriptOptions)[])
+      .filter((key) => scripts[key] !== DEFAULT_SCRIPTS[key])
+      .map((key) => `--${key}`);
+
+    if (nonDefaultFlags.length > 0) {
+      logger.warning(
+        `${nonDefaultFlags.join(", ")} ignored — the install command does not run quality checks`,
+      );
+    }
   }
 
   /**

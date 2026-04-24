@@ -8,6 +8,7 @@
  * @module workflows/ScfwWorkflowOrchestrator
  */
 import type { ScriptOptions } from "../args/types";
+import { ArgumentValidator } from "../args/ArgumentValidator";
 import { ExecutionContextFactory } from "../context/ExecutionContextFactory";
 import { SCFWRunner } from "../install/scfw/SCFWRunner";
 import { NpmInstallRunner } from "../install/npm/NpmInstallRunner";
@@ -59,6 +60,21 @@ export class ScfwWorkflowOrchestrator {
         logger.info("Usage: dep-guard scfw <package@version> [package@version...]");
       }
       return { exitCode: 1 };
+    }
+
+    for (const spec of packageSpecs) {
+      const parsed = ArgumentValidator.validatePackageName(spec);
+      if (!parsed.version) {
+        const error = `"${spec}" must include a version (e.g., ${parsed.name}@1.2.3)`;
+        if (json) {
+          const output: ScfwJsonOutput = { success: false, packages: [], error };
+          process.stdout.write(JSON.stringify(output, null, 2) + "\n");
+        } else {
+          logger.error(error);
+          logger.info("Usage: dep-guard scfw <package@version> [package@version...]");
+        }
+        return { exitCode: 1 };
+      }
     }
 
     const context = ExecutionContextFactory.create({ days, scripts });

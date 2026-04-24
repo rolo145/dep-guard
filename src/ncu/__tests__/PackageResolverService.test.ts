@@ -76,6 +76,33 @@ describe("PackageResolverService", () => {
       expect(result.ageInDays).toBeGreaterThan(0);
     });
 
+    it("returns highest semver version, not most recently published, when branches diverge", async () => {
+      const thirtyDaysAgo = new Date();
+      thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+
+      const fifteenDaysAgo = new Date();
+      fifteenDaysAgo.setDate(fifteenDaysAgo.getDate() - 15);
+
+      mockFetch.mockResolvedValue({
+        ok: true,
+        json: () =>
+          Promise.resolve({
+            versions: {
+              "5.1.1": {},
+              "5.2.0": {},
+            },
+            time: {
+              "5.1.1": fifteenDaysAgo.toISOString(), // more recent date, lower semver
+              "5.2.0": thirtyDaysAgo.toISOString(),  // older date, higher semver
+            },
+          }),
+      });
+
+      const result = await service.resolveLatestSafeVersion("pkg");
+
+      expect(result.version).toBe("5.2.0");
+    });
+
     it("filters out prerelease versions", async () => {
       const oldDate = new Date();
       oldDate.setDate(oldDate.getDate() - 14);

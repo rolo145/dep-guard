@@ -6,5 +6,5 @@
  * @module npq
  */
 export { NPQService } from "./NPQService";
-export { NPQRunner, type NPQCheckResult } from "./NPQRunner";
+export { NPQRunner } from "./NPQRunner";
 export { NPQConfirmation } from "./NPQConfirmation";

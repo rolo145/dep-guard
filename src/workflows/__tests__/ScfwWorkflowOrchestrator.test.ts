@@ -54,6 +54,93 @@ describe("ScfwWorkflowOrchestrator", () => {
     vi.mocked(NpmInstallRunner).mockImplementation(function (this: any) { return mockNpmInstallRunner; } as any);
   });
 
+  describe("execute() - package spec validation", () => {
+    it("rejects a package spec without a version in JSON mode", async () => {
+      const orchestrator = new ScfwWorkflowOrchestrator({
+        packageSpecs: ["lodash"],
+        useNpmFallback: false,
+        days: 7,
+        scripts: SCRIPTS,
+        json: true,
+      });
+
+      const result = await orchestrator.execute();
+
+      expect(result.exitCode).toBe(1);
+      const output = JSON.parse(stdoutSpy.mock.calls[0][0] as string);
+      expect(output.success).toBe(false);
+      expect(output.error).toContain("lodash");
+      expect(mockSCFWRunner.install).not.toHaveBeenCalled();
+    });
+
+    it("rejects a scoped package spec without a version in JSON mode", async () => {
+      const orchestrator = new ScfwWorkflowOrchestrator({
+        packageSpecs: ["@vue/cli"],
+        useNpmFallback: false,
+        days: 7,
+        scripts: SCRIPTS,
+        json: true,
+      });
+
+      const result = await orchestrator.execute();
+
+      expect(result.exitCode).toBe(1);
+      const output = JSON.parse(stdoutSpy.mock.calls[0][0] as string);
+      expect(output.success).toBe(false);
+      expect(mockSCFWRunner.install).not.toHaveBeenCalled();
+    });
+
+    it("rejects unversioned package among valid ones in JSON mode", async () => {
+      const orchestrator = new ScfwWorkflowOrchestrator({
+        packageSpecs: ["lodash@4.17.21", "chalk"],
+        useNpmFallback: false,
+        days: 7,
+        scripts: SCRIPTS,
+        json: true,
+      });
+
+      const result = await orchestrator.execute();
+
+      expect(result.exitCode).toBe(1);
+      const output = JSON.parse(stdoutSpy.mock.calls[0][0] as string);
+      expect(output.success).toBe(false);
+      expect(output.error).toContain("chalk");
+      expect(mockSCFWRunner.install).not.toHaveBeenCalled();
+    });
+
+    it("rejects unversioned package in human-readable mode", async () => {
+      const orchestrator = new ScfwWorkflowOrchestrator({
+        packageSpecs: ["lodash"],
+        useNpmFallback: false,
+        days: 7,
+        scripts: SCRIPTS,
+        json: false,
+      });
+
+      const result = await orchestrator.execute();
+
+      expect(result.exitCode).toBe(1);
+      expect(mockSCFWRunner.install).not.toHaveBeenCalled();
+    });
+
+    it("accepts all versioned packages and proceeds to install", async () => {
+      mockSCFWRunner.install.mockReturnValue({ success: true });
+
+      const orchestrator = new ScfwWorkflowOrchestrator({
+        packageSpecs: ["lodash@4.17.21", "@vue/cli@5.0.0"],
+        useNpmFallback: false,
+        days: 7,
+        scripts: SCRIPTS,
+        json: true,
+      });
+
+      const result = await orchestrator.execute();
+
+      expect(result.exitCode).toBe(0);
+      expect(mockSCFWRunner.install).toHaveBeenCalledWith(["lodash@4.17.21", "@vue/cli@5.0.0"]);
+    });
+  });
+
   describe("execute() - JSON mode", () => {
     it("outputs valid JSON on successful SCFW install", async () => {
       mockSCFWRunner.install.mockReturnValue({

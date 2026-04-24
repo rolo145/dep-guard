@@ -57,6 +57,17 @@ describe("command utilities", () => {
       expect(result).toBeFalsy();
     });
 
+    it("throws when binary is not found (ENOENT)", () => {
+      vi.mocked(spawnSync).mockReturnValue({
+        status: null,
+        error: new Error("spawn npq ENOENT"),
+      } as any);
+
+      expect(() => tryRunCommand("npq", ["install", "lodash@4.17.21", "--dry-run"])).toThrow(
+        'Failed to spawn "npq": spawn npq ENOENT',
+      );
+    });
+
     it("uses custom options when provided", () => {
       vi.mocked(spawnSync).mockReturnValue({ status: 0 } as any);
 

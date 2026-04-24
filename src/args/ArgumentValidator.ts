@@ -54,8 +54,8 @@ export class ArgumentValidator {
     if (isNaN(num)) {
       throw new InvalidFormatError(flag, value, "a positive number");
     }
-    if (num < 0) {
-      throw new OutOfRangeError(flag, num, 0);
+    if (num < 1) {
+      throw new OutOfRangeError(flag, num, 1);
     }
 
     return num;

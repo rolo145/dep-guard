@@ -16,8 +16,15 @@ vi.mock("../../errors", () => ({
   EXIT_CODE_CANCELLED: 130,
 }));
 
+vi.mock("../../logger", () => ({
+  logger: {
+    warning: vi.fn(),
+  },
+}));
+
 import { BootstrapWorkflowOrchestrator } from "../BootstrapWorkflowOrchestrator";
 import * as errors from "../../errors";
+import { logger } from "../../logger";
 
 describe("BootstrapWorkflowOrchestrator", () => {
   const defaultOptions = {
@@ -33,6 +40,31 @@ describe("BootstrapWorkflowOrchestrator", () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
+  });
+
+  describe("execute() - script flag warnings", () => {
+    it("warns when a non-default script name is passed (flags have no effect on install)", async () => {
+      mockServiceInstance.run.mockResolvedValue(true);
+
+      const orchestrator = new BootstrapWorkflowOrchestrator({
+        ...defaultOptions,
+        scripts: { lint: "my-lint", typecheck: "typecheck", test: "test", build: "build" },
+      });
+      await orchestrator.execute();
+
+      expect(vi.mocked(logger.warning)).toHaveBeenCalledWith(
+        expect.stringContaining("--lint"),
+      );
+    });
+
+    it("does not warn when all script names are defaults", async () => {
+      mockServiceInstance.run.mockResolvedValue(true);
+
+      const orchestrator = new BootstrapWorkflowOrchestrator(defaultOptions);
+      await orchestrator.execute();
+
+      expect(vi.mocked(logger.warning)).not.toHaveBeenCalled();
+    });
   });
 
   describe("execute()", () => {

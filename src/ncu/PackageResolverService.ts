@@ -76,11 +76,16 @@ export class PackageResolverService {
         };
       }
 
-      // Sort by publish date (newest first)
+      // Sort by semver (highest version first). Sorting by publish date would cause
+      // downgrades when a package maintains parallel release branches (e.g. a later-published
+      // patch on an older branch would be incorrectly preferred over a newer major).
       const sorted = eligibleVersions.sort((a, b) => {
-        const dateA = new Date(times[a]);
-        const dateB = new Date(times[b]);
-        return dateB.getTime() - dateA.getTime();
+        const partsA = VersionAnalyzer.parseSemver(a);
+        const partsB = VersionAnalyzer.parseSemver(b);
+        if (!partsA || !partsB) return 0;
+        if (partsB.major !== partsA.major) return partsB.major - partsA.major;
+        if (partsB.minor !== partsA.minor) return partsB.minor - partsA.minor;
+        return partsB.patch - partsA.patch;
       });
 
       const latestSafe = sorted[0];

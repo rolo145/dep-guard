@@ -2,6 +2,7 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 import { AddSecurityValidationStep } from "../AddSecurityValidationStep";
 import type { PackageToAdd } from "../../add/types";
 import type { NPQService } from "../../../npq";
+import type { NPQValidationResult } from "../../../npq/NPQService";
 
 // Mock dependencies
 vi.mock("../../../logger", () => ({
@@ -26,19 +27,18 @@ describe("AddSecurityValidationStep", () => {
   });
 
   describe("execute()", () => {
-    it("returns confirmed package when user confirms", async () => {
+    it("returns confirmed package with npqPassed: true when NPQ passes cleanly", async () => {
       const packageToAdd: PackageToAdd = {
         name: "vue",
         version: "3.2.0",
         wasSpecified: false,
         ageInDays: 14,
         saveDev: false,
-        existing: {
-          exists: false,
-        },
+        existing: { exists: false },
       };
 
-      mockNpqService.validateAndConfirm.mockResolvedValue(true);
+      const validationResult: NPQValidationResult = { confirmed: true, npqPassed: true };
+      mockNpqService.validateAndConfirm.mockResolvedValue(validationResult);
 
       const result = await step.execute(packageToAdd);
 
@@ -49,6 +49,25 @@ describe("AddSecurityValidationStep", () => {
         userConfirmed: true,
       });
       expect(mockNpqService.validateAndConfirm).toHaveBeenCalledWith("vue", "3.2.0");
+    });
+
+    it("returns npqPassed: false when user overrides a failing NPQ check", async () => {
+      const packageToAdd: PackageToAdd = {
+        name: "sketchy-pkg",
+        version: "1.0.0",
+        wasSpecified: false,
+        ageInDays: 14,
+        saveDev: false,
+        existing: { exists: false },
+      };
+
+      const validationResult: NPQValidationResult = { confirmed: true, npqPassed: false };
+      mockNpqService.validateAndConfirm.mockResolvedValue(validationResult);
+
+      const result = await step.execute(packageToAdd);
+
+      expect(result.confirmed).toBeTruthy();
+      expect(result.package?.npqPassed).toBe(false);
     });
 
     it("returns not confirmed when user declines", async () => {
@@ -63,7 +82,7 @@ describe("AddSecurityValidationStep", () => {
         },
       };
 
-      mockNpqService.validateAndConfirm.mockResolvedValue(false);
+      mockNpqService.validateAndConfirm.mockResolvedValue({ confirmed: false, npqPassed: false });
 
       const result = await step.execute(packageToAdd);
 
@@ -79,12 +98,10 @@ describe("AddSecurityValidationStep", () => {
         wasSpecified: true,
         ageInDays: 30,
         saveDev: true,
-        existing: {
-          exists: false,
-        },
+        existing: { exists: false },
       };
 
-      mockNpqService.validateAndConfirm.mockResolvedValue(true);
+      mockNpqService.validateAndConfirm.mockResolvedValue({ confirmed: true, npqPassed: true });
 
       const result = await step.execute(packageToAdd);
 
@@ -99,14 +116,10 @@ describe("AddSecurityValidationStep", () => {
         wasSpecified: false,
         ageInDays: 100,
         saveDev: false,
-        existing: {
-          exists: true,
-          currentVersion: "4.17.20",
-          location: "dependencies",
-        },
+        existing: { exists: true, currentVersion: "4.17.20", location: "dependencies" },
       };
 
-      mockNpqService.validateAndConfirm.mockResolvedValue(true);
+      mockNpqService.validateAndConfirm.mockResolvedValue({ confirmed: true, npqPassed: true });
 
       const result = await step.execute(packageToAdd);
 

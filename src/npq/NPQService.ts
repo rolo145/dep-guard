@@ -11,6 +11,11 @@ import type { IExecutionContext } from "../context/IExecutionContext";
 import { NPQRunner } from "./NPQRunner";
 import { NPQConfirmation } from "./NPQConfirmation";
 
+export interface NPQValidationResult {
+  confirmed: boolean;
+  npqPassed: boolean;
+}
+
 /**
  * Service for orchestrating NPQ security validation workflow.
  *
@@ -56,15 +61,16 @@ export class NPQService {
    *
    * @param name - Package name
    * @param version - Package version
-   * @returns True if package passed validation and user confirmed
+   * @returns Result with whether the user confirmed and whether NPQ actually passed
    */
-  async validateAndConfirm(name: string, version: string): Promise<boolean> {
+  async validateAndConfirm(name: string, version: string): Promise<NPQValidationResult> {
     const packageSpec = `${name}@${version}`;
 
     this.confirmation.showPackageHeader(packageSpec);
 
     const npqPassed = this.runSecurityCheck(packageSpec);
-    return this.confirmation.confirm(packageSpec, npqPassed);
+    const confirmed = await this.confirmation.confirm(packageSpec, npqPassed);
+    return { confirmed, npqPassed };
   }
 
   /**
@@ -83,7 +89,7 @@ export class NPQService {
     const packagesToInstall: PackageSelection[] = [];
 
     for (const { name, version } of selected) {
-      const confirmed = await this.validateAndConfirm(name, version);
+      const { confirmed } = await this.validateAndConfirm(name, version);
       if (confirmed) {
         packagesToInstall.push({ name, version });
       }

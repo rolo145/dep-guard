@@ -1,3 +1,18 @@
+## [1.1.0] - 2026-04-23
+
+### Added
+
+- **Three standalone subcommands for automation:**
+  - `dep-guard npq <package[@version]>` — Run an NPQ security check without installing; resolves the latest safe version when `@version` is omitted
+  - `dep-guard scfw <package@version...>` — Install one or more packages directly via scfw
+  - `dep-guard quality` — Run quality checks (lint, typecheck, test, build) standalone
+- **`--json` output** on `npq`, `scfw`, `quality`, and `update --dry-run` for structured parsing in CI pipelines
+- **Allowlist file** (`dep-guard-allowlist.json`) to pre-approve known NPQ warnings — supports `*` wildcards, case-insensitive matching; `requiresUserDecision: false` in JSON output signals automation can proceed without human input
+
+[1.1.0]: https://github.com/rolo145/dep-guard/compare/v1.0.2...v1.1.0
+
+---
+
 ## [1.0.2] - 2026-04-16
 
 ### Fixed

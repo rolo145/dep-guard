@@ -14,6 +14,11 @@ describe("PackageJsonReader", () => {
     it("throws when file does not exist", () => {
       expect(() => new PackageJsonReader("nonexistent.json")).toThrow();
     });
+
+    it("throws a friendly error message when package.json is malformed", () => {
+      const malformedPath = join(__dirname, "fixtures/malformed.json");
+      expect(() => new PackageJsonReader(malformedPath)).toThrow("Could not parse package.json");
+    });
   });
 
   describe("scripts", () => {

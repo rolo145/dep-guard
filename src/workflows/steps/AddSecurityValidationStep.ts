@@ -19,7 +19,7 @@ export class AddSecurityValidationStep {
     logger.newLine();
 
     // Run NPQ validation and get user confirmation
-    const confirmed = await this.npqService.validateAndConfirm(
+    const { confirmed, npqPassed } = await this.npqService.validateAndConfirm(
       packageToAdd.name,
       packageToAdd.version,
     );
@@ -32,12 +32,11 @@ export class AddSecurityValidationStep {
       };
     }
 
-    // User confirmed installation
     return {
       confirmed: true,
       package: {
         ...packageToAdd,
-        npqPassed: true, // If we got here, NPQ passed (user may have overridden)
+        npqPassed,
         userConfirmed: true,
       },
     };
