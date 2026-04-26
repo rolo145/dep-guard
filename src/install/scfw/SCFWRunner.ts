@@ -13,7 +13,7 @@
  * @see https://github.com/DataDog/supply-chain-firewall
  */
 import type { IExecutionContext } from "../../context/IExecutionContext";
-import { tryRunCommand } from "../../utils/command";
+import { runWithOutput } from "../../utils/command";
 
 export interface SCFWInstallResult {
   packageSpecs: string[];
@@ -73,11 +73,16 @@ export class SCFWRunner {
    */
   install(packageSpecs: string[], saveDev: boolean = false): SCFWInstallResult {
     const args = this.buildInstallArgs(packageSpecs, saveDev);
-    const success = tryRunCommand("scfw", args);
+    const { success, output } = runWithOutput("scfw", args);
+
+    // scfw exits 0 even when it blocks an install — check output for the block indicator
+    const blocked = output.includes("installation request was aborted");
+
+    if (output) process.stdout.write(output + "\n");
 
     return {
       packageSpecs,
-      success,
+      success: success && !blocked,
     };
   }
 
