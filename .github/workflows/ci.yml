@@ -19,8 +19,11 @@ jobs:
           node-version: 24
           cache: npm
 
+      - name: Sync lock file for Linux
+        run: npm install --package-lock-only --ignore-scripts
+
       - name: Install dependencies
-        run: npm ci
+        run: npm ci --omit=optional
 
       - name: Build
         run: npm run build
