@@ -18,6 +18,30 @@ dep-guard update --dry-run
 
 ---
 
+## AI Update
+
+A **dep-guard-update skill** is available for AI coding agents (Claude Code and others). It turns dep-guard into a guided, conversational dependency update workflow — the agent discovers available updates, runs security checks, explains risks in plain language, and installs only what you approve.
+
+**What the skill does:**
+
+- Runs `dep-guard update --dry-run --json` and presents updates as a numbered list
+- Runs `dep-guard npq` for each selected package and explains each warning in plain language (low / medium / high risk)
+- Distinguishes allowlisted warnings (proceed silently) from genuine issues (wait for approval)
+- Installs approved packages via `dep-guard scfw` and handles supply chain blocks with context
+- Optionally runs `dep-guard quality` and reports results
+
+**Get the skill:** [github.com/rolo145/rolo-skills](https://github.com/rolo145/rolo-skills)
+
+**Usage in Claude Code:**
+
+```
+/dep-guard-update
+```
+
+The skill file can be installed from the repository above and invoked as a slash command in any Claude Code session.
+
+---
+
 ## Key Features
 
 🔒 **Security-First**
@@ -46,6 +70,7 @@ dep-guard update --dry-run
 - Standalone subcommands for each pipeline stage
 - `--json` output on all subcommands for structured parsing
 - Allowlist file to pre-approve known NPQ warnings
+- [AI agent skill](#ai-update) for guided dependency updates in Claude Code
 
 ---
 
@@ -285,30 +310,6 @@ npm run typecheck
 npm test
 npm run test:coverage
 ```
-
----
-
-## AI Update
-
-A **dep-guard-update skill** is available for AI coding agents (Claude Code and others). It turns dep-guard into a guided, conversational dependency update workflow — the agent discovers available updates, runs security checks, explains risks in plain language, and installs only what you approve.
-
-**What the skill does:**
-
-- Runs `dep-guard update --dry-run --json` and presents updates as a numbered list
-- Runs `dep-guard npq` for each selected package and explains each warning in plain language (low / medium / high risk)
-- Distinguishes allowlisted warnings (proceed silently) from genuine issues (wait for approval)
-- Installs approved packages via `dep-guard scfw` and handles supply chain blocks with context
-- Optionally runs `dep-guard quality` and reports results
-
-**Get the skill:** [github.com/rolo145/rolo-skills](https://github.com/rolo145/rolo-skills)
-
-**Usage in Claude Code:**
-
-```
-/dep-guard-update
-```
-
-The skill file can be installed from the repository above and invoked as a slash command in any Claude Code session.
 
 ---
 
