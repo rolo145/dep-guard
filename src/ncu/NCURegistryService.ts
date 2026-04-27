@@ -115,8 +115,8 @@ export class NCURegistryService {
       // If we can't check (network error, etc.), use suggested version (fail open)
       // This prevents the tool from being unusable due to temporary issues
       if (error instanceof RegistryFetchError || error instanceof RegistryParseError) {
-        // Log the specific error but continue gracefully
-        logger.progress(`Registry error for ${packageName}, using suggested version`);
+        // Warn visibly — safety buffer is being skipped, which users must know about
+        logger.warning(`Registry error for ${packageName} — safety buffer skipped, using suggested version`);
       }
       return suggestedVersion;
     } finally {

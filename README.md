@@ -5,7 +5,7 @@ dep-guard provides secure workflows for installing, updating, and adding npm dep
 
 > dep-guard is intentionally opinionated: it favors security and explicit decisions over speed and convenience.
 
-This is a **stable (1.0.2)** release. Commands and flags are considered stable across 1.x versions.
+This is a **stable (1.1.0)** release. Commands and flags are considered stable across 1.x versions.
 
 ---
 
@@ -15,6 +15,30 @@ This is a **stable (1.0.2)** release. Commands and flags are considered stable a
 npm install -g @roland.botka/dep-guard
 dep-guard update --dry-run
 ```
+
+---
+
+## AI Update
+
+A **dep-guard-update skill** is available for AI coding agents (Claude Code and others). It turns dep-guard into a guided, conversational dependency update workflow — the agent discovers available updates, runs security checks, explains risks in plain language, and installs only what you approve.
+
+**What the skill does:**
+
+- Runs `dep-guard update --dry-run --json` and presents updates as a numbered list
+- Runs `dep-guard npq` for each selected package and explains each warning in plain language (low / medium / high risk)
+- Distinguishes allowlisted warnings (proceed silently) from genuine issues (wait for approval)
+- Installs approved packages via `dep-guard scfw` and handles supply chain blocks with context
+- Optionally runs `dep-guard quality` and reports results
+
+**Get the skill:** [github.com/rolo145/rolo-skills](https://github.com/rolo145/rolo-skills)
+
+**Usage in Claude Code:**
+
+```
+/dep-guard-update
+```
+
+The skill file can be installed from the repository above and invoked as a slash command in any Claude Code session.
 
 ---
 
@@ -41,6 +65,12 @@ dep-guard update --dry-run
 - All installs use `--save-exact` (no `^` or `~`)
 - Reproducible dependency trees
 - Only versions older than the safety buffer are allowed
+
+🤖 **Automation-Friendly**
+- Standalone subcommands for each pipeline stage
+- `--json` output on all subcommands for structured parsing
+- Allowlist file to pre-approve known NPQ warnings
+- [AI agent skill](#ai-update) for guided dependency updates in Claude Code
 
 ---
 
@@ -75,7 +105,7 @@ Safe dependency updates with multiple guardrails.
 **Highlights:**
 - Interactive update selection
 - Per-package NPQ validation
-- `--dry-run` mode (no install, no scfw required)
+- `--dry-run --json` mode outputs structured update list for automation
 - User can cancel at any point (Ctrl+C)
 
 ---
@@ -91,6 +121,96 @@ Add a new dependency with security validation:
 - Installs with `--save-exact`
 - Supports dev dependencies via `-D`
 - One package per invocation
+
+---
+
+### `dep-guard npq <package[@version]>`
+
+Run an NPQ security check on a single package without installing it. If `@version` is omitted, the latest safe version (per the safety buffer) is resolved automatically.
+
+- Checks against the [allowlist file](#allowlist) — known-safe warnings skip user confirmation
+- `--json` outputs structured results for automation
+
+**JSON output:**
+```json
+{
+  "package": "lodash@4.17.21",
+  "passed": false,
+  "requiresUserDecision": true,
+  "issues": [
+    "Supply Chain Security - 3 vulnerabilities found by OSV for lodash",
+    "Supply Chain Security - Unable to verify provenance: the package was published without any attestations"
+  ],
+  "allowlisted": []
+}
+```
+
+- `passed: true` — no issues found
+- `requiresUserDecision: false` — issues exist but all are in the allowlist; proceed automatically
+- `requiresUserDecision: true` — unrecognized issues; show to user before proceeding
+
+---
+
+### `dep-guard scfw <package@version...>`
+
+Install one or more packages via scfw (Supply Chain Firewall).
+
+- `--json` outputs a structured result
+- Multiple packages can be passed in a single invocation
+
+**JSON output:**
+```json
+{
+  "success": true,
+  "packages": ["lodash@4.17.21", "chalk@5.3.0"],
+  "error": null
+}
+```
+
+---
+
+### `dep-guard quality`
+
+Run quality checks (lint, typecheck, test, build) standalone.
+
+- Only runs checks that have a matching npm script
+- Checks with no matching script are reported as skipped (not failures)
+- `--json` outputs per-check results
+
+**JSON output:**
+```json
+{
+  "success": true,
+  "checks": {
+    "lint":      { "ran": true,  "passed": true,  "skipped": false },
+    "typecheck": { "ran": true,  "passed": true,  "skipped": false },
+    "test":      { "ran": true,  "passed": false, "skipped": false },
+    "build":     { "ran": false, "passed": null,  "skipped": true  }
+  }
+}
+```
+
+---
+
+## Allowlist
+
+The allowlist file (`dep-guard-allowlist.json`) maps package names to NPQ warning patterns that your project has accepted. When all issues for a package are allowlisted, `dep-guard npq` sets `requiresUserDecision: false` so automation can proceed without human input.
+
+**Example:**
+```json
+{
+  "lodash": [
+    "Supply Chain Security - Unable to verify provenance: *"
+  ],
+  "chalk": [
+    "Package Health - Detected an old package: *"
+  ]
+}
+```
+
+- Patterns support `*` as a wildcard for variable text (e.g. day counts, version numbers)
+- Matching is case-insensitive
+- Place the file in your project root
 
 ---
 
@@ -121,7 +241,7 @@ NPQ checks run before every install:
 - Package health & maintenance status
 - Provenance verification
 
-Users must explicitly approve risky packages.
+Issues found by NPQ are matched against the allowlist. Unrecognized issues require explicit user approval.
 
 ### Why a Safety Buffer?
 
@@ -143,18 +263,25 @@ dep-guard <command> [options]
 - `install` – Fresh install from package.json
 - `update` – Safe dependency updates
 - `add <package>` – Securely add a dependency
+- `npq <package[@version]>` – Run NPQ security check on a single package
+- `scfw <package@version...>` – Install packages via scfw
+- `quality` – Run quality checks standalone
 
 ### Options
-- `-d, --days <n>` – Safety buffer in days (default: 7)
-- `--allow-npm-install` – Allow npm fallback
-- `--dry-run` – Preview updates without installing (update only)
-- `-D, --save-dev` – Add as dev dependency (add only)
-- `--lint <script>` – Lint script (update only)
-- `--typecheck <script>` – Typecheck script (update only)
-- `--test <script>` – Test script (update only)
-- `--build <script>` – Build script (update only)
-- `-v, --version`
-- `-h, --help`
+
+| Flag | Default | Applies to | Description |
+|---|---|---|---|
+| `-d, --days <n>` | `7` | all | Safety buffer in days. Versions published more recently than this are excluded. Increase for stricter safety, decrease if you need faster access to new releases. |
+| `--allow-npm-install` | off | `install`, `update` | Fall back to plain `npm install` when `scfw` is not available. Not recommended for production workflows — scfw is the preferred install path. |
+| `--dry-run` | off | `update` | Show available updates and their version bumps without installing anything. Combine with `--json` for structured output suitable for automation or AI agents. |
+| `--json` | off | `npq`, `scfw`, `quality`, `update --dry-run` | Output structured JSON instead of interactive output. Intended for automation, CI pipelines, and AI agent integrations. See each command section for the exact schema. |
+| `-D, --save-dev` | off | `add` | Install the package as a dev dependency (`devDependencies`). |
+| `--lint <script>` | `lint` | `update`, `quality` | Name of the npm script to use for linting. If the script is not present in `package.json`, the lint check is skipped gracefully. |
+| `--typecheck <script>` | `typecheck` | `update`, `quality` | Name of the npm script to use for type checking. Skipped if the script is missing. |
+| `--test <script>` | `test` | `update`, `quality` | Name of the npm script to use for running tests. Skipped if the script is missing. |
+| `--build <script>` | `build` | `update`, `quality` | Name of the npm script to use for building. Skipped if the script is missing. |
+| `-v, --version` | — | all | Print the installed dep-guard version and exit. |
+| `-h, --help` | — | all | Print the help message and exit. |
 
 ---
 
@@ -196,4 +323,3 @@ npm run test:coverage
 ## License
 
 MIT (see `LICENSE`)
-

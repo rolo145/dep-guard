@@ -29,7 +29,11 @@ export class PackageJsonReader {
 
   constructor(path: string = FILES.PACKAGE_JSON) {
     const content = fs.readFileSync(path, "utf8");
-    this.data = JSON.parse(content);
+    try {
+      this.data = JSON.parse(content);
+    } catch {
+      throw new Error(`Could not parse package.json: file contains invalid JSON`);
+    }
   }
 
   /**

@@ -11,6 +11,7 @@ vi.mock("../../logger", () => ({
   logger: {
     spinner: vi.fn(() => mockSpinner),
     progress: vi.fn(),
+    warning: vi.fn(),
     newLine: vi.fn(),
   },
 }));
@@ -132,6 +133,16 @@ describe("NCURegistryService", () => {
       const result = await service.filterUpdatesByAge({ lodash: "5.0.0" });
 
       expect(result).toStrictEqual({ lodash: "5.0.0" });
+    });
+
+    it("logs a warning (not progress) when registry fails and safety buffer is skipped", async () => {
+      const { logger } = await import("../../logger");
+      mockFetch.mockResolvedValue({ ok: false, status: 500 });
+
+      await service.filterUpdatesByAge({ lodash: "5.0.0" });
+
+      expect(vi.mocked(logger.warning)).toHaveBeenCalledWith(expect.stringContaining("lodash"));
+      expect(vi.mocked(logger.progress)).not.toHaveBeenCalled();
     });
 
     it("uses suggested version when response is malformed", async () => {

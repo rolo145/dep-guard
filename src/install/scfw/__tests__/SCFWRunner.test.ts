@@ -4,10 +4,10 @@ import { ExecutionContextFactory } from "../../../context/ExecutionContextFactor
 
 // Mock the command utility
 vi.mock("../../../utils/command", () => ({
-  tryRunCommand: vi.fn(),
+  runWithOutput: vi.fn(),
 }));
 
-import { tryRunCommand } from "../../../utils/command";
+import { runWithOutput } from "../../../utils/command";
 
 describe("SCFWRunner", () => {
   const mockContext = ExecutionContextFactory.createMock({
@@ -23,11 +23,11 @@ describe("SCFWRunner", () => {
 
   describe("install()", () => {
     it("executes scfw with correct arguments", () => {
-      vi.mocked(tryRunCommand).mockReturnValue(true);
+      vi.mocked(runWithOutput).mockReturnValue({ success: true, output: "" });
 
       runner.install(["chalk@5.0.0"]);
 
-      expect(tryRunCommand).toHaveBeenCalledWith("scfw", [
+      expect(runWithOutput).toHaveBeenCalledWith("scfw", [
         "run",
         "npm",
         "install",
@@ -40,11 +40,11 @@ describe("SCFWRunner", () => {
     });
 
     it("handles multiple packages", () => {
-      vi.mocked(tryRunCommand).mockReturnValue(true);
+      vi.mocked(runWithOutput).mockReturnValue({ success: true, output: "" });
 
       runner.install(["chalk@5.0.0", "lodash@4.17.21"]);
 
-      expect(tryRunCommand).toHaveBeenCalledWith("scfw", [
+      expect(runWithOutput).toHaveBeenCalledWith("scfw", [
         "run",
         "npm",
         "install",
@@ -58,7 +58,7 @@ describe("SCFWRunner", () => {
     });
 
     it("returns success: true and packageSpecs when command succeeds", () => {
-      vi.mocked(tryRunCommand).mockReturnValue(true);
+      vi.mocked(runWithOutput).mockReturnValue({ success: true, output: "" });
 
       const result = runner.install(["chalk@5.0.0"]);
 
@@ -66,8 +66,20 @@ describe("SCFWRunner", () => {
       expect(result.packageSpecs).toStrictEqual(["chalk@5.0.0"]);
     });
 
-    it("returns success: false when command fails", () => {
-      vi.mocked(tryRunCommand).mockReturnValue(false);
+    it("returns success: false when scfw outputs block message (exits 0 but aborted)", () => {
+      vi.mocked(runWithOutput).mockReturnValue({
+        success: true, // scfw exits 0 even when blocking
+        output: "The installation request was aborted. No changes have been made.",
+      });
+
+      const result = runner.install(["lodash@4.17.21"]);
+
+      expect(result.success).toBe(false);
+      expect(result.packageSpecs).toStrictEqual(["lodash@4.17.21"]);
+    });
+
+    it("returns success: false when command exits non-zero", () => {
+      vi.mocked(runWithOutput).mockReturnValue({ success: false, output: "some error" });
 
       const result = runner.install(["chalk@5.0.0"]);
 
@@ -78,22 +90,22 @@ describe("SCFWRunner", () => {
 
   describe("installSingle()", () => {
     it("delegates to install with single package array", () => {
-      vi.mocked(tryRunCommand).mockReturnValue(true);
+      vi.mocked(runWithOutput).mockReturnValue({ success: true, output: "" });
 
       const result = runner.installSingle("chalk@5.0.0");
 
-      expect(tryRunCommand).toHaveBeenCalledWith("scfw", expect.arrayContaining(["chalk@5.0.0"]));
+      expect(runWithOutput).toHaveBeenCalledWith("scfw", expect.arrayContaining(["chalk@5.0.0"]));
       expect(result.packageSpecs).toStrictEqual(["chalk@5.0.0"]);
     });
   });
 
   describe("--save-dev flag", () => {
     it("includes --save-dev flag when saveDev is true", () => {
-      vi.mocked(tryRunCommand).mockReturnValue(true);
+      vi.mocked(runWithOutput).mockReturnValue({ success: true, output: "" });
 
       runner.install(["typescript@5.0.0"], true);
 
-      expect(tryRunCommand).toHaveBeenCalledWith("scfw", [
+      expect(runWithOutput).toHaveBeenCalledWith("scfw", [
         "run",
         "npm",
         "install",
@@ -107,11 +119,11 @@ describe("SCFWRunner", () => {
     });
 
     it("omits --save-dev flag when saveDev is false", () => {
-      vi.mocked(tryRunCommand).mockReturnValue(true);
+      vi.mocked(runWithOutput).mockReturnValue({ success: true, output: "" });
 
       runner.install(["typescript@5.0.0"], false);
 
-      expect(tryRunCommand).toHaveBeenCalledWith("scfw", [
+      expect(runWithOutput).toHaveBeenCalledWith("scfw", [
         "run",
         "npm",
         "install",
@@ -124,11 +136,11 @@ describe("SCFWRunner", () => {
     });
 
     it("omits --save-dev flag when saveDev is not provided", () => {
-      vi.mocked(tryRunCommand).mockReturnValue(true);
+      vi.mocked(runWithOutput).mockReturnValue({ success: true, output: "" });
 
       runner.install(["typescript@5.0.0"]);
 
-      expect(tryRunCommand).toHaveBeenCalledWith("scfw", [
+      expect(runWithOutput).toHaveBeenCalledWith("scfw", [
         "run",
         "npm",
         "install",
@@ -141,11 +153,11 @@ describe("SCFWRunner", () => {
     });
 
     it("includes --save-dev flag in installSingle when saveDev is true", () => {
-      vi.mocked(tryRunCommand).mockReturnValue(true);
+      vi.mocked(runWithOutput).mockReturnValue({ success: true, output: "" });
 
       runner.installSingle("typescript@5.0.0", true);
 
-      expect(tryRunCommand).toHaveBeenCalledWith("scfw", expect.arrayContaining(["--save-dev"]));
+      expect(runWithOutput).toHaveBeenCalledWith("scfw", expect.arrayContaining(["--save-dev"]));
     });
   });
 });

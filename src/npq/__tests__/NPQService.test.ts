@@ -151,22 +151,34 @@ describe("NPQService", () => {
       expect(mockConfirmationInstance.confirm).toHaveBeenCalledWith("lodash@5.0.0", true);
     });
 
-    it("returns true when user confirms", async () => {
+    it("returns confirmed: true and npqPassed: true when NPQ passes and user confirms", async () => {
       mockRunnerInstance.checkCapturingOutput.mockReturnValue({ packageSpec: "lodash@5.0.0", passed: true, outputLines: [] });
       mockConfirmationInstance.confirm.mockResolvedValue(true);
 
       const result = await service.validateAndConfirm("lodash", "5.0.0");
 
-      expect(result).toBeTruthy();
+      expect(result.confirmed).toBe(true);
+      expect(result.npqPassed).toBe(true);
     });
 
-    it("returns false when user declines", async () => {
+    it("returns confirmed: false and npqPassed: true when user declines a clean package", async () => {
       mockRunnerInstance.checkCapturingOutput.mockReturnValue({ packageSpec: "lodash@5.0.0", passed: true, outputLines: [] });
       mockConfirmationInstance.confirm.mockResolvedValue(false);
 
       const result = await service.validateAndConfirm("lodash", "5.0.0");
 
-      expect(result).toBeFalsy();
+      expect(result.confirmed).toBe(false);
+      expect(result.npqPassed).toBe(true);
+    });
+
+    it("returns confirmed: true and npqPassed: false when user overrides a failing check", async () => {
+      mockRunnerInstance.checkCapturingOutput.mockReturnValue({ packageSpec: "bad@1.0.0", passed: false, outputLines: ["Supply Chain Security - Malware"] });
+      mockConfirmationInstance.confirm.mockResolvedValue(true);
+
+      const result = await service.validateAndConfirm("bad", "1.0.0");
+
+      expect(result.confirmed).toBe(true);
+      expect(result.npqPassed).toBe(false);
     });
   });
 

@@ -38,8 +38,8 @@ describe("ArgumentValidator", () => {
       expect(validator.validateNumeric("--days", "7")).toBe(7);
     });
 
-    it("returns 0 for zero input", () => {
-      expect(validator.validateNumeric("--days", "0")).toBe(0);
+    it("throws OutOfRangeError for zero (minimum is 1)", () => {
+      expect(() => validator.validateNumeric("--days", "0")).toThrow(OutOfRangeError);
     });
 
     it("parses large numbers correctly", () => {

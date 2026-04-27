@@ -1,3 +1,31 @@
+## [1.1.0] - 2026-04-23
+
+### Added
+
+- **Three standalone subcommands for automation:**
+  - `dep-guard npq <package[@version]>` — Run an NPQ security check without installing; resolves the latest safe version when `@version` is omitted
+  - `dep-guard scfw <package@version...>` — Install one or more packages directly via scfw
+  - `dep-guard quality` — Run quality checks (lint, typecheck, test, build) standalone
+- **`--json` output** on `npq`, `scfw`, `quality`, and `update --dry-run` for structured parsing in CI pipelines
+- **Allowlist file** (`dep-guard-allowlist.json`) to pre-approve known NPQ warnings — supports `*` wildcards, case-insensitive matching; `requiresUserDecision: false` in JSON output signals automation can proceed without human input
+
+### Fixed
+
+- `dep-guard scfw` now rejects package specs without a version (e.g. `scfw lodash`) — previously forwarded bare names to npm, bypassing the safety buffer
+- `SCFWRunner` now correctly reports `success: false` when scfw blocks an install due to CVEs — scfw exits 0 even when blocking, so output is now parsed for the block indicator
+- `PackageResolverService` (used by `add` and `npq`) now sorts eligible versions by semver instead of publish date, fixing incorrect version selection on packages with parallel release branches
+- `tryRunCommand` now throws a clear error when a required binary is not on PATH, instead of silently returning false
+- `validateAndConfirm` now returns the actual `npqPassed` status — the install summary no longer falsely reports "NPQ passed" when the user overrode a failing check
+- Registry errors during the update safety-buffer check now log at warning level (was `progress`, hidden in CI) so skipped buffers are always visible
+- `--days 0` is now rejected with a clear error — minimum safety buffer is 1 day
+- Malformed `package.json` now produces a friendly error instead of a raw `SyntaxError`
+- `dep-guard install` now warns when `--lint`, `--typecheck`, `--test`, or `--build` flags are passed, as they have no effect on the install command
+- Removed unreliable `NPQRunner.check()` and `checkBatch()` methods that reported pass/fail based on exit code (NPQ always exits 0 in dry-run mode)
+
+[1.1.0]: https://github.com/rolo145/dep-guard/compare/v1.0.2...v1.1.0
+
+---
+
 ## [1.0.2] - 2026-04-16
 
 ### Fixed
