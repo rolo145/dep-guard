@@ -5,7 +5,7 @@ dep-guard provides secure workflows for installing, updating, and adding npm dep
 
 > dep-guard is intentionally opinionated: it favors security and explicit decisions over speed and convenience.
 
-This is a **stable (1.1.0)** release. Commands and flags are considered stable across 1.x versions.
+This is a **stable (1.1.1)** release. Commands and flags are considered stable across 1.x versions.
 
 ---
 
@@ -218,6 +218,7 @@ The allowlist file (`dep-guard-allowlist.json`) maps package names to NPQ warnin
 
 - Node.js **>= 24**
 - npm
+- Works on macOS, Linux, and Windows
 - **scfw** (Supply Chain Firewall) — **strongly recommended**
   - Install via `pipx install scfw` (recommended) or `pip install scfw`
   - https://github.com/DataDog/supply-chain-firewall
