@@ -1,3 +1,13 @@
+## [1.1.2] - 2026-06-25
+
+### Documentation
+
+- Corrected the version string in the README and noted cross-platform (macOS, Linux, Windows) support. No code changes from 1.1.1 — this patch only ships the updated README to the npm package page
+
+[1.1.2]: https://github.com/rolo145/dep-guard/compare/v1.1.1...v1.1.2
+
+---
+
 ## [1.1.1] - 2026-06-25
 
 ### Fixed
