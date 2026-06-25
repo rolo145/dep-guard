@@ -5,17 +5,18 @@
  *
  * @module utils/command
  */
-import {
-  spawnSync,
-  type SpawnSyncOptions,
-} from "child_process";
+import { type SpawnSyncOptions } from "child_process";
+import spawn from "cross-spawn";
 
 /**
- * Standard spawn options for child processes
+ * Standard spawn options for child processes.
+ *
+ * Note: commands are spawned via cross-spawn, which resolves platform-specific
+ * launchers (e.g. `npm.cmd` on Windows) without a shell. This keeps argument
+ * passing literal and injection-safe across platforms — do not add `shell: true`.
  */
 const SPAWN_OPTIONS: SpawnSyncOptions = {
   stdio: "inherit",
-  shell: false,
 } as const;
 
 /**
@@ -30,7 +31,7 @@ export function tryRunCommand(
   args: string[],
   options: SpawnSyncOptions = SPAWN_OPTIONS,
 ): boolean {
-  const result = spawnSync(cmd, args, options);
+  const result = spawn.sync(cmd, args, options);
   if (result.error) {
     throw new Error(`Failed to spawn "${cmd}": ${result.error.message}`);
   }
@@ -44,7 +45,7 @@ export function tryRunCommand(
  * @returns success status and captured stdout+stderr text
  */
 export function runWithOutput(cmd: string, args: string[]): { success: boolean; output: string } {
-  const result = spawnSync(cmd, args, { stdio: "pipe", shell: false, encoding: "utf-8" });
+  const result = spawn.sync(cmd, args, { stdio: "pipe", encoding: "utf-8" });
 
   if (result.error) {
     throw new Error(`Failed to spawn "${cmd}": ${result.error.message}`);

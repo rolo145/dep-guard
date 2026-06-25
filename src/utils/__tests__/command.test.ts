@@ -1,11 +1,13 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 
-vi.mock("child_process", () => ({
-  spawnSync: vi.fn(),
+vi.mock("cross-spawn", () => ({
+  default: { sync: vi.fn() },
 }));
 
 import { tryRunCommand, runWithOutput } from "../command";
-import { spawnSync } from "child_process";
+import spawn from "cross-spawn";
+
+const spawnSync = spawn.sync;
 
 describe("command utilities", () => {
   beforeEach(() => {
@@ -21,7 +23,7 @@ describe("command utilities", () => {
       expect(spawnSync).toHaveBeenCalledWith(
         "npm",
         ["install", "lodash"],
-        { stdio: "inherit", shell: false }
+        { stdio: "inherit" }
       );
     });
 
@@ -85,7 +87,7 @@ describe("command utilities", () => {
       expect(spawnSync).toHaveBeenCalledWith(
         "node",
         [],
-        { stdio: "inherit", shell: false }
+        { stdio: "inherit" }
       );
       expect(result).toBeTruthy();
     });
@@ -98,7 +100,7 @@ describe("command utilities", () => {
       expect(spawnSync).toHaveBeenCalledWith(
         "git",
         ["commit", "-m", "test message", "--no-verify"],
-        { stdio: "inherit", shell: false }
+        { stdio: "inherit" }
       );
     });
 
@@ -110,7 +112,7 @@ describe("command utilities", () => {
       expect(spawnSync).toHaveBeenCalledWith(
         "echo",
         ["hello world", "foo=bar", "--flag=value"],
-        { stdio: "inherit", shell: false }
+        { stdio: "inherit" }
       );
     });
   });
@@ -124,7 +126,7 @@ describe("command utilities", () => {
       expect(spawnSync).toHaveBeenCalledWith(
         "npm",
         ["--version"],
-        { stdio: "pipe", shell: false, encoding: "utf-8" }
+        { stdio: "pipe", encoding: "utf-8" }
       );
     });
 
