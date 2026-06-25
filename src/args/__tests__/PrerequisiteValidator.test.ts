@@ -1,11 +1,13 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
-import { spawnSync } from "child_process";
+import spawn from "cross-spawn";
 import { PrerequisiteValidator } from "../PrerequisiteValidator";
 
-// Mock child_process
-vi.mock("child_process", () => ({
-  spawnSync: vi.fn(),
+// Mock cross-spawn (used to spawn the prerequisite checks cross-platform)
+vi.mock("cross-spawn", () => ({
+  default: { sync: vi.fn() },
 }));
+
+const spawnSync = spawn.sync;
 
 // Mock logger to avoid console output during tests
 vi.mock("../../logger", () => ({
@@ -50,7 +52,6 @@ describe("PrerequisiteValidator", () => {
 
       expect(spawnSync).toHaveBeenCalledWith("scfw", ["--version"], {
         stdio: "ignore",
-        shell: false,
       });
     });
 

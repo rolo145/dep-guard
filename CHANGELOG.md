@@ -1,3 +1,13 @@
+## [1.1.1] - 2026-06-25
+
+### Fixed
+
+- **Windows compatibility** — `dep-guard` now works on Windows. External commands (`npm`, `npq`, `scfw`) are spawned through cross-spawn, which resolves the `.cmd` launchers Windows uses; previously every invocation failed immediately with a spawn error, starting with the prerequisite check
+
+[1.1.1]: https://github.com/rolo145/dep-guard/compare/v1.1.0...v1.1.1
+
+---
+
 ## [1.1.0] - 2026-04-23
 
 ### Added

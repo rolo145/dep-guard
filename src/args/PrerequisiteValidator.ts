@@ -6,7 +6,7 @@
  *
  * @module args/PrerequisiteValidator
  */
-import { spawnSync } from "child_process";
+import spawn from "cross-spawn";
 import chalk from "chalk";
 import { logger } from "../logger";
 import { PrerequisiteError } from "../errors";
@@ -25,9 +25,8 @@ export interface PrerequisiteCheckResult {
  * Checks if a command is available in the system PATH
  */
 export function isCommandAvailable(command: string): boolean {
-  const result = spawnSync(command, ["--version"], {
+  const result = spawn.sync(command, ["--version"], {
     stdio: "ignore",
-    shell: false,
   });
   return result.status === 0;
 }
